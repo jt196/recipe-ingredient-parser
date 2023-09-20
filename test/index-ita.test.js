@@ -1,5 +1,6 @@
-import {expect} from 'chai';
 import {multiLineParse, parse} from '../src/index';
+
+/* global expect, it, describe */
 
 describe('recipe parser ita', () => {
   it('returns an object', () => {

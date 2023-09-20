@@ -1,16 +1,13 @@
-import {i18nMap, SupportedLanguages} from './i18n';
+import {i18nMap} from './i18n';
 
-function keepThreeDecimals(val: number, delimiter: string) {
+function keepThreeDecimals(val, delimiter) {
   const strVal = val.toString();
   return (
     strVal.split('.')[0] + delimiter + strVal.split('.')[1].substring(0, 3)
   );
 }
 
-export function convertFromFraction(
-  value: string,
-  language: SupportedLanguages,
-): string {
+export function convertFromFraction(value, language) {
   const {isCommaDelimited} = i18nMap[language];
 
   const delimiter = isCommaDelimited ? ',' : '.';
@@ -32,12 +29,12 @@ export function convertFromFraction(
   }
 }
 
-export function getFirstMatch(line: string, regex: RegExp) {
+export function getFirstMatch(line, regex) {
   const match = line.match(regex);
   return (match && match[0]) || '';
 }
 
-const unicodeObj: {[key: string]: string} = {
+const unicodeObj = {
   '½': '1/2',
   '⅓': '1/3',
   '⅔': '2/3',
@@ -57,9 +54,9 @@ const unicodeObj: {[key: string]: string} = {
   '⅑': '1/9',
   '⅒': '1/10',
 };
-export function text2num(s: string, language: SupportedLanguages) {
+export function text2num(s, language) {
   const a = s.toString().split(/[\s-]+/);
-  let values: number[] = [0, 0];
+  let values = [0, 0];
   a.forEach(x => {
     values = feach(x, values[0], values[1], language);
   });
@@ -70,12 +67,7 @@ export function text2num(s: string, language: SupportedLanguages) {
   }
 }
 
-export function feach(
-  w: string,
-  g: number,
-  n: number,
-  language: SupportedLanguages,
-): number[] {
+export function feach(w, g, n, language) {
   const {numbersSmall, numbersMagnitude} = i18nMap[language];
 
   let x = numbersSmall[w];
@@ -99,10 +91,7 @@ export function feach(
   return [g, n];
 }
 
-export function findQuantityAndConvertIfUnicode(
-  ingredientLine: string,
-  language: SupportedLanguages,
-) {
+export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   const {joiners, isCommaDelimited} = i18nMap[language];
 
   // Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"

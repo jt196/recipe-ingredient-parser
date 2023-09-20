@@ -1,5 +1,7 @@
 import {parse} from '../src/index';
 
+/* global expect, it, describe */
+
 describe('recipe parser eng', () => {
   it('returns an object', () => {
     expect(typeof parse('1 cup water', 'eng')).to.equal('object');

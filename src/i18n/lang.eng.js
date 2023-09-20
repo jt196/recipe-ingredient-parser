@@ -1,5 +1,3 @@
-import {LanguageConfig} from './interfaces';
-
 const units = {
   clove: ['clove'],
   gallon: ['gallon', 'gal'],
@@ -29,7 +27,7 @@ const units = {
   large: ['large'],
   handful: ['handful'],
   inch: ['inch'],
-} as {[key: string]: string[]};
+};
 
 const pluralUnits = {
   cup: 'cups',
@@ -58,7 +56,7 @@ const pluralUnits = {
   large: 'large',
   handful: 'handfuls',
   inch: 'inches',
-} as {[key: string]: string};
+};
 
 const symbolUnits = {
   cup: 'c',
@@ -84,7 +82,7 @@ const symbolUnits = {
   stick: '',
   handful: '',
   inch: '',
-} as {[key: string]: string};
+};
 
 const prepositions = ['of'];
 
@@ -92,7 +90,7 @@ const joiners = ['to'];
 
 const toTaste = ['to taste'];
 
-const numbersSmall: {[key: string]: number} = {
+const numbersSmall = {
   zero: 0,
   one: 1,
   two: 2,
@@ -123,7 +121,7 @@ const numbersSmall: {[key: string]: number} = {
   ninety: 90,
 };
 
-const numbersMagnitude: {[key: string]: number} = {
+const numbersMagnitude = {
   hundred: 100,
   thousand: 1000,
   million: 1000000,
@@ -131,7 +129,7 @@ const numbersMagnitude: {[key: string]: number} = {
   trillion: 1000000000000,
 };
 
-export const LangEng: LanguageConfig = {
+export const LangEng = {
   units,
   pluralUnits,
   symbolUnits,

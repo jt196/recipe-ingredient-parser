@@ -1,5 +1,3 @@
-import {LanguageConfig} from './interfaces';
-
 const units = {
   Pack: ['pack', 'packung', 'pck', 'pck.', 'päckchen'],
   Messerspitze: ['messerspitze', 'msp', 'msp.'],
@@ -26,7 +24,7 @@ const units = {
   Schuss: ['schuss', 'schusse', 'schüsse', 'schuss(e)', 'schuss/e', 'schuß'],
   Flasche: ['flaschen', 'flasche', 'flasche(n)', 'flasche/n'],
   Bund: ['bund', 'bunde', 'bund(e)', 'bund/e'],
-} as {[key: string]: string[]};
+};
 
 const pluralUnits = {
   Pack: 'Packung',
@@ -54,7 +52,7 @@ const pluralUnits = {
   Schuss: 'Schuss',
   Flasche: 'Flaschen',
   Bund: 'Bund',
-} as {[key: string]: string};
+};
 
 const symbolUnits = {
   Pack: 'Pck',
@@ -82,14 +80,14 @@ const symbolUnits = {
   Schuss: '',
   Flasche: '',
   Bund: '',
-} as {[key: string]: string};
+};
 
 const prepositions = ['von'];
 const joiners = ['bis'];
 
-const toTaste: string[] = [];
+const toTaste = [];
 
-const numbersSmall: {[key: string]: number} = {
+const numbersSmall = {
   null: 0,
   ein: 1,
   eins: 1,
@@ -123,7 +121,7 @@ const numbersSmall: {[key: string]: number} = {
   neunzig: 90,
 };
 
-const numbersMagnitude: {[key: string]: number} = {
+const numbersMagnitude = {
   hundert: 100,
   tausend: 1000,
   million: 1000000,
@@ -131,7 +129,7 @@ const numbersMagnitude: {[key: string]: number} = {
   billion: 1000000000000,
 };
 
-export const LangDeu: LanguageConfig = {
+export const LangDeu = {
   units,
   pluralUnits,
   symbolUnits,

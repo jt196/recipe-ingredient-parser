@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "lib": ["es5","es6", "dom"],
+    "lib": ["es5", "es6", "dom"],
     "sourceMap": true,
     "outDir": "./lib",
     "rootDir": "./src",
@@ -16,15 +16,17 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": "./",
     "paths": {
-      "*": [
-        "node_modules/@types/*"
-      ]
+      "*": ["node_modules/@types/*"]
     }
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/convert.js",
+    "src/index.js",
+    "src/repeatingFractions.js",
+    "src/i18n/lang.eng.js",
+    "src/i18n/lang.deu.js",
+    "src/i18n/index.js"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

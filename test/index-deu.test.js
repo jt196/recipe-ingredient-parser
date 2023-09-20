@@ -1,5 +1,6 @@
-import {expect} from 'chai';
 import {parse} from '../src/index';
+
+/* global expect, it, describe */
 
 describe('recipe parser deu', () => {
   it('returns an object', () => {

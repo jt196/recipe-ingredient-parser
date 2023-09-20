@@ -1,20 +1,8 @@
 import * as convert from './convert';
-import {SupportedLanguages, i18nMap} from './i18n';
+import {i18nMap} from './i18n';
 import {repeatingFractions} from './repeatingFractions';
 
-export interface Ingredient {
-  ingredient: string;
-  quantity: number | null;
-  unit: string | null;
-  symbol: string | null;
-  minQty: number | null;
-  maxQty: number | null;
-}
-
-export function toTasteRecognize(
-  input: string,
-  language: SupportedLanguages,
-): [string, string, boolean] {
+export function toTasteRecognize(input, language) {
   const {toTaste} = i18nMap[language];
 
   for (const toTasteItem of toTaste) {
@@ -46,11 +34,11 @@ export function toTasteRecognize(
   return ['', '', false];
 }
 
-function getUnit(input: string, language: SupportedLanguages): string[] {
+function getUnit(input, language) {
   const {units, pluralUnits, symbolUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
-  const res = (response: string[]) => {
+  const res = response => {
     const symbol = symbolUnits[response[0]];
     response.splice(2, 0, symbol);
     return response;
@@ -91,7 +79,7 @@ function getUnit(input: string, language: SupportedLanguages): string[] {
 
 /* return the proposition if it's used before of the name of
 the ingredient */
-function getPreposition(input: string, language: SupportedLanguages) {
+function getPreposition(input, language) {
   const {prepositions} = i18nMap[language];
 
   for (const preposition of prepositions) {
@@ -104,14 +92,14 @@ function getPreposition(input: string, language: SupportedLanguages) {
   return null;
 }
 
-function convertToNumber(input: string, language: SupportedLanguages): number {
+function convertToNumber(input, language) {
   const {isCommaDelimited} = i18nMap[language];
   if (!input) return 0;
 
   return +input.replace(isCommaDelimited ? /\./ : /,/, '').replace(/,/, '.');
 }
 
-export function parse(recipeString: string, language: SupportedLanguages) {
+export function parse(recipeString, language) {
   const ingredientLine = recipeString.trim(); // removes leading and trailing whitespace
 
   /* restOfIngredient represents rest of ingredient line.
@@ -119,7 +107,7 @@ export function parse(recipeString: string, language: SupportedLanguages) {
   let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
     ingredientLine,
     language,
-  ) as string[];
+  );
   quantity = convert.convertFromFraction(quantity, language);
 
   /* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
@@ -133,7 +121,7 @@ export function parse(recipeString: string, language: SupportedLanguages) {
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
     restOfIngredient,
     language,
-  ) as string[];
+  );
 
   // remove unit from the ingredient if one was found and trim leading and trailing whitespace
   let ingredient = originalUnit
@@ -168,16 +156,13 @@ export function parse(recipeString: string, language: SupportedLanguages) {
   };
 }
 
-export function multiLineParse(
-  recipeString: string,
-  language: SupportedLanguages,
-) {
+export function multiLineParse(recipeString, language) {
   const ingredients = recipeString.split(/[,👉🏻👉\r\n-]/); // eslint-disable-line no-misleading-character-class
 
   return ingredients.map(x => parse(x, language)).filter(x => x['ingredient']);
 }
 
-export function combine(ingredientArray: Ingredient[]): Ingredient[] {
+export function combine(ingredientArray) {
   const combinedIngredients = ingredientArray.reduce((acc, ingredient) => {
     const key = ingredient.ingredient + ingredient.unit; // when combining different units, remove this from the key and just use the name
     const existingIngredient = acc[key];
@@ -189,20 +174,17 @@ export function combine(ingredientArray: Ingredient[]): Ingredient[] {
     } else {
       return Object.assign(acc, {[key]: ingredient});
     }
-  }, {} as {[key: string]: Ingredient});
+  }, {});
 
   return Object.keys(combinedIngredients)
     .reduce((acc, key) => {
       const ingredient = combinedIngredients[key];
       return acc.concat(ingredient);
-    }, [] as Ingredient[])
+    }, [])
     .sort(compareIngredients);
 }
 
-export function prettyPrintingPress(
-  ingredient: Ingredient,
-  language: SupportedLanguages,
-): string {
+export function prettyPrintingPress(ingredient, language) {
   let quantityString = '';
   let unit = ingredient.unit;
   if (ingredient.quantity) {
@@ -247,7 +229,7 @@ export function prettyPrintingPress(
   return `${quantityString}${unit ? ' ' + unit : ''} ${ingredient.ingredient}`;
 }
 
-function gcd(a: number, b: number): number {
+function gcd(a, b) {
   if (b < 0.0000001) {
     return a;
   }
@@ -256,10 +238,7 @@ function gcd(a: number, b: number): number {
 }
 
 // TODO: Maybe change this to existingIngredients: Ingredient | Ingredient[]
-function combineTwoIngredients(
-  existingIngredients: Ingredient,
-  ingredient: Ingredient,
-): Ingredient {
+function combineTwoIngredients(existingIngredients, ingredient) {
   const quantity =
     existingIngredients.quantity !== null && ingredient.quantity !== null
       ? Number(existingIngredients.quantity) + Number(ingredient.quantity)
@@ -275,7 +254,7 @@ function combineTwoIngredients(
   return Object.assign({}, existingIngredients, {quantity, minQty, maxQty});
 }
 
-function compareIngredients(a: Ingredient, b: Ingredient) {
+function compareIngredients(a, b) {
   if (a.ingredient === b.ingredient) {
     return 0;
   }

@@ -1,5 +1,6 @@
-import {expect} from 'chai';
-import {combine, Ingredient, prettyPrintingPress} from '../src/index';
+import {combine, prettyPrintingPress} from '../src/index';
+
+/* global expect, it, describe */
 
 describe('combine ingredients', () => {
   it('accepts an empty array', () => {
@@ -7,7 +8,7 @@ describe('combine ingredients', () => {
   });
 
   it('returns sorted ingredients', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -46,7 +47,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines two ingredient objects into one', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -77,7 +78,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines three ingredient objects into one', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -116,7 +117,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines four ingredient objects into two', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -171,7 +172,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines 2 ingredients that have a quantity range', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -202,7 +203,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines 1 ingredient with no range, and 1 with a range', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 10,
@@ -233,7 +234,7 @@ describe('combine ingredients', () => {
   });
 
   it('combines 2 ingredient with a range, and 1 different ingredient without a range', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 10,
@@ -280,7 +281,7 @@ describe('combine ingredients', () => {
   });
 
   it('does not combine if ingredients have different units (for now)', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'butter',
         quantity: 2,
@@ -343,7 +344,7 @@ describe('combine ingredients', () => {
   });
 
   it('handles the no-unit case', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'tortilla',
         quantity: 10,
@@ -374,7 +375,7 @@ describe('combine ingredients', () => {
   });
 
   it('handles the no-unit and no-quantity case', () => {
-    const ingredientArray: Ingredient[] = [
+    const ingredientArray = [
       {
         ingredient: 'Powdered Sugar',
         quantity: 0,
@@ -406,7 +407,7 @@ describe('combine ingredients', () => {
 });
 
 describe('pretty printing press', () => {
-  const ingredients: Ingredient[] = [
+  const ingredients = [
     {
       ingredient: 'milk',
       unit: 'cup',

@@ -1,5 +1,3 @@
-import {LanguageConfig} from './interfaces';
-
 const units = {
   barattolo: ['barattolo', 'barattoli'],
   bicchiere: ['bicchiere'],
@@ -10,6 +8,7 @@ const units = {
   cucchiaino: ['cucchiaini', 'cucchiaino'],
   confezione: ['confezioni', 'confezione'],
   grammo: ['g', 'g.', 'gr', 'gr.', 'grammi', 'grammo'],
+
   chilogrammo: [
     'kg.',
     'kg',
@@ -18,6 +17,7 @@ const units = {
     'kilogrammo',
     'chilogrammo',
   ],
+
   fetta: ['fetta', 'fette'],
   fettina: ['fettina', 'fettine'],
   fogliolina: ['fogliolina', 'foglioline'],
@@ -46,9 +46,10 @@ const units = {
   rametto: ['rametto', 'rametti'],
   rotolo: ['rotolo'],
   pugno: ['pugno', 'pugni'],
-  bicchierino: ['bicchierino'],
+
   // noce: ['noce'],
-} as {[key: string]: string[]};
+  bicchierino: ['bicchierino'],
+};
 
 const pluralUnits = {
   barattolo: 'barattoli',
@@ -89,9 +90,10 @@ const pluralUnits = {
   rametto: 'rametti',
   rotolo: 'rotoli',
   bicchierino: 'bicchierini',
-  pugno: 'pugni',
+
   //noce: 'noci'
-} as {[key: string]: string};
+  pugno: 'pugni',
+};
 
 const symbolUnits = {
   bicchiere: '',
@@ -118,7 +120,7 @@ const symbolUnits = {
   litro: 'lt',
   milligrammo: 'mg',
   millilitro: 'ml',
-} as {[key: string]: string};
+};
 
 const prepositions = ['di', "d'"];
 
@@ -126,7 +128,7 @@ const joiners = ['o'];
 
 const toTaste = ['quanto basta'];
 
-export const numbersSmall: {[key: string]: number} = {
+export const numbersSmall = {
   zero: 0,
   mezzo: 0.5,
   mezza: 0.5,
@@ -172,7 +174,7 @@ export const numbersSmall: {[key: string]: number} = {
   novantuno: 91,
 };
 
-export const numbersMagnitude: {[key: string]: number} = {
+export const numbersMagnitude = {
   cento: 100,
   etto: 100,
   mille: 1000,
@@ -182,7 +184,7 @@ export const numbersMagnitude: {[key: string]: number} = {
   trilliardo: 1000000000000,
 };
 
-export const LangIta: LanguageConfig = {
+export const LangIta = {
   units,
   pluralUnits,
   symbolUnits,
