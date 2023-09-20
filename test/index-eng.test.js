@@ -295,6 +295,17 @@ describe('recipe parser eng', () => {
         maxQty: 1,
       });
     });
+    it('"1 3-inch cinammon stick"', () => {
+      expect(parse('1 3-inch cinammon stick', 'eng')).to.deep.equal({
+        unit: 'stick',
+        unitPlural: 'sticks',
+        symbol: null,
+        quantity: 1,
+        ingredient: '3-inch cinammon',
+        minQty: 1,
+        maxQty: 1,
+      });
+    });
     it('"25 lb beef stew chunks (or buy a roast and chop into small cubes)"', () => {
       expect(
         parse(
