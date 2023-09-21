@@ -2,6 +2,11 @@ import {parse} from '../src/index';
 
 /* global expect, it, describe */
 
+function testExpectation(inputString, expectation) {
+  expectation.originalString = inputString.trim(); // Set the originalString dynamically
+  expect(parse(inputString, 'eng')).to.deep.equal(expectation);
+}
+
 describe('recipe parser eng', () => {
   it('returns an object', () => {
     expect(typeof parse('1 cup water', 'eng')).to.equal('object');
@@ -83,21 +88,54 @@ describe('recipe parser eng', () => {
         maxQty: 20,
         minQty: 10,
         quantity: 10,
+        additional: null,
+        originalString: '',
         symbol: 'tsp',
         unit: 'teaspoon',
         unitPlural: 'teaspoons',
       };
       it('of "10-20 teaspoon water"', () => {
-        expect(parse('10-20 teaspoon water', 'eng')).to.deep.equal(expectation);
+        testExpectation('10-20 teaspoon water', expectation);
       });
       it('of "10 - 20 teaspoon water"', () => {
-        expect(parse('10 - 20 teaspoon water', 'eng')).to.deep.equal(
-          expectation,
-        );
+        testExpectation('10 - 20 teaspoon water', expectation);
       });
       it('of "10 to 20 teaspoon water"', () => {
-        expect(parse('10 to 20 teaspoon water', 'eng')).to.deep.equal(
-          expectation,
+        testExpectation('10 to 20 teaspoon water', expectation);
+      });
+    });
+
+    it('correctly parses additional and range', () => {
+      expect(
+        parse('3–5 dried red chilies, ( three is medium spicy)', 'eng'),
+      ).to.deep.equal({
+        quantity: 3,
+        additional: '( three is medium spicy)',
+        originalString: '3–5 dried red chilies, ( three is medium spicy)',
+        unit: null,
+        unitPlural: null,
+        symbol: null,
+        ingredient: 'dried red chilies',
+        minQty: 3,
+        maxQty: 5,
+      });
+    });
+
+    describe('translates teaspoons correctly', () => {
+      const teaspoon = {
+        ingredient: 'salt',
+        maxQty: 1,
+        minQty: 1,
+        quantity: 1,
+        additional: 'more to taste',
+        originalString: '1 teaspoon salt, more to taste',
+        symbol: 'tsp',
+        unit: 'teaspoon',
+        unitPlural: 'teaspoons',
+      };
+      it('of "1 teaspoon salt, more to taste"', () => {
+        expect(parse('1 teaspoon salt, more to taste', 'eng')).to.deep.equal(
+          teaspoon,
         );
       });
     });
@@ -194,6 +232,8 @@ describe('recipe parser eng', () => {
     it("doesn't freak out if a strange unicode character is present", () => {
       expect(parse('1/3 cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 0.333,
+        additional: null,
+        originalString: '1/3 cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -206,6 +246,8 @@ describe('recipe parser eng', () => {
     it('correctly removes unicode value from ingredient', () => {
       expect(parse('2 ½ cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 2.5,
+        additional: null,
+        originalString: '2 ½ cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -216,6 +258,8 @@ describe('recipe parser eng', () => {
 
       expect(parse('2½ cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 2.5,
+        additional: null,
+        originalString: '2½ cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -290,7 +334,9 @@ describe('recipe parser eng', () => {
         unitPlural: 'cans',
         symbol: null,
         quantity: 1,
-        ingredient: 'tomatoes (14.5 oz)',
+        additional: '14.5 oz',
+        originalString: '1 (14.5 oz) can tomatoes',
+        ingredient: 'tomatoes',
         minQty: 1,
         maxQty: 1,
       });
@@ -306,8 +352,10 @@ describe('recipe parser eng', () => {
         unitPlural: 'pounds',
         symbol: 'lb',
         quantity: 25,
-        ingredient:
-          'beef stew chunks (or buy a roast and chop into small cubes)',
+        additional: 'or buy a roast and chop into small cubes',
+        originalString:
+          '25 lb beef stew chunks (or buy a roast and chop into small cubes)',
+        ingredient: 'beef stew chunks',
         minQty: 25,
         maxQty: 25,
       });
@@ -318,6 +366,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 to 2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -329,6 +379,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 - 2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -340,6 +392,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1-2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -351,7 +405,9 @@ describe('recipe parser eng', () => {
         unitPlural: 'boxes',
         symbol: null,
         quantity: 1,
-        ingredient: 'pasta (16 oz)',
+        additional: '16 oz',
+        originalString: '1 (16 oz) box pasta',
+        ingredient: 'pasta',
         minQty: 1,
         maxQty: 1,
       });
@@ -362,6 +418,8 @@ describe('recipe parser eng', () => {
         unitPlural: 'slices',
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 slice cheese',
         ingredient: 'cheese',
         minQty: 1,
         maxQty: 1,
@@ -376,6 +434,8 @@ describe('recipe parser eng', () => {
       symbol: null,
       ingredient: 'tortilla',
       quantity: 1,
+      additional: null,
+      originalString: '1 tortilla',
       minQty: 1,
       maxQty: 1,
     });
@@ -385,6 +445,8 @@ describe('recipe parser eng', () => {
     expect(parse('Powdered Sugar', 'eng')).to.deep.equal({
       ingredient: 'Powdered Sugar',
       quantity: 0,
+      additional: null,
+      originalString: 'Powdered Sugar',
       unit: null,
       unitPlural: null,
       symbol: null,

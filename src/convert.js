@@ -105,11 +105,12 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   );
 
   const numericRangeWithSpaceRegex = new RegExp(
-    `^(\\d+\\-\\d+)|^(\\d+\\s\\-\\s\\d+)|^(\\d+\\s(?:${joiners.join(
+    `^(\\d+[\\-–]\\d+)|^(\\d+\\s[\\-–]\\s\\d+)|^(\\d+\\s(?:${joiners.join(
       '|',
     )})\\s\\d+)`,
     'g',
-  ); // for ex: "1 to 2" or "1 - 2"
+  );
+  // for ex: "1 to 2" or "1 - 2"
   // const unicodeFractionRegex = /(\d*)\s*([^\u0000-\u007F]+)/g;
   const unicodeFractionRegex = new RegExp(
     `(\\d*)\\s*(${Object.keys(unicodeObj).join('|')})`,

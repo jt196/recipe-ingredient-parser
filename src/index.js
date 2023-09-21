@@ -100,7 +100,23 @@ function convertToNumber(input, language) {
 }
 
 export function parse(recipeString, language) {
-  const ingredientLine = recipeString.trim(); // removes leading and trailing whitespace
+  // Initialize variables
+  let additional = '';
+  let originalString = recipeString.trim(); // Save the original string
+  let ingredientLine = originalString; // Initialize working copy
+
+  // Capture information within parentheses and after commas
+  // Negative lookbehind and ahead for numbers either side of a comma to account for 1,500.
+  // \s should trim whitespace before and after brackets
+  const additionalInfoRegex =
+    /(?:\(\s*([^)]+)\s*\)|(?<![0-9]),\s*([^,]+)\s*(?![0-9]))/g;
+  let additionalInfoMatch;
+  while ((additionalInfoMatch = additionalInfoRegex.exec(originalString))) {
+    if (additional) additional += ', '; // Add a comma between multiple additional notes
+    additional += additionalInfoMatch[1] || additionalInfoMatch[2].trim();
+  }
+  // Remove additional information from the working copy to avoid confusing toTasteRecognize
+  ingredientLine = ingredientLine.replace(additionalInfoRegex, '').trim();
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
@@ -139,8 +155,8 @@ export function parse(recipeString, language) {
   let maxQty = quantity; // default to quantity
 
   // if quantity is non-nil and is a range, for ex: "1-2", we want to get minQty and maxQty
-  if (quantity && quantity.includes('-')) {
-    [minQty, maxQty] = quantity.split('-');
+  if (quantity && (quantity.includes('-') || quantity.includes('–'))) {
+    [minQty, maxQty] = quantity.split(/-|–/);
     quantity = minQty;
   }
   return {
@@ -153,6 +169,8 @@ export function parse(recipeString, language) {
       : ingredient.replace(/( )*\.( )*/g, ''),
     minQty: convertToNumber(minQty, language),
     maxQty: convertToNumber(maxQty, language),
+    additional: additional ? additional : null, // Add additional field
+    originalString, // Include the original string
   };
 }
 
