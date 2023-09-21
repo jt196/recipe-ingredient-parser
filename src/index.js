@@ -126,13 +126,6 @@ export function parse(recipeString, language) {
   );
   quantity = convert.convertFromFraction(quantity, language);
 
-  /* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
-  For example: "sugar (or other sweetener)" --> extraInfo: "(or other sweetener)" */
-  let extraInfo;
-  if (convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/)) {
-    extraInfo = convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/);
-    restOfIngredient = restOfIngredient.replace(extraInfo, '').trim();
-  }
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
     restOfIngredient,
@@ -164,12 +157,10 @@ export function parse(recipeString, language) {
     unit: unit ? unit : null,
     unitPlural: unitPlural ? unitPlural : null,
     symbol: symbol ? symbol : null,
-    ingredient: extraInfo
-      ? `${ingredient} ${extraInfo}`
-      : ingredient.replace(/( )*\.( )*/g, ''),
+    ingredient: ingredient.replace(/\s+/g, ' ').trim(),
     minQty: convertToNumber(minQty, language),
     maxQty: convertToNumber(maxQty, language),
-    additional: additional ? additional : null, // Add additional field
+    additional: additional ? additional.replace(/\s+/g, ' ').trim() : null, // Add additional field
     originalString, // Include the original string
   };
 }

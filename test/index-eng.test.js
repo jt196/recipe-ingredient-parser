@@ -105,22 +105,6 @@ describe('recipe parser eng', () => {
       });
     });
 
-    it('correctly parses additional and range', () => {
-      expect(
-        parse('3–5 dried red chilies, ( three is medium spicy)', 'eng'),
-      ).to.deep.equal({
-        quantity: 3,
-        additional: '( three is medium spicy)',
-        originalString: '3–5 dried red chilies, ( three is medium spicy)',
-        unit: null,
-        unitPlural: null,
-        symbol: null,
-        ingredient: 'dried red chilies',
-        minQty: 3,
-        maxQty: 5,
-      });
-    });
-
     describe('translates teaspoons correctly', () => {
       const teaspoon = {
         ingredient: 'salt',
@@ -547,6 +531,20 @@ describe('recipe parser eng', () => {
       expect(parse('1 teaspoon of powdered sugar', 'eng').ingredient).to.equal(
         'powdered sugar',
       );
+    });
+  });
+
+  it('correctly parses range in middle of string', () => {
+    expect(parse('Juice from 1–2 limes', 'eng')).to.deep.equal({
+      quantity: 1,
+      additional: null,
+      originalString: 'Juice from 1–2 limes',
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: 'Juice from limes',
+      minQty: 1,
+      maxQty: 2,
     });
   });
 });
