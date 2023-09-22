@@ -38,43 +38,40 @@ function getUnit(input, language) {
   const {units, pluralUnits, symbolUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
-  const res = response => {
-    const symbol = symbolUnits[response[0]];
-    response.splice(2, 0, symbol);
-    return response;
+  const allMatches = [];
+
+  const addMatch = (unit, pluralUnit, match) => {
+    const symbol = symbolUnits[unit];
+    allMatches.push([unit, pluralUnit, symbol, match]);
   };
 
   if (toTaste) {
-    return res([toTaste, toTaste, toTasteMatch]);
-  }
-
-  if (units[input] || pluralUnits[input]) {
-    return res([input, pluralUnits[input], input]);
+    addMatch(toTaste, toTaste, toTasteMatch);
   }
 
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
       const regex = new RegExp(
-        '((?:^|\\s)' + shorthand.replace(/\./g, '\\.') + '(?:$|\\s))',
+        `(?:^|\\s)${shorthand.replace(/\./g, '\\.')}(?:$|\\s)`,
         'gi',
       );
-
       const match = input.match(regex);
       if (match) {
-        return res([unit, pluralUnits[unit], match[0]]);
+        addMatch(unit, pluralUnits[unit], match[0]);
       }
     }
   }
 
+  // match plural units
   for (const pluralUnit of Object.keys(pluralUnits)) {
-    const regex = new RegExp('(\\b' + pluralUnits[pluralUnit] + '\\b)', 'gi');
+    const regex = new RegExp(`\\b${pluralUnits[pluralUnit]}\\b`, 'gi');
     const match = input.match(regex);
     if (match) {
-      return res([pluralUnit, pluralUnits[pluralUnit], match[0]]);
+      addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
     }
   }
-
-  return [];
+  // Return the first match, or an empty array if no matches were found
+  return allMatches.length > 0 ? allMatches[allMatches.length - 1] : [];
 }
 
 /* return the proposition if it's used before of the name of
@@ -131,19 +128,16 @@ export function parse(recipeString, language) {
     restOfIngredient,
     language,
   );
-
   // remove unit from the ingredient if one was found and trim leading and trailing whitespace
   let ingredient = originalUnit
     ? restOfIngredient.replace(originalUnit, '').trim()
     : restOfIngredient.replace(unit, '').trim();
-  ingredient = ingredient.split('.').join('').trim();
+  ingredient = ingredient.replace(/\.(\s|$)/g, '$1').trim();
   const preposition = getPreposition(ingredient.split(' ')[0], language);
-
   if (preposition) {
     const regex = new RegExp('^' + preposition);
     ingredient = ingredient.replace(regex, '').trim();
   }
-
   let minQty = quantity; // default to quantity
   let maxQty = quantity; // default to quantity
 

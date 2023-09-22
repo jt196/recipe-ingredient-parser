@@ -547,4 +547,25 @@ describe('recipe parser eng', () => {
       maxQty: 2,
     });
   });
+
+  it('correctly parses numbers in middle of string', () => {
+    expect(
+      parse(
+        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+        'eng',
+      ),
+    ).to.deep.equal({
+      quantity: 2,
+      additional:
+        'do not use “lite” – and if you like an even richer broth, add a third can.',
+      originalString:
+        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+      unit: 'can',
+      unitPlural: 'cans',
+      symbol: null,
+      ingredient: '13.5 ounce full-fat coconut milk',
+      minQty: 2,
+      maxQty: 2,
+    });
+  });
 });
