@@ -38,43 +38,40 @@ function getUnit(input, language) {
   const {units, pluralUnits, symbolUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
-  const res = response => {
-    const symbol = symbolUnits[response[0]];
-    response.splice(2, 0, symbol);
-    return response;
+  const allMatches = [];
+
+  const addMatch = (unit, pluralUnit, match) => {
+    const symbol = symbolUnits[unit];
+    allMatches.push([unit, pluralUnit, symbol, match]);
   };
 
   if (toTaste) {
-    return res([toTaste, toTaste, toTasteMatch]);
-  }
-
-  if (units[input] || pluralUnits[input]) {
-    return res([input, pluralUnits[input], input]);
+    addMatch(toTaste, toTaste, toTasteMatch);
   }
 
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
       const regex = new RegExp(
-        '((?:^|\\s)' + shorthand.replace(/\./g, '\\.') + '(?:$|\\s))',
+        `(?:^|\\s)${shorthand.replace(/\./g, '\\.')}(?:$|\\s)`,
         'gi',
       );
-
       const match = input.match(regex);
       if (match) {
-        return res([unit, pluralUnits[unit], match[0]]);
+        addMatch(unit, pluralUnits[unit], match[0]);
       }
     }
   }
 
+  // match plural units
   for (const pluralUnit of Object.keys(pluralUnits)) {
-    const regex = new RegExp('(\\b' + pluralUnits[pluralUnit] + '\\b)', 'gi');
+    const regex = new RegExp(`\\b${pluralUnits[pluralUnit]}\\b`, 'gi');
     const match = input.match(regex);
     if (match) {
-      return res([pluralUnit, pluralUnits[pluralUnit], match[0]]);
+      addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
     }
   }
-
-  return [];
+  // Return the first match, or an empty array if no matches were found
+  return allMatches.length > 0 ? allMatches[allMatches.length - 1] : [];
 }
 
 /* return the proposition if it's used before of the name of
@@ -100,7 +97,23 @@ function convertToNumber(input, language) {
 }
 
 export function parse(recipeString, language) {
-  const ingredientLine = recipeString.trim(); // removes leading and trailing whitespace
+  // Initialize variables
+  let additional = '';
+  let originalString = recipeString.trim(); // Save the original string
+  let ingredientLine = originalString; // Initialize working copy
+
+  // Capture information within parentheses and after commas
+  // Negative lookbehind and ahead for numbers either side of a comma to account for 1,500.
+  // \s should trim whitespace before and after brackets
+  const additionalInfoRegex =
+    /(?:\(\s*([^)]+)\s*\)|(?<![0-9]),\s*([^,]+)\s*(?![0-9]))/g;
+  let additionalInfoMatch;
+  while ((additionalInfoMatch = additionalInfoRegex.exec(originalString))) {
+    if (additional) additional += ', '; // Add a comma between multiple additional notes
+    additional += additionalInfoMatch[1] || additionalInfoMatch[2].trim();
+  }
+  // Remove additional information from the working copy to avoid confusing toTasteRecognize
+  ingredientLine = ingredientLine.replace(additionalInfoRegex, '').trim();
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
@@ -110,37 +123,27 @@ export function parse(recipeString, language) {
   );
   quantity = convert.convertFromFraction(quantity, language);
 
-  /* extraInfo will be any info in parantheses. We'll place it at the end of the ingredient.
-  For example: "sugar (or other sweetener)" --> extraInfo: "(or other sweetener)" */
-  let extraInfo;
-  if (convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/)) {
-    extraInfo = convert.getFirstMatch(restOfIngredient, /\(([^\\)]+)\)/);
-    restOfIngredient = restOfIngredient.replace(extraInfo, '').trim();
-  }
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
     restOfIngredient,
     language,
   );
-
   // remove unit from the ingredient if one was found and trim leading and trailing whitespace
   let ingredient = originalUnit
     ? restOfIngredient.replace(originalUnit, '').trim()
     : restOfIngredient.replace(unit, '').trim();
-  ingredient = ingredient.split('.').join('').trim();
+  ingredient = ingredient.replace(/\.(\s|$)/g, '$1').trim();
   const preposition = getPreposition(ingredient.split(' ')[0], language);
-
   if (preposition) {
     const regex = new RegExp('^' + preposition);
     ingredient = ingredient.replace(regex, '').trim();
   }
-
   let minQty = quantity; // default to quantity
   let maxQty = quantity; // default to quantity
 
   // if quantity is non-nil and is a range, for ex: "1-2", we want to get minQty and maxQty
-  if (quantity && quantity.includes('-')) {
-    [minQty, maxQty] = quantity.split('-');
+  if (quantity && (quantity.includes('-') || quantity.includes('–'))) {
+    [minQty, maxQty] = quantity.split(/-|–/);
     quantity = minQty;
   }
   return {
@@ -148,11 +151,11 @@ export function parse(recipeString, language) {
     unit: unit ? unit : null,
     unitPlural: unitPlural ? unitPlural : null,
     symbol: symbol ? symbol : null,
-    ingredient: extraInfo
-      ? `${ingredient} ${extraInfo}`
-      : ingredient.replace(/( )*\.( )*/g, ''),
+    ingredient: ingredient.replace(/\s+/g, ' ').trim(),
     minQty: convertToNumber(minQty, language),
     maxQty: convertToNumber(maxQty, language),
+    additional: additional ? additional.replace(/\s+/g, ' ').trim() : null, // Add additional field
+    originalString, // Include the original string
   };
 }
 

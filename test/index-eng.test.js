@@ -2,6 +2,11 @@ import {parse} from '../src/index';
 
 /* global expect, it, describe */
 
+function testExpectation(inputString, expectation) {
+  expectation.originalString = inputString.trim(); // Set the originalString dynamically
+  expect(parse(inputString, 'eng')).to.deep.equal(expectation);
+}
+
 describe('recipe parser eng', () => {
   it('returns an object', () => {
     expect(typeof parse('1 cup water', 'eng')).to.equal('object');
@@ -31,6 +36,9 @@ describe('recipe parser eng', () => {
     });
     it('of "1 teaspoon water"', () => {
       expect(parse('1 teaspoon water', 'eng').quantity).to.equal(1);
+    });
+    it('of "1 Tbs. water"', () => {
+      expect(parse('1 Tbs. water', 'eng').unit).to.equal('tablespoon');
     });
     it('of "1.5 teaspoon water"', () => {
       expect(parse('1.5 teaspoon water', 'eng').quantity).to.equal(1.5);
@@ -83,21 +91,38 @@ describe('recipe parser eng', () => {
         maxQty: 20,
         minQty: 10,
         quantity: 10,
+        additional: null,
+        originalString: '',
         symbol: 'tsp',
         unit: 'teaspoon',
         unitPlural: 'teaspoons',
       };
       it('of "10-20 teaspoon water"', () => {
-        expect(parse('10-20 teaspoon water', 'eng')).to.deep.equal(expectation);
+        testExpectation('10-20 teaspoon water', expectation);
       });
       it('of "10 - 20 teaspoon water"', () => {
-        expect(parse('10 - 20 teaspoon water', 'eng')).to.deep.equal(
-          expectation,
-        );
+        testExpectation('10 - 20 teaspoon water', expectation);
       });
       it('of "10 to 20 teaspoon water"', () => {
-        expect(parse('10 to 20 teaspoon water', 'eng')).to.deep.equal(
-          expectation,
+        testExpectation('10 to 20 teaspoon water', expectation);
+      });
+    });
+
+    describe('translates teaspoons correctly', () => {
+      const teaspoon = {
+        ingredient: 'salt',
+        maxQty: 1,
+        minQty: 1,
+        quantity: 1,
+        additional: 'more to taste',
+        originalString: '1 teaspoon salt, more to taste',
+        symbol: 'tsp',
+        unit: 'teaspoon',
+        unitPlural: 'teaspoons',
+      };
+      it('of "1 teaspoon salt, more to taste"', () => {
+        expect(parse('1 teaspoon salt, more to taste', 'eng')).to.deep.equal(
+          teaspoon,
         );
       });
     });
@@ -194,6 +219,8 @@ describe('recipe parser eng', () => {
     it("doesn't freak out if a strange unicode character is present", () => {
       expect(parse('1/3 cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 0.333,
+        additional: null,
+        originalString: '1/3 cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -206,6 +233,8 @@ describe('recipe parser eng', () => {
     it('correctly removes unicode value from ingredient', () => {
       expect(parse('2 ½ cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 2.5,
+        additional: null,
+        originalString: '2 ½ cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -216,6 +245,8 @@ describe('recipe parser eng', () => {
 
       expect(parse('2½ cup confectioners’ sugar', 'eng')).to.deep.equal({
         quantity: 2.5,
+        additional: null,
+        originalString: '2½ cup confectioners’ sugar',
         unit: 'cup',
         unitPlural: 'cups',
         symbol: 'c',
@@ -290,7 +321,9 @@ describe('recipe parser eng', () => {
         unitPlural: 'cans',
         symbol: null,
         quantity: 1,
-        ingredient: 'tomatoes (14.5 oz)',
+        additional: '14.5 oz',
+        originalString: '1 (14.5 oz) can tomatoes',
+        ingredient: 'tomatoes',
         minQty: 1,
         maxQty: 1,
       });
@@ -317,8 +350,10 @@ describe('recipe parser eng', () => {
         unitPlural: 'pounds',
         symbol: 'lb',
         quantity: 25,
-        ingredient:
-          'beef stew chunks (or buy a roast and chop into small cubes)',
+        additional: 'or buy a roast and chop into small cubes',
+        originalString:
+          '25 lb beef stew chunks (or buy a roast and chop into small cubes)',
+        ingredient: 'beef stew chunks',
         minQty: 25,
         maxQty: 25,
       });
@@ -329,6 +364,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 to 2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -340,6 +377,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 - 2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -351,6 +390,8 @@ describe('recipe parser eng', () => {
         unitPlural: null,
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1-2 chicken breasts',
         ingredient: 'chicken breasts',
         minQty: 1,
         maxQty: 2,
@@ -362,7 +403,9 @@ describe('recipe parser eng', () => {
         unitPlural: 'boxes',
         symbol: null,
         quantity: 1,
-        ingredient: 'pasta (16 oz)',
+        additional: '16 oz',
+        originalString: '1 (16 oz) box pasta',
+        ingredient: 'pasta',
         minQty: 1,
         maxQty: 1,
       });
@@ -373,6 +416,8 @@ describe('recipe parser eng', () => {
         unitPlural: 'slices',
         symbol: null,
         quantity: 1,
+        additional: null,
+        originalString: '1 slice cheese',
         ingredient: 'cheese',
         minQty: 1,
         maxQty: 1,
@@ -387,6 +432,8 @@ describe('recipe parser eng', () => {
       symbol: null,
       ingredient: 'tortilla',
       quantity: 1,
+      additional: null,
+      originalString: '1 tortilla',
       minQty: 1,
       maxQty: 1,
     });
@@ -396,6 +443,8 @@ describe('recipe parser eng', () => {
     expect(parse('Powdered Sugar', 'eng')).to.deep.equal({
       ingredient: 'Powdered Sugar',
       quantity: 0,
+      additional: null,
+      originalString: 'Powdered Sugar',
       unit: null,
       unitPlural: null,
       symbol: null,
@@ -496,6 +545,41 @@ describe('recipe parser eng', () => {
       expect(parse('1 teaspoon of powdered sugar', 'eng').ingredient).to.equal(
         'powdered sugar',
       );
+    });
+  });
+
+  it('correctly parses range in middle of string', () => {
+    expect(parse('Juice from 1–2 limes', 'eng')).to.deep.equal({
+      quantity: 1,
+      additional: null,
+      originalString: 'Juice from 1–2 limes',
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: 'Juice from limes',
+      minQty: 1,
+      maxQty: 2,
+    });
+  });
+
+  it('correctly parses numbers in middle of string', () => {
+    expect(
+      parse(
+        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+        'eng',
+      ),
+    ).to.deep.equal({
+      quantity: 2,
+      additional:
+        'do not use “lite” – and if you like an even richer broth, add a third can.',
+      originalString:
+        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+      unit: 'can',
+      unitPlural: 'cans',
+      symbol: null,
+      ingredient: '13.5 ounce full-fat coconut milk',
+      minQty: 2,
+      maxQty: 2,
     });
   });
 });
