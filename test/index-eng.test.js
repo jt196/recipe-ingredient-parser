@@ -328,13 +328,28 @@ describe('recipe parser eng', () => {
         maxQty: 1,
       });
     });
+    it('"3 cloves"', () => {
+      expect(parse('3 cloves', 'eng')).to.deep.equal({
+        unit: null,
+        unitPlural: null,
+        symbol: null,
+        quantity: 3,
+        additional: null,
+        originalString: '3 cloves',
+        ingredient: 'cloves',
+        minQty: 3,
+        maxQty: 3,
+      });
+    });
     it('"1 3-inch cinammon stick"', () => {
       expect(parse('1 3-inch cinammon stick', 'eng')).to.deep.equal({
         unit: 'stick',
         unitPlural: 'sticks',
         symbol: null,
         quantity: 1,
+        additional: null,
         ingredient: '3-inch cinammon',
+        originalString: '1 3-inch cinammon stick',
         minQty: 1,
         maxQty: 1,
       });

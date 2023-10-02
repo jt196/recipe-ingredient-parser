@@ -129,6 +129,13 @@ const numbersMagnitude = {
   trillion: 1000000000000,
 };
 
+// If the text string has garlic, use clove, otherwise, don't
+export const problematicUnits = {
+  clove: ['garlic'],
+  // Add more problematic units here
+  // 'unit': ['context clue1', 'context clue2']
+};
+
 export const LangEng = {
   units,
   pluralUnits,
@@ -138,5 +145,6 @@ export const LangEng = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  problematicUnits,
   isCommaDelimited: false,
 };

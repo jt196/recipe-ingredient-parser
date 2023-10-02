@@ -35,7 +35,7 @@ export function toTasteRecognize(input, language) {
 }
 
 function getUnit(input, language) {
-  const {units, pluralUnits, symbolUnits} = i18nMap[language];
+  const {units, pluralUnits, symbolUnits, problematicUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
   const allMatches = [];
@@ -70,8 +70,24 @@ function getUnit(input, language) {
       addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
     }
   }
+  // After all units have been checked
+  let filteredMatches = allMatches;
+  for (const problematicUnit in problematicUnits) {
+    const contextClues = problematicUnits[problematicUnit];
+    if (
+      allMatches.some(match => match[0] === problematicUnit) &&
+      !contextClues.some(clue => input.includes(clue))
+    ) {
+      // Filter out the problematic unit match
+      filteredMatches = filteredMatches.filter(
+        match => match[0] !== problematicUnit,
+      );
+    }
+  }
   // Return the first match, or an empty array if no matches were found
-  return allMatches.length > 0 ? allMatches[allMatches.length - 1] : [];
+  return filteredMatches.length > 0
+    ? filteredMatches[filteredMatches.length - 1]
+    : [];
 }
 
 /* return the proposition if it's used before of the name of

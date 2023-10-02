@@ -184,6 +184,12 @@ export const numbersMagnitude = {
   trilliardo: 1000000000000,
 };
 
+export const problematicUnits = {
+  clove: ['garlic'],
+  // Add more problematic units here
+  // 'unit': ['context clue1', 'context clue2']
+};
+
 export const LangIta = {
   units,
   pluralUnits,
@@ -193,5 +199,6 @@ export const LangIta = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  problematicUnits,
   isCommaDelimited: true,
 };

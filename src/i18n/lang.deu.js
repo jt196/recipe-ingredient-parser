@@ -129,6 +129,12 @@ const numbersMagnitude = {
   billion: 1000000000000,
 };
 
+export const problematicUnits = {
+  clove: ['garlic'],
+  // Add more problematic units here
+  // 'unit': ['context clue1', 'context clue2']
+};
+
 export const LangDeu = {
   units,
   pluralUnits,
@@ -138,5 +144,6 @@ export const LangDeu = {
   toTaste,
   numbersSmall,
   numbersMagnitude,
+  problematicUnits,
   isCommaDelimited: true,
 };
