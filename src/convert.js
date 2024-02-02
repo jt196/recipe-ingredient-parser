@@ -92,6 +92,14 @@ export function feach(w, g, n, language) {
 }
 
 export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
+  const trimmedLine = ingredientLine.trim(); // Ensure the string is trimmed
+
+  // Check if the line starts with "a " and handle it as quantity "1"
+  if (trimmedLine.toLowerCase().startsWith('a ')) {
+    const restOfIngredient = trimmedLine.substring(2).trim(); // Remove "a " from the start
+    return ['1', restOfIngredient];
+  }
+
   const {joiners, isCommaDelimited} = i18nMap[language];
 
   // Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"

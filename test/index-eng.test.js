@@ -37,6 +37,9 @@ describe('recipe parser eng', () => {
     it('of "1 teaspoon water"', () => {
       expect(parse('1 teaspoon water', 'eng').quantity).to.equal(1);
     });
+    it('of "A teaspoon water"', () => {
+      expect(parse('A teaspoon water', 'eng').quantity).to.equal(1);
+    });
     it('of "1 Tbs. water"', () => {
       expect(parse('1 Tbs. water', 'eng').unit).to.equal('tablespoon');
     });
