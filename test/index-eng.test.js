@@ -152,8 +152,8 @@ describe('recipe parser eng', () => {
         '⅞',
       ];
       const unicodeExpectedAmounts = [
-        0.25, 0.5, 0.75, 0.142, 0.111, 0.1, 0.333, 0.666, 0.2, 0.4, 0.6, 0.8,
-        0.166, 0.833, 0.125, 0.375, 0.625, 0.875,
+        0.25, 0.5, 0.75, 0.143, 0.111, 0.1, 0.333, 0.667, 0.2, 0.4, 0.6, 0.8,
+        0.167, 0.833, 0.125, 0.375, 0.625, 0.875,
       ];
 
       for (let u = 0; u < unicodeAmounts.length; u++) {
@@ -244,6 +244,18 @@ describe('recipe parser eng', () => {
         ingredient: 'confectioners’ sugar',
         minQty: 2.5,
         maxQty: 2.5,
+      });
+
+      expect(parse('1 ½ cup water', 'eng')).to.deep.equal({
+        quantity: 1.5,
+        additional: null,
+        originalString: '1 ½ cup water',
+        unit: 'cup',
+        unitPlural: 'cups',
+        symbol: 'c',
+        ingredient: 'water',
+        minQty: 1.5,
+        maxQty: 1.5,
       });
 
       expect(parse('2½ cup confectioners’ sugar', 'eng')).to.deep.equal({

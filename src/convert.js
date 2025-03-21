@@ -60,10 +60,11 @@ export function text2num(s, language) {
   a.forEach(x => {
     values = feach(x, values[0], values[1], language);
   });
-  if (values[0] + values[1] < 0) {
+  const total = values[0] + values[1];
+  if (total < 0) {
     return null;
   } else {
-    return values[0] + values[1];
+    return total;
   }
 }
 
@@ -92,7 +93,9 @@ export function feach(w, g, n, language) {
 }
 
 export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
-  const trimmedLine = ingredientLine.trim(); // Ensure the string is trimmed
+  let trimmedLine = ingredientLine.trim(); // Ensure the string is trimmed
+
+  const {joiners, isCommaDelimited} = i18nMap[language];
 
   // Check if the line starts with "a " and handle it as quantity "1"
   if (trimmedLine.toLowerCase().startsWith('a ')) {
@@ -100,9 +103,10 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     return ['1', restOfIngredient];
   }
 
-  const {joiners, isCommaDelimited} = i18nMap[language];
-
-  // Supports any of "1/3" "1 1/3" "1,000" "1,000.01" "1000"
+  // Remove commas (thousands separators) if not using comma-delimited decimals
+  if (!isCommaDelimited) {
+    ingredientLine = trimmedLine.replace(/,/g, '');
+  }
 
   const delimiter = isCommaDelimited ? ',' : '\\.';
   const magnitudeSeperator = isCommaDelimited ? '\\.' : ',';
@@ -127,17 +131,27 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   );
   const wordUntilSpace = /[^\s]+/g;
 
-  // found a unicode quantity inside our regex, for ex: '⅝'
+  // found a unicode quantity inside our regex, for ex: '⅝', '1½', or '1 ½'
   const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
   if (unicodeQuantityMatch) {
-    const [str, numericPart, unicodePart] = unicodeQuantityMatch;
+    const match = unicodeQuantityMatch[0]; // full match e.g. "1 ½" or "½"
+    const parts = match.match(/(\d*)\s*([^\u0000-\u007F]+)/); // Extract numericPart and unicodePart
+    if (parts && parts.length === 3) {
+      const numericPart = parseFloat(parts[1] || '0');
+      const unicodeStr = unicodeObj[parts[2]]; // e.g., '1/2'
+      const [num, denom] = unicodeStr.split('/').map(Number);
+      const unicodeValue = denom ? num / denom : 0;
+      const totalQuantity = numericPart + unicodeValue;
+      const rest = ingredientLine.replace(match, '').trim();
 
-    // If there's a match for the unicodePart in our dictionary above
-    if (unicodeObj[unicodePart]) {
-      return [
-        `${numericPart} ${unicodeObj[unicodePart]}`,
-        ingredientLine.replace(str, '').trim(),
-      ];
+      // ✅ Return here to prevent further parsing
+      console.log('DEBUG: unicode fraction', {
+        match,
+        numericPart,
+        unicodePart: parts[2],
+        unicodeValue,
+      });
+      return [totalQuantity.toString(), rest];
     }
   }
 
@@ -169,7 +183,9 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   if (wordUntilSpaceMatch) {
     const quantity = getFirstMatch(ingredientLine, wordUntilSpace);
     const quantityNumber = text2num(quantity.toLowerCase(), language);
-    if (quantityNumber) {
+
+    if (quantityNumber !== null) {
+      // ✅ allow 0, but still exclude null
       const restOfIngredient = ingredientLine
         .replace(getFirstMatch(ingredientLine, wordUntilSpace), '')
         .trim();
@@ -178,6 +194,7 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
         : `${quantityNumber}`;
       return [quantityString, restOfIngredient];
     }
+
     return [null, ingredientLine];
   }
 

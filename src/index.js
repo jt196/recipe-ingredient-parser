@@ -105,11 +105,17 @@ function getPreposition(input, language) {
   return null;
 }
 
-function convertToNumber(input, language) {
+export function convertToNumber(value, language) {
   const {isCommaDelimited} = i18nMap[language];
-  if (!input) return 0;
+  if (!value) return 0;
 
-  return +input.replace(isCommaDelimited ? /\./ : /,/, '').replace(/,/, '.');
+  let num =
+    typeof value === 'string'
+      ? parseFloat(value.replace(isCommaDelimited ? ',' : '.', '.'))
+      : value;
+
+  // Round to 3 decimals max
+  return Math.round(num * 1000) / 1000;
 }
 
 export function parse(recipeString, language) {
@@ -162,6 +168,7 @@ export function parse(recipeString, language) {
     [minQty, maxQty] = quantity.split(/-|–/);
     quantity = minQty;
   }
+
   return {
     quantity: convertToNumber(quantity, language),
     unit: unit ? unit : null,
