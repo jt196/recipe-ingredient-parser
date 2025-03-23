@@ -190,7 +190,7 @@ export const problematicUnits = {
   // 'unit': ['context clue1', 'context clue2']
 };
 
-export const LangIta = {
+export const langIta = {
   units,
   pluralUnits,
   symbolUnits,

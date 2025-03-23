@@ -135,7 +135,7 @@ export const problematicUnits = {
   // 'unit': ['context clue1', 'context clue2']
 };
 
-export const LangDeu = {
+export const langDeu = {
   units,
   pluralUnits,
   symbolUnits,
