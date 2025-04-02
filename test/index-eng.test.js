@@ -602,6 +602,15 @@ describe('recipe parser eng', () => {
     });
   });
 
+  describe('multi-word unit edge cases', () => {
+    it('parses "3 fl oz vegetable oil" correctly', () => {
+      const result = parse('3 fl oz vegetable oil', 'eng');
+      expect(result.quantity).to.equal(3);
+      expect(result.unit).to.equal('floz');
+      expect(result.ingredient).to.equal('vegetable oil');
+    });
+  });
+
   it('correctly parses range in middle of string', () => {
     expect(parse('Juice from 1–2 limes', 'eng')).to.deep.equal({
       quantity: 1,

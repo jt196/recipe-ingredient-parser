@@ -35,39 +35,43 @@ export function toTasteRecognize(input, language) {
 }
 
 /**
- * Extracts the unit of measurement from a given string of text.
- * Supports different languages and returns an array containing the unit,
- * plural unit, symbol, and the original match.
- * If no unit is found, the function returns an empty array.
+ * Extracts the unit of measurement from a given text.
+ * Supports multiple languages by looking up the units in the i18nMap.
+ * Returns an array with the singular unit, plural unit, symbol, and the matched text.
+ * If no unit is found, returns an empty array.
  *
- * @param {string} input - The string to parse.
- * @param {string} language - The language of the string.
- * @returns {Array} - An array containing the unit, plural unit, symbol, and the original match.
+ * @param {string} input - The text to parse.
+ * @param {string} language - The language key (e.g., 'eng', 'deu', 'ita').
+ * @returns {Array} An array in the form [unit, pluralUnit, symbol, match] or [] if no match.
  */
 function getUnit(input, language) {
   const {units, pluralUnits, symbolUnits, problematicUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
+  // This will collect all unit matches in the form: [unit, pluralUnit, symbol, match]
   let allMatches = [];
 
   /**
    * Adds a unit match to the allMatches array.
    *
-   * @param {string} unit - The singular form of the unit found in the input.
-   * @param {string} pluralUnit - The plural form of the unit.
-   * @param {string} match - The original string match from the input.
+   * @param {string} unit - The canonical singular unit.
+   * @param {string} pluralUnit - The plural version of the unit.
+   * @param {string} match - The substring from the input that matched.
    */
   const addMatch = (unit, pluralUnit, match) => {
     const symbol = symbolUnits[unit];
     allMatches.push([unit, pluralUnit, symbol, match]);
   };
 
+  // If "to taste" is detected, add it as a unit.
   if (toTaste) {
     addMatch(toTaste, toTaste, toTasteMatch);
   }
 
+  // Look for singular unit matches using defined shorthands.
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
+      // Create a regex that ensures the shorthand is a whole word (or at word boundaries).
       const regex = new RegExp(
         `(?:^|\\s)${shorthand.replace(/\./g, '\\.')}(?:$|\\s)`,
         'gi',
@@ -79,7 +83,7 @@ function getUnit(input, language) {
     }
   }
 
-  // match plural units
+  // Look for plural unit matches.
   for (const pluralUnit of Object.keys(pluralUnits)) {
     const regex = new RegExp(`\\b${pluralUnits[pluralUnit]}\\b`, 'gi');
     const match = input.match(regex);
@@ -87,9 +91,10 @@ function getUnit(input, language) {
       addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
     }
   }
-  // After all units have been checked
-  let filteredMatches = allMatches;
-  // After all units have been checked
+
+  // Filter out problematic units if no context clue is present.
+  // e.g. "2 cloves garlic" vs "2 cloves"
+  // if "garlic" is not present (context clue), don't process "clove" as a unit
   for (const problematicUnit in problematicUnits) {
     const contextClues = problematicUnits[problematicUnit];
     if (
@@ -100,10 +105,26 @@ function getUnit(input, language) {
     }
   }
 
-  // 🔥 Return the first match instead of the last
-  return allMatches.length > 0
-    ? allMatches[0] // use first match, not last
-    : [];
+  // Determine the best match:
+  // Choose the match that appears earliest in the input.
+  // If two matches start at the same index, choose the longer (more specific) match.
+  if (allMatches.length > 0) {
+    let bestMatch = null;
+    for (const match of allMatches) {
+      // match[3] is the matched text
+      const idx = input.indexOf(match[3]);
+      if (
+        bestMatch === null ||
+        idx < bestMatch.index ||
+        (idx === bestMatch.index &&
+          match[3].trim().length > bestMatch.match[3].trim().length)
+      ) {
+        bestMatch = {match, index: idx};
+      }
+    }
+    return bestMatch.match;
+  }
+  return [];
 }
 
 /* return the proposition if it's used before of the name of
@@ -134,10 +155,32 @@ export function convertToNumber(value, language) {
   return Math.round(num * 1000) / 1000;
 }
 
-export function parse(recipeString, language) {
+/**
+ * Parses a ingredient string to extract ingredient details.
+ *
+ * This function processes a recipe string to extract and return a structured
+ * object containing the quantity, unit, ingredient name, and additional
+ * information. It supports multiple languages and handles various text
+ * formats such as fractions, ranges, and additional notes within parentheses
+ * or after commas.
+ *
+ * @param {string} ingredientString - The input string representing the recipe ingredient.
+ * @param {string} language - The language key to use for parsing (e.g., 'eng', 'deu', 'ita').
+ * @returns {Object} An object containing:
+ *   - {number|null} quantity - The parsed quantity as a number.
+ *   - {string|null} unit - The singular form of the unit if detected.
+ *   - {string|null} unitPlural - The plural form of the unit if applicable.
+ *   - {string|null} symbol - The unit symbol if available.
+ *   - {string} ingredient - The cleaned ingredient name.
+ *   - {number} minQty - The minimum quantity in a range or the single quantity.
+ *   - {number} maxQty - The maximum quantity in a range or the single quantity.
+ *   - {string|null} additional - Any additional notes or information found.
+ *   - {string} originalString - The original input string for reference.
+ */
+export function parse(ingredientString, language) {
   // Initialize variables
   let additional = '';
-  let originalString = recipeString.trim(); // Save the original string
+  let originalString = ingredientString.trim(); // Save the original string
   let ingredientLine = originalString; // Initialize working copy
 
   // Capture information within parentheses and after commas
