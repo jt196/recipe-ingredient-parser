@@ -34,12 +34,29 @@ export function toTasteRecognize(input, language) {
   return ['', '', false];
 }
 
+/**
+ * Extracts the unit of measurement from a given string of text.
+ * Supports different languages and returns an array containing the unit,
+ * plural unit, symbol, and the original match.
+ * If no unit is found, the function returns an empty array.
+ *
+ * @param {string} input - The string to parse.
+ * @param {string} language - The language of the string.
+ * @returns {Array} - An array containing the unit, plural unit, symbol, and the original match.
+ */
 function getUnit(input, language) {
   const {units, pluralUnits, symbolUnits, problematicUnits} = i18nMap[language];
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
-  const allMatches = [];
+  let allMatches = [];
 
+  /**
+   * Adds a unit match to the allMatches array.
+   *
+   * @param {string} unit - The singular form of the unit found in the input.
+   * @param {string} pluralUnit - The plural form of the unit.
+   * @param {string} match - The original string match from the input.
+   */
   const addMatch = (unit, pluralUnit, match) => {
     const symbol = symbolUnits[unit];
     allMatches.push([unit, pluralUnit, symbol, match]);
@@ -72,21 +89,20 @@ function getUnit(input, language) {
   }
   // After all units have been checked
   let filteredMatches = allMatches;
+  // After all units have been checked
   for (const problematicUnit in problematicUnits) {
     const contextClues = problematicUnits[problematicUnit];
     if (
       allMatches.some(match => match[0] === problematicUnit) &&
       !contextClues.some(clue => input.includes(clue))
     ) {
-      // Filter out the problematic unit match
-      filteredMatches = filteredMatches.filter(
-        match => match[0] !== problematicUnit,
-      );
+      allMatches = allMatches.filter(match => match[0] !== problematicUnit);
     }
   }
-  // Return the first match, or an empty array if no matches were found
-  return filteredMatches.length > 0
-    ? filteredMatches[filteredMatches.length - 1]
+
+  // 🔥 Return the first match instead of the last
+  return allMatches.length > 0
+    ? allMatches[0] // use first match, not last
     : [];
 }
 

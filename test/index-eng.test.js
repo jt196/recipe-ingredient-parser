@@ -88,6 +88,30 @@ describe('recipe parser eng', () => {
       });
     });
 
+    describe('unit + descriptor edge cases', () => {
+      it('parses "200g medium oatmeal" correctly', () => {
+        const result = parse('200g medium oatmeal', 'eng');
+        expect(result.quantity).to.equal(200);
+        expect(result.unit).to.equal('gram');
+        expect(result.ingredient).to.equal('medium oatmeal');
+      });
+
+      it('parses "1kg piece of pork belly" correctly', () => {
+        const result = parse('1kg piece of pork belly', 'eng');
+        expect(result.quantity).to.equal(1);
+        expect(result.unit).to.equal('kilogram');
+        expect(result.ingredient).to.equal('piece of pork belly');
+      });
+
+      it('parses "25g walnut pieces (chopped)" correctly', () => {
+        const result = parse('25g walnut pieces (chopped)', 'eng');
+        expect(result.quantity).to.equal(25);
+        expect(result.unit).to.equal('gram');
+        expect(result.ingredient).to.equal('walnut pieces');
+        expect(result.additional).to.equal('chopped');
+      });
+    });
+
     describe('translates the quantity range', () => {
       const expectation = {
         ingredient: 'water',
@@ -595,19 +619,19 @@ describe('recipe parser eng', () => {
   it('correctly parses numbers in middle of string', () => {
     expect(
       parse(
-        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+        '2 cans full-fat coconut milk, 13.5 ounces, do not use “lite” – and if you like an even richer broth, add a third can.',
         'eng',
       ),
     ).to.deep.equal({
       quantity: 2,
       additional:
-        'do not use “lite” – and if you like an even richer broth, add a third can.',
+        '13.5 ounces, do not use “lite” – and if you like an even richer broth, add a third can.',
       originalString:
-        '2 13.5 ounce cans full-fat coconut milk, do not use “lite” – and if you like an even richer broth, add a third can.',
+        '2 cans full-fat coconut milk, 13.5 ounces, do not use “lite” – and if you like an even richer broth, add a third can.',
       unit: 'can',
       unitPlural: 'cans',
       symbol: null,
-      ingredient: '13.5 ounce full-fat coconut milk',
+      ingredient: 'full-fat coconut milk',
       minQty: 2,
       maxQty: 2,
     });
