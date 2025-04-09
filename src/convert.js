@@ -144,13 +144,6 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
       const totalQuantity = numericPart + unicodeValue;
       const rest = ingredientLine.replace(match, '').trim();
 
-      // ✅ Return here to prevent further parsing
-      console.log('DEBUG: unicode fraction', {
-        match,
-        numericPart,
-        unicodePart: parts[2],
-        unicodeValue,
-      });
       return [totalQuantity.toString(), rest];
     }
   }
