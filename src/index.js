@@ -127,8 +127,13 @@ function getUnit(input, language) {
   return [];
 }
 
-/* return the proposition if it's used before of the name of
-the ingredient */
+/**
+ * Return the preposition (if any) that starts the given input string.
+ *
+ * @param {string} input
+ * @param {string} language
+ * @return {string|null} The matched preposition, or null if none.
+ */
 function getPreposition(input, language) {
   const {prepositions} = i18nMap[language];
 
@@ -141,6 +146,24 @@ function getPreposition(input, language) {
 
   return null;
 }
+
+/**
+ * Returns the symbol for a given unit in a given language, if available.
+ *
+ * @param {string} unit - The unit to look up.
+ * @param {string} language - The language to use for the lookup.
+ * @returns {string} The symbol for the unit, or an empty string if not found.
+ */
+export const getSymbol = (unit, language) => {
+  const langMap = i18nMap[language];
+  if (!unit || !langMap?.units || !langMap?.symbolUnits) return '';
+
+  const normalizedKey = Object.keys(langMap.units).find(key =>
+    langMap.units[key].includes(unit),
+  );
+
+  return langMap.symbolUnits[normalizedKey] || '';
+};
 
 export function convertToNumber(value, language) {
   const {isCommaDelimited} = i18nMap[language];
