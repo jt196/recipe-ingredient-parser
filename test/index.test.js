@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import {combine, prettyPrintingPress} from '../src/index';
 
 /* global expect, it, describe */

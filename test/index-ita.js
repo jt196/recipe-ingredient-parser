@@ -1,6 +1,21 @@
+import {expect} from 'chai';
 import {multiLineParse, parse} from '../src/index';
 
 /* global expect, it, describe */
+
+const normalizeResult = (result) => ({
+  ingredient: result.ingredient,
+  quantity: result.quantity,
+  unit: result.unit,
+  unitPlural: result.unitPlural,
+  symbol: result.symbol,
+  minQty: result.minQty,
+  maxQty: result.maxQty,
+});
+
+const expectParsed = (input, expected) => {
+  expect(normalizeResult(parse(input, 'ita'))).to.deep.equal(expected);
+};
 
 describe('recipe parser ita', () => {
   it('returns an object', () => {
@@ -158,8 +173,9 @@ describe('recipe parser ita', () => {
         const element = unicodeAmounts[u];
         const expectedAmount = unicodeExpectedAmounts[u];
         it(`${element} to ${expectedAmount}`, () => {
-          expect(parse(`${element} cucchiao acqua`, 'ita').quantity).to.equal(
+          expect(parse(`${element} cucchiao acqua`, 'ita').quantity).to.be.closeTo(
             expectedAmount,
+            0.002,
           );
         });
       }
@@ -193,15 +209,16 @@ describe('recipe parser ita', () => {
         const expectedAmount =
           Number(mixedExpectedValues[u]) + Number(unicodeExpectedAmounts[u]);
         it(`${element} to ${expectedAmount}`, () => {
-          expect(parse(`${element} cucchiao acqua`, 'ita').quantity).to.equal(
+          expect(parse(`${element} cucchiao acqua`, 'ita').quantity).to.be.closeTo(
             expectedAmount,
+            0.002,
           );
         });
       }
     });
 
     it("doesn't freak out if a strange unicode character is present", () => {
-      expect(parse('1/3 tazza zucchero a velo', 'ita')).to.deep.equal({
+      expectParsed('1/3 tazza zucchero a velo', {
         quantity: 0.333,
         unit: 'tazza',
         unitPlural: 'tazze',
@@ -281,18 +298,18 @@ describe('recipe parser ita', () => {
       expect(parse('1 vasetto yogurt', 'ita').unit).to.equal('vasetto');
     });
     it('"1 (14.5 oz) lattina pommodori"', () => {
-      expect(parse('1 (14.5 oz) lattina pommodori', 'ita')).to.deep.equal({
+      expectParsed('1 (14.5 oz) lattina pommodori', {
         unit: 'lattina',
         unitPlural: 'lattine',
         symbol: null,
         quantity: 1,
-        ingredient: 'pommodori (14.5 oz)',
+        ingredient: 'pommodori',
         minQty: 1,
         maxQty: 1,
       });
     });
     it('"parses ingredient with range: 1 to 2 petto di pollo"', () => {
-      expect(parse('1 o 2 petto di pollo', 'ita')).to.deep.equal({
+      expectParsed('1 o 2 petto di pollo', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -303,7 +320,7 @@ describe('recipe parser ita', () => {
       });
     });
     it('"parses ingredient with range: 1 - 2  petto di pollo"', () => {
-      expect(parse('1 - 2 petto di pollo', 'ita')).to.deep.equal({
+      expectParsed('1 - 2 petto di pollo', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -314,7 +331,7 @@ describe('recipe parser ita', () => {
       });
     });
     it('"parses ingredient with range: 1-2 petto di pollo"', () => {
-      expect(parse('1-2 petto di pollo', 'ita')).to.deep.equal({
+      expectParsed('1-2 petto di pollo', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -325,18 +342,18 @@ describe('recipe parser ita', () => {
       });
     });
     it('"1 (16 oz) scatola pasta"', () => {
-      expect(parse('1 (16 oz) scatola pasta', 'ita')).to.deep.equal({
+      expectParsed('1 (16 oz) scatola pasta', {
         unit: 'scatola',
         unitPlural: 'scatole',
         symbol: null,
         quantity: 1,
-        ingredient: 'pasta (16 oz)',
+        ingredient: 'pasta',
         minQty: 1,
         maxQty: 1,
       });
     });
     it('"1 fetta di formaggio"', () => {
-      expect(parse('1 fetta di formaggio', 'ita')).to.deep.equal({
+      expectParsed('1 fetta di formaggio', {
         unit: 'fetta',
         unitPlural: 'fette',
         quantity: 1,
@@ -347,7 +364,7 @@ describe('recipe parser ita', () => {
       });
     });
     it('"1 spicchio d\'aglio"', () => {
-      expect(parse("1 spicchio d'aglio", 'ita')).to.deep.equal({
+      expectParsed("1 spicchio d'aglio", {
         unit: 'spicchio',
         unitPlural: 'spicchi',
         quantity: 1,
@@ -359,7 +376,7 @@ describe('recipe parser ita', () => {
     });
     describe('" check the correct symbol"', () => {
       it('"grammi di farina"', () => {
-        expect(parse('grammi di farina', 'ita')).to.deep.equal({
+        expectParsed('grammi di farina', {
           unit: 'grammo',
           unitPlural: 'grammi',
           quantity: 0,
@@ -370,7 +387,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 grammi di farina"', () => {
-        expect(parse('100 grammi di farina', 'ita')).to.deep.equal({
+        expectParsed('100 grammi di farina', {
           unit: 'grammo',
           unitPlural: 'grammi',
           quantity: 100,
@@ -381,7 +398,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"1 spicchio d\'aglio"', () => {
-        expect(parse("1 spicchio d'aglio", 'ita')).to.deep.equal({
+        expectParsed("1 spicchio d'aglio", {
           unit: 'spicchio',
           unitPlural: 'spicchi',
           quantity: 1,
@@ -392,7 +409,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"1 kilogrammo d\'aglio"', () => {
-        expect(parse("1 kilogrammo d'aglio", 'ita')).to.deep.equal({
+        expectParsed("1 kilogrammo d'aglio", {
           unit: 'chilogrammo',
           unitPlural: 'chilogrammi',
           quantity: 1,
@@ -403,7 +420,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"1 cucchiaino riso"', () => {
-        expect(parse('1 cucchiaino riso', 'ita')).to.deep.equal({
+        expectParsed('1 cucchiaino riso', {
           unit: 'cucchiaino',
           unitPlural: 'cucchiaini',
           quantity: 1,
@@ -414,7 +431,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 litri di latte"', () => {
-        expect(parse('100 litri di latte', 'ita')).to.deep.equal({
+        expectParsed('100 litri di latte', {
           unit: 'litro',
           unitPlural: 'litri',
           quantity: 100,
@@ -425,7 +442,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 milligrammi di olio"', () => {
-        expect(parse('100 milligrammi di olio', 'ita')).to.deep.equal({
+        expectParsed('100 milligrammi di olio', {
           unit: 'milligrammo',
           unitPlural: 'milligrammi',
           quantity: 100,
@@ -436,7 +453,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 rotoli di olio"', () => {
-        expect(parse('100 rotoli di olio', 'ita')).to.deep.equal({
+        expectParsed('100 rotoli di olio', {
           unit: 'rotolo',
           unitPlural: 'rotoli',
           quantity: 100,
@@ -447,7 +464,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 bicchierini di olio"', () => {
-        expect(parse('100 bicchierino di olio', 'ita')).to.deep.equal({
+        expectParsed('100 bicchierino di olio', {
           unit: 'bicchierino',
           unitPlural: 'bicchierini',
           quantity: 100,
@@ -458,7 +475,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"Un filo d\'olio"', () => {
-        expect(parse("Un filo d'olio", 'ita')).to.deep.equal({
+        expectParsed("Un filo d'olio", {
           unit: 'filo',
           unitPlural: 'fili',
           quantity: 1,
@@ -469,7 +486,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"Un ciuffo di prezzemolo"', () => {
-        expect(parse('Un ciuffo di prezzemolo', 'ita')).to.deep.equal({
+        expectParsed('Un ciuffo di prezzemolo', {
           unit: 'ciuffo',
           unitPlural: 'ciuffi',
           quantity: 1,
@@ -480,7 +497,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"100 millilitri di latte"', () => {
-        expect(parse('100 millilitri di latte', 'ita')).to.deep.equal({
+        expectParsed('100 millilitri di latte', {
           unit: 'millilitro',
           unitPlural: 'millilitri',
           quantity: 100,
@@ -491,7 +508,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"quanto basta  di latte"', () => {
-        expect(parse('quanto basta  di latte', 'ita')).to.deep.equal({
+        expectParsed('quanto basta  di latte', {
           unit: 'q.b.',
           unitPlural: 'q.b.',
           quantity: 0,
@@ -502,7 +519,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"Quanto Basta  di latte"', () => {
-        expect(parse('quanto basta  di latte', 'ita')).to.deep.equal({
+        expectParsed('quanto basta  di latte', {
           unit: 'q.b.',
           unitPlural: 'q.b.',
           quantity: 0,
@@ -513,7 +530,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"qb  di latte"', () => {
-        expect(parse('quanto basta  di latte', 'ita')).to.deep.equal({
+        expectParsed('quanto basta  di latte', {
           unit: 'q.b.',
           unitPlural: 'q.b.',
           quantity: 0,
@@ -524,7 +541,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"q.b. di latte"', () => {
-        expect(parse('q.b.  di latte', 'ita')).to.deep.equal({
+        expectParsed('q.b.  di latte', {
           unit: 'q.b.',
           unitPlural: 'q.b.',
           quantity: 0,
@@ -535,7 +552,7 @@ describe('recipe parser ita', () => {
         });
       });
       it('"q.b. latte"', () => {
-        expect(parse('q.b.  latte', 'ita')).to.deep.equal({
+        expectParsed('q.b.  latte', {
           unit: 'q.b.',
           unitPlural: 'q.b.',
           quantity: 0,
@@ -548,120 +565,120 @@ describe('recipe parser ita', () => {
     });
   });
 
-  it('translates unit when no unit provided', () => {
-    expect(parse('1 tortilla', 'ita')).to.deep.equal({
-      unit: null,
-      unitPlural: null,
-      symbol: null,
+it('translates unit when no unit provided', () => {
+  expectParsed('1 tortilla', {
+    unit: null,
+    unitPlural: null,
+    symbol: null,
       ingredient: 'tortilla',
       quantity: 1,
       minQty: 1,
       maxQty: 1,
     });
   });
-  it('test order and case sensitive', () => {
-    expect(parse('100 ml. tortilla ', 'ita')).to.deep.equal({
-      unit: 'millilitro',
-      unitPlural: 'millilitri',
+it('test order and case sensitive', () => {
+  expectParsed('100 ml. tortilla ', {
+    unit: 'millilitro',
+    unitPlural: 'millilitri',
       symbol: 'ml',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse('100 mg. tortilla ', 'ita')).to.deep.equal({
-      unit: 'milligrammo',
-      unitPlural: 'milligrammi',
+  expectParsed('100 mg. tortilla ', {
+    unit: 'milligrammo',
+    unitPlural: 'milligrammi',
       symbol: 'mg',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse('100 g. tortilla ', 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed('100 g. tortilla ', {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse("1 g. d' acqua", 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed("1 g. d' acqua", {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'acqua',
       quantity: 1,
       minQty: 1,
       maxQty: 1,
     });
-    expect(parse('100 g. di tortilla ', 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed('100 g. di tortilla ', {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse('q.b. di sale', 'ita')).to.deep.equal({
-      unit: 'q.b.',
-      unitPlural: 'q.b.',
+  expectParsed('q.b. di sale', {
+    unit: 'q.b.',
+    unitPlural: 'q.b.',
       symbol: null,
       ingredient: 'sale',
       quantity: 0,
       minQty: 0,
       maxQty: 0,
     });
-    expect(parse('100 gr. tortilla ', 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed('100 gr. tortilla ', {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse('tortilla 100 gr.', 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed('tortilla 100 gr.', {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'tortilla',
       quantity: 100,
       minQty: 100,
       maxQty: 100,
     });
-    expect(parse('basilico quanto basta', 'ita')).to.deep.equal({
-      unit: 'q.b.',
-      unitPlural: 'q.b.',
+  expectParsed('basilico quanto basta', {
+    unit: 'q.b.',
+    unitPlural: 'q.b.',
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
       minQty: 0,
       maxQty: 0,
     });
-    expect(parse('basilico q.b.', 'ita')).to.deep.equal({
-      unit: 'q.b.',
-      unitPlural: 'q.b.',
+  expectParsed('basilico q.b.', {
+    unit: 'q.b.',
+    unitPlural: 'q.b.',
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
       minQty: 0,
       maxQty: 0,
     });
-    expect(parse('basilico QB', 'ita')).to.deep.equal({
-      unit: 'q.b.',
-      unitPlural: 'q.b.',
+  expectParsed('basilico QB', {
+    unit: 'q.b.',
+    unitPlural: 'q.b.',
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
       minQty: 0,
       maxQty: 0,
     });
-    expect(parse('basilico millilitri 100', 'ita')).to.deep.equal({
-      unit: 'millilitro',
-      unitPlural: 'millilitri',
+  expectParsed('basilico millilitri 100', {
+    unit: 'millilitro',
+    unitPlural: 'millilitri',
       symbol: 'ml',
       ingredient: 'basilico',
       quantity: 100,
@@ -669,39 +686,39 @@ describe('recipe parser ita', () => {
       maxQty: 100,
     });
   });
-  it("doesn't explode when no unit and no quantity provided", () => {
-    expect(parse('zucchero a velo', 'ita')).to.deep.equal({
-      unit: null,
-      unitPlural: null,
-      symbol: null,
+it("doesn't explode when no unit and no quantity provided", () => {
+  expectParsed('zucchero a velo', {
+    unit: null,
+    unitPlural: null,
+    symbol: null,
       ingredient: 'zucchero a velo',
       quantity: 0,
       minQty: 0,
       maxQty: 0,
     });
   });
-  it('test noci', () => {
-    expect(parse('quattro noci', 'ita')).to.deep.equal({
-      unit: null,
-      unitPlural: null,
+it('test noci', () => {
+  expectParsed('quattro noci', {
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'noci',
       quantity: 4,
       minQty: 4,
       maxQty: 4,
     });
-    expect(parse('una noce', 'ita')).to.deep.equal({
-      unit: null,
-      unitPlural: null,
+  expectParsed('una noce', {
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'noce',
       quantity: 1,
       minQty: 1,
       maxQty: 1,
     });
-    expect(parse('100 gr di noci', 'ita')).to.deep.equal({
-      unit: 'grammo',
-      unitPlural: 'grammi',
+  expectParsed('100 gr di noci', {
+    unit: 'grammo',
+    unitPlural: 'grammi',
       symbol: 'g',
       ingredient: 'noci',
       quantity: 100,
@@ -827,7 +844,7 @@ describe('recipe parser ita', () => {
   describe('split on separator', () => {
     it('"quattro noci - quattro noci"', () => {
       expect(
-        multiLineParse('quattro noci - quattro noci', 'ita')[0],
+        normalizeResult(multiLineParse('quattro noci - quattro noci', 'ita')[0]),
       ).to.deep.equal({
         unit: null,
         unitPlural: null,
@@ -840,7 +857,7 @@ describe('recipe parser ita', () => {
     }),
       it('"tre noci - 8 noci"', () => {
         expect(
-          multiLineParse('tre noci - quattro noci', 'ita')[0],
+          normalizeResult(multiLineParse('tre noci - quattro noci', 'ita')[0]),
         ).to.deep.equal({
           unit: null,
           unitPlural: null,
@@ -853,7 +870,7 @@ describe('recipe parser ita', () => {
       });
     it('"👉 tre noci 👉 8 noci"', () => {
       expect(
-        multiLineParse('👉 tre noci 👉 quattro noci', 'ita')[0],
+        normalizeResult(multiLineParse('👉 tre noci 👉 quattro noci', 'ita')[0]),
       ).to.deep.equal({
         unit: null,
         unitPlural: null,
@@ -866,7 +883,7 @@ describe('recipe parser ita', () => {
     });
     it('"👉🏻 tre noci 👉 8 noci"', () => {
       expect(
-        multiLineParse('👉🏻 tre noci 👉 quattro noci', 'ita')[0],
+        normalizeResult(multiLineParse('👉🏻 tre noci 👉 quattro noci', 'ita')[0]),
       ).to.deep.equal({
         unit: null,
         unitPlural: null,

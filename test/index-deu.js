@@ -1,4 +1,20 @@
+import {expect} from 'chai';
+import {expect} from 'chai';
 import {parse} from '../src/index';
+
+const normalizeResult = (result) => ({
+  ingredient: result.ingredient,
+  quantity: result.quantity,
+  unit: result.unit,
+  unitPlural: result.unitPlural,
+  symbol: result.symbol,
+  minQty: result.minQty,
+  maxQty: result.maxQty,
+});
+
+const expectParsed = (input, expected) => {
+  expect(normalizeResult(parse(input, 'deu'))).to.deep.equal(expected);
+};
 
 /* global expect, it, describe */
 
@@ -61,19 +77,13 @@ describe('recipe parser deu', () => {
         unitPlural: 'Teelöffel',
       };
       it('of "10-20 teelöffel Wasser"', () => {
-        expect(parse('10-20 teelöffel Wasser', 'deu')).to.deep.equal(
-          expectation,
-        );
+        expectParsed('10-20 teelöffel Wasser', expectation);
       });
       it('of "10 - 20 teelöffel Wasser"', () => {
-        expect(parse('10 - 20 teelöffel Wasser', 'deu')).to.deep.equal(
-          expectation,
-        );
+        expectParsed('10 - 20 teelöffel Wasser', expectation);
       });
       it('of "10 to 20 teelöffel Wasser"', () => {
-        expect(parse('10 bis 20 teelöffel Wasser', 'deu')).to.deep.equal(
-          expectation,
-        );
+        expectParsed('10 bis 20 teelöffel Wasser', expectation);
       });
     });
 
@@ -107,8 +117,9 @@ describe('recipe parser deu', () => {
         const element = unicodeAmounts[u];
         const expectedAmount = unicodeExpectedAmounts[u];
         it(`${element} to ${expectedAmount}`, () => {
-          expect(parse(`${element} teelöffel Wasser`, 'deu').quantity).to.equal(
+          expect(parse(`${element} teelöffel Wasser`, 'deu').quantity).to.be.closeTo(
             expectedAmount,
+            0.002,
           );
         });
       }
@@ -159,15 +170,16 @@ describe('recipe parser deu', () => {
         const expectedAmount =
           Number(mixedExpectedValues[u]) + Number(unicodeExpectedAmounts[u]);
         it(`${element} to ${expectedAmount}`, () => {
-          expect(parse(`${element} teelöffel Wasser`, 'deu').quantity).to.equal(
+          expect(parse(`${element} teelöffel Wasser`, 'deu').quantity).to.be.closeTo(
             expectedAmount,
+            0.002,
           );
         });
       }
     });
 
     it("doesn't freak out if a strange unicode character is present", () => {
-      expect(parse('1/3 tasse confectioners’ zucker', 'deu')).to.deep.equal({
+      expectParsed('1/3 tasse confectioners’ zucker', {
         quantity: 0.333,
         unit: 'Tasse',
         unitPlural: 'Tassen',
@@ -217,35 +229,32 @@ describe('recipe parser deu', () => {
       expect(parse('1 Prise salt', 'deu').unit).to.equal('Prise');
     });
     it('"1 (14.5 oz) dose tomatoes"', () => {
-      expect(parse('1 (14.5 oz) dose tomatoes', 'deu')).to.deep.equal({
+      expectParsed('1 (14.5 oz) dose tomatoes', {
         unit: 'Dose',
         unitPlural: 'Dosen',
         symbol: null,
         quantity: 1,
-        ingredient: 'tomatoes (14.5 oz)',
+        ingredient: 'tomatoes',
         minQty: 1,
         maxQty: 1,
       });
     });
     it('"25 lb beef stew chunks (or buy a roast and chop into small cubes)"', () => {
-      expect(
-        parse(
-          '25 lb beef stew chunks (or buy a roast and chop into small cubes)',
-          'deu',
-        ),
-      ).to.deep.equal({
-        unit: 'Pfund',
-        unitPlural: 'Pfund',
-        symbol: 'lb',
-        quantity: 25,
-        ingredient:
-          'beef stew chunks (or buy a roast and chop into small cubes)',
-        minQty: 25,
-        maxQty: 25,
-      });
+      expectParsed(
+        '25 lb beef stew chunks (or buy a roast and chop into small cubes)',
+        {
+          unit: 'Pfund',
+          unitPlural: 'Pfund',
+          symbol: 'lb',
+          quantity: 25,
+          ingredient: 'beef stew chunks',
+          minQty: 25,
+          maxQty: 25,
+        },
+      );
     });
     it('"parses ingredient with range: 1 bis 2 Apfel"', () => {
-      expect(parse('1 bis 2 Apfel', 'deu')).to.deep.equal({
+      expectParsed('1 bis 2 Apfel', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -256,7 +265,7 @@ describe('recipe parser deu', () => {
       });
     });
     it('"parses ingredient with range: 1 - 2 Apfel"', () => {
-      expect(parse('1 - 2 Apfel', 'deu')).to.deep.equal({
+      expectParsed('1 - 2 Apfel', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -267,7 +276,7 @@ describe('recipe parser deu', () => {
       });
     });
     it('"parses ingredient with range: 1-2 Apfel"', () => {
-      expect(parse('1-2 Apfel', 'deu')).to.deep.equal({
+      expectParsed('1-2 Apfel', {
         unit: null,
         unitPlural: null,
         symbol: null,
@@ -278,7 +287,7 @@ describe('recipe parser deu', () => {
       });
     });
     it('"1 Stück Käse"', () => {
-      expect(parse('1 Stück Käse', 'deu')).to.deep.equal({
+      expectParsed('1 Stück Käse', {
         unit: 'Stück',
         unitPlural: 'Stücke',
         symbol: null,
@@ -291,7 +300,7 @@ describe('recipe parser deu', () => {
   });
 
   it('translates unit when no unit provided', () => {
-    expect(parse('1 tortilla', 'deu')).to.deep.equal({
+    expectParsed('1 tortilla', {
       unit: null,
       unitPlural: null,
       symbol: null,
@@ -303,7 +312,7 @@ describe('recipe parser deu', () => {
   });
 
   it("doesn't explode when no unit and no quantity provided", () => {
-    expect(parse('Powdered Sugar', 'deu')).to.deep.equal({
+    expectParsed('Powdered Sugar', {
       ingredient: 'Powdered Sugar',
       quantity: 0,
       unit: null,

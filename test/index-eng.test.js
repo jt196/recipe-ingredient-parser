@@ -1,3 +1,4 @@
+import {expect} from 'chai';
 import {parse} from '../src/index';
 
 /* global expect, it, describe */
