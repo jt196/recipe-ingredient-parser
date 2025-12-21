@@ -134,6 +134,33 @@ describe('recipe parser eng', () => {
       it('of "10 to 20 teaspoon water"', () => {
         testExpectation('10 to 20 teaspoon water', expectation);
       });
+
+      describe('fraction ranges', () => {
+        const fractionRangeExpectation = {
+          ingredient: 'flour',
+          maxQty: 0.5,
+          minQty: 0.25,
+          quantity: 0.25,
+          additional: null,
+          originalString: '',
+          symbol: 'c',
+          unit: 'cup',
+          unitPlural: 'cups',
+        };
+
+        const fractionRangeInputs = [
+          '¼-½ cup of flour',
+          '¼ - ½ cup of flour',
+          '1/4-1/2 cup of flour',
+          '1/4 - 1/2 cup of flour',
+        ];
+
+        fractionRangeInputs.forEach(input => {
+          it(`of "${input}"`, () => {
+            testExpectation(input, fractionRangeExpectation);
+          });
+        });
+      });
     });
 
     describe('translates teaspoons correctly', () => {

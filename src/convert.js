@@ -12,6 +12,10 @@ export function convertFromFraction(value, language) {
 
   const delimiter = isCommaDelimited ? ',' : '.';
 
+  if (value && Object.prototype.hasOwnProperty.call(unicodeObj, value)) {
+    value = unicodeObj[value];
+  }
+
   // number comes in, for example: 1 1/3
   if (value && value.split(' ').length > 1) {
     const [whole, fraction] = value.split(' ');
@@ -21,8 +25,13 @@ export function convertFromFraction(value, language) {
       ? parseInt(whole) + remainder
       : remainder;
     return keepThreeDecimals(wholeAndFraction, delimiter);
-  } else if (!value || value.split('-').length > 1) {
+  } else if (!value) {
     return value;
+  } else if (value.includes('-') || value.includes('–')) {
+    const parts = value.split(/-|–/).map(part =>
+      convertFromFraction(part.trim(), language),
+    );
+    return parts.join('-');
   } else {
     const [a, b] = value.split('/');
     return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : a;
@@ -110,16 +119,15 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
 
   const delimiter = isCommaDelimited ? ',' : '\\.';
   const magnitudeSeperator = isCommaDelimited ? '\\.' : ',';
+  const quantityPattern = `(\\d+\\/\\d+|\\d+\\s\\d+\\/\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`;
+  const joinersEscaped = joiners.map(j => j.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'));
 
-  const numericAndFractionRegex = new RegExp(
-    `(\\d+\\/\\d+|\\d+\\s\\d+\\/\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`,
-    'g',
-  );
+  const numericAndFractionRegex = new RegExp(quantityPattern, 'g');
 
   const numericRangeWithSpaceRegex = new RegExp(
-    `(\\d+[\\-–]\\d+)|(\\d+\\s[\\-–]\\s\\d+)|(\\d+\\s(?:${joiners.join(
+    `${quantityPattern}\\s*(?:[\\-–]|(?:${joinersEscaped.join(
       '|',
-    )})\\s\\d+)`,
+    )}))\\s*${quantityPattern}`,
     'g',
   );
 
@@ -143,6 +151,23 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
       const unicodeValue = denom ? num / denom : 0;
       const totalQuantity = numericPart + unicodeValue;
       const rest = ingredientLine.replace(match, '').trim();
+      const rangeDashMatch = rest.match(/^[-–]\s*([^\s]+)/);
+      if (rangeDashMatch) {
+        const secondQty = convertFromFraction(rangeDashMatch[1], language);
+        const restOfIngredient = rest.replace(rangeDashMatch[0], '').trim();
+        return [`${totalQuantity}-${secondQty}`, restOfIngredient];
+      }
+      const rangeJoinerMatch = rest.match(
+        new RegExp(
+          `^(${joinersEscaped.join('|')})\\s*([^\\s]+)`,
+          'i',
+        ),
+      );
+      if (rangeJoinerMatch) {
+        const secondQty = convertFromFraction(rangeJoinerMatch[2], language);
+        const restOfIngredient = rest.replace(rangeJoinerMatch[0], '').trim();
+        return [`${totalQuantity}-${secondQty}`, restOfIngredient];
+      }
 
       return [totalQuantity.toString(), rest];
     }
@@ -152,7 +177,7 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   const quantityRangeMatch = ingredientLine.match(numericRangeWithSpaceRegex);
   if (quantityRangeMatch) {
     const quantity = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex)
-      .replace(new RegExp(`${joiners.join('|')}`), '-')
+      .replace(new RegExp(`${joinersEscaped.join('|')}`), '-')
       .split(' ')
       .join('');
     const restOfIngredient = ingredientLine
