@@ -22,7 +22,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/convert.js",
+    "src/utils/convert.js",
     "src/index.js",
     "src/i18n/lang.eng.js",
     "src/i18n/lang.deu.js",

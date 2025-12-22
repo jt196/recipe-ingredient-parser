@@ -1,4 +1,4 @@
-import * as convert from '../convert';
+import * as convert from './convert';
 import {i18nMap} from '../i18n';
 
 export function toTasteRecognize(input, language) {
@@ -71,7 +71,10 @@ export function getUnit(input, language) {
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
       const regex = new RegExp(
-        `(?:^|[^A-Za-z0-9])${shorthand.replace(/\./g, '\\.')}(?:$|[^A-Za-z0-9])`,
+        `(?:^|[^A-Za-z0-9])${shorthand.replace(
+          /\./g,
+          '\\.',
+        )}(?:$|[^A-Za-z0-9])`,
         'gi',
       );
       const match = input.match(regex);
@@ -193,9 +196,7 @@ export function extractMultiplier(line, language) {
       return {multiplier: 1, line: working};
     }
 
-    if (
-      /^(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)/u.test(candidateRest)
-    ) {
+    if (/^(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)/u.test(candidateRest)) {
       return {multiplier: 1, line: working};
     }
 
@@ -206,7 +207,9 @@ export function extractMultiplier(line, language) {
       const [candidateQty, candidateRemainder] =
         convert.findQuantityAndConvertIfUnicode(candidateRest, language);
       const candidateUnitParts =
-        candidateQty && candidateRemainder ? getUnit(candidateRemainder, language) : [];
+        candidateQty && candidateRemainder
+          ? getUnit(candidateRemainder, language)
+          : [];
       const hasUnit = candidateUnitParts.length > 0;
 
       const sizeLikeUnit =

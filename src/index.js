@@ -1,28 +1,21 @@
-import * as convert from './convert';
+import * as convert from './utils/convert';
 import {i18nMap} from './i18n';
 import {
-  toTasteRecognize,
   getUnit,
   getPreposition,
-  getSymbol,
   getUnitSystem,
   convertToNumber,
-  resultQuantityCaptured,
   extractMultiplier,
   extractParentheticalSegments,
   extractInstructions,
 } from './utils/parser-helpers';
+import {
+  resultQuantityCaptured,
+  getUnitAndRemainder,
+  resolveRangeQuantities,
+} from './utils/quantity';
 import {combine as combineIngredients} from './utils/combine';
-export {toTasteRecognize, getSymbol, getUnitSystem, convertToNumber} from './utils/parser-helpers';
-export {combine as combineIngredients} from './utils/combine';
 
-/**
- * Detect "to taste" style units and return a normalized shorthand with metadata.
- *
- * @param {string} input
- * @param {string} language
- * @returns {[string,string|undefined,boolean]} tuple of [unitShorthand, matchedText, isExtendedMatch]
- */
 /**
  * Parses a ingredient string to extract ingredient details.
  *
@@ -188,14 +181,20 @@ export function parse(ingredientString, language, options = {}) {
           if (altEntry) {
             alternatives.push(altEntry);
             const primarySegment = ingredientLine.split('/')[0].trim();
-            ingredientLine = `${primarySegment} ${altEntry.ingredient || ''}`.trim();
+            ingredientLine = `${primarySegment} ${
+              altEntry.ingredient || ''
+            }`.trim();
           }
         }
       }
     }
   }
   // Fallback: if slash-present alt was filtered out, at least keep the primary side.
-  if (includeAlternatives && originalString.includes('/') && alternatives.length === 0) {
+  if (
+    includeAlternatives &&
+    originalString.includes('/') &&
+    alternatives.length === 0
+  ) {
     const slashParts = originalString.split('/');
     if (slashParts.length >= 2) {
       const lastPart = slashParts[slashParts.length - 1];
@@ -207,11 +206,16 @@ export function parse(ingredientString, language, options = {}) {
         const altEntry = tryAddAlternative(lastPart.trim());
         if (altEntry && primarySegment) {
           alternatives.push(altEntry);
-          ingredientLine = `${primarySegment} ${altEntry.ingredient || ''}`.trim();
+          ingredientLine = `${primarySegment} ${
+            altEntry.ingredient || ''
+          }`.trim();
           if (altEntry.additional) {
             additionalParts.push(altEntry.additional);
           }
-          if (Array.isArray(altEntry.instructions) && altEntry.instructions.length) {
+          if (
+            Array.isArray(altEntry.instructions) &&
+            altEntry.instructions.length
+          ) {
             additionalParts.push(...altEntry.instructions);
           }
         } else if (primarySegment) {
@@ -275,10 +279,7 @@ export function parse(ingredientString, language, options = {}) {
   }
 
   // Normalize ampersand-separated mixed numbers like "1 & 1/2"
-  ingredientLine = ingredientLine.replace(
-    /(\d)\s*&\s*(\d+\/\d+)/g,
-    '$1 $2',
-  );
+  ingredientLine = ingredientLine.replace(/(\d)\s*&\s*(\d+\/\d+)/g, '$1 $2');
 
   // Convert stray non-dash separators between digits into fraction slash (but ignore hyphen/dash ranges)
   ingredientLine = ingredientLine.replace(
@@ -316,7 +317,9 @@ export function parse(ingredientString, language, options = {}) {
     language,
   );
   quantity = convert.convertFromFraction(quantity, language);
-  const leadingFractionInOriginal = originalString.match(/^\s*(\d+)\s*\/\s*(\d+)/);
+  const leadingFractionInOriginal = originalString.match(
+    /^\s*(\d+)\s*\/\s*(\d+)/,
+  );
   if (leadingFractionInOriginal) {
     const numerator = Number(leadingFractionInOriginal[1]);
     const denominator = Number(leadingFractionInOriginal[2]);
@@ -391,7 +394,9 @@ export function parse(ingredientString, language, options = {}) {
   // Handle inch descriptors without an explicit leading digit (e.g., "inch piece ginger" after word-number quantities).
   if (/^inch(?:es)?\b/i.test(restOfIngredient)) {
     additionalParts.push('1-inch');
-    restOfIngredient = restOfIngredient.replace(/^inch(?:es)?\b[-\s]*/i, '').trim();
+    restOfIngredient = restOfIngredient
+      .replace(/^inch(?:es)?\b[-\s]*/i, '')
+      .trim();
   }
 
   // Capture leading secondary size notes that precede container units (e.g., "15-ounce cans")
@@ -399,22 +404,27 @@ export function parse(ingredientString, language, options = {}) {
     /^(?:of\s+)?(?:a\s+)?(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*(?:oz|ounce|ounces|g|gram|grams|kg|kilogram|milliliter|millilitre|ml|liter|litre|lb|pound|pounds)\b[-\s]*(?=\s*(?:can|cans|package|packages|pack|packs|packet|packets|pack\.?|tin|tins|bag|bags|piece|pieces|bunch|handful|handfuls))/i;
   const containerSizeMatch = restOfIngredient.match(containerSizeRegex);
   if (containerSizeMatch) {
-    containerSizeText = containerSizeMatch[0].replace(/^(?:of\s+)?(?:a\s+)?/i, '').trim();
-    restOfIngredient = restOfIngredient.slice(containerSizeMatch[0].length).trim();
+    containerSizeText = containerSizeMatch[0]
+      .replace(/^(?:of\s+)?(?:a\s+)?/i, '')
+      .trim();
+    restOfIngredient = restOfIngredient
+      .slice(containerSizeMatch[0].length)
+      .trim();
   }
 
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
   const restBeforeUnit = restOfIngredient;
-  let [unit, unitPlural, symbol, originalUnit] = getUnit(
-    restOfIngredient,
-    language,
-  );
-  // remove unit from the ingredient if one was found and trim leading and trailing whitespace
-  let ingredient = originalUnit
-    ? restOfIngredient.replace(originalUnit, '').trim()
-    : restOfIngredient.replace(unit, '').trim();
-  ingredient = ingredient.replace(/\.(\s|$)/g, '$1').trim();
-  ingredient = ingredient.replace(/^(?:can|tin)\s+/i, '').trim();
+  const {
+    unit: unitRaw,
+    unitPlural: unitPluralRaw,
+    symbol: symbolRaw,
+    ingredient: ingredientRaw,
+    originalUnit,
+  } = getUnitAndRemainder(restOfIngredient, language);
+  let unit = unitRaw;
+  let unitPlural = unitPluralRaw;
+  let symbol = symbolRaw;
+  let ingredient = ingredientRaw;
 
   // Prefer container units (can/pack/bag) when a size descriptor precedes them, instead of weight/volume units.
   if (
@@ -461,7 +471,9 @@ export function parse(ingredientString, language, options = {}) {
 
   // Treat leading inch-based size descriptors as additional context when followed by pieces.
   if (unit === 'inch' && /\bpiece\b/i.test(restBeforeUnit)) {
-    const sizeText = (restBeforeUnit.match(/^[^A-Za-z]*([\d¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞.,-]+\s*inch(?:es)?)/i) || [])[1];
+    const sizeText = (restBeforeUnit.match(
+      /^[^A-Za-z]*([\d¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞.,-]+\s*inch(?:es)?)/i,
+    ) || [])[1];
     if (sizeText) {
       additionalParts.push(sizeText.trim());
     }
@@ -539,7 +551,10 @@ export function parse(ingredientString, language, options = {}) {
     const escapedAdverbs = adverbWords.map(w =>
       w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
     );
-    const adverbOnlyRegex = new RegExp(`\\b(${escapedAdverbs.join('|')})\\b`, 'gi');
+    const adverbOnlyRegex = new RegExp(
+      `\\b(${escapedAdverbs.join('|')})\\b`,
+      'gi',
+    );
     ingredient = ingredient.replace(adverbOnlyRegex, match => {
       if (!instructionsFound.includes(match.trim())) {
         instructionsFound.push(match.trim());
@@ -619,7 +634,10 @@ export function parse(ingredientString, language, options = {}) {
     const sizeWords = ['small', 'large', 'medium', 'scant', 'healthy'];
     const sizeRegex = new RegExp(`^(?:${sizeWords.join('|')})\\b`, 'i');
     const sizeMatch = ingredient.match(sizeRegex);
-    const nextChar = ingredient.slice(sizeMatch ? sizeMatch[0].length : 0, sizeMatch ? sizeMatch[0].length + 1 : 0);
+    const nextChar = ingredient.slice(
+      sizeMatch ? sizeMatch[0].length : 0,
+      sizeMatch ? sizeMatch[0].length + 1 : 0,
+    );
     if (sizeMatch && nextChar !== '-') {
       const sizeWord = sizeMatch[0].trim();
       if (!instructionsFound.includes(sizeWord)) {
@@ -644,7 +662,10 @@ export function parse(ingredientString, language, options = {}) {
     }
 
     // Ensure lukewarm stays as an instruction if present in the original string.
-    if (/lukewarm/i.test(originalString) && !instructionsFound.includes('lukewarm')) {
+    if (
+      /lukewarm/i.test(originalString) &&
+      !instructionsFound.includes('lukewarm')
+    ) {
       instructionsFound.push('lukewarm');
     }
 
@@ -672,7 +693,9 @@ export function parse(ingredientString, language, options = {}) {
       const firstWord = (ingredient.split(/\s+/)[0] || '').toLowerCase();
       const wordNum = convert.text2num(firstWord, language);
       if (resultQuantityCaptured(quantity) && wordNum > 0) {
-        ingredient = ingredient.replace(new RegExp(`^${firstWord}\\s+`, 'i'), '').trim();
+        ingredient = ingredient
+          .replace(new RegExp(`^${firstWord}\\s+`, 'i'), '')
+          .trim();
       }
     }
 
@@ -699,12 +722,16 @@ export function parse(ingredientString, language, options = {}) {
     }
 
     if (unit === 'can') {
-      ingredient = ingredient.replace(/^(?:cans?|tins?)\b\s*(?:of\s+)?/i, '').trim();
+      ingredient = ingredient
+        .replace(/^(?:cans?|tins?)\b\s*(?:of\s+)?/i, '')
+        .trim();
     }
 
     // Drop leading conjunctions/prepositions.
     ingredient = ingredient.replace(/^(?:of|or|and)\s+/i, '').trim();
-    ingredient = ingredient.replace(/^(?:small|large|medium)\s+of\s+/i, '').trim();
+    ingredient = ingredient
+      .replace(/^(?:small|large|medium)\s+of\s+/i, '')
+      .trim();
     // Drop trailing dangling conjunctions.
     ingredient = ingredient.replace(/\b(?:and|or)\s*$/i, '').trim();
   }
@@ -734,7 +761,10 @@ export function parse(ingredientString, language, options = {}) {
     /^(\d+\s*\/\s*\d+|[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/u,
   );
   if (leadingFraction && !(quantity && `${quantity}`.includes('-'))) {
-    const leadingQty = convert.convertFromFraction(leadingFraction[0], language);
+    const leadingQty = convert.convertFromFraction(
+      leadingFraction[0],
+      language,
+    );
     if (leadingQty != null) {
       quantity = leadingQty.toString();
       ingredient = ingredient.replace(leadingFraction[0], '').trim();
@@ -753,21 +783,12 @@ export function parse(ingredientString, language, options = {}) {
   ingredient = ingredient.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 
   // Initialize range bounds up-front so downstream alternative handling can reuse them.
-  let minQty = quantity; // default to quantity
-  let maxQty = quantity; // default to quantity
-
-  const fractionRangeMatch = originalString.match(
-    /([0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞\/]+)\s*[-–]\s*([0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞\/]+)/i,
-  );
-  if (fractionRangeMatch) {
-    const minVal = convert.convertFromFraction(fractionRangeMatch[1], language);
-    const maxVal = convert.convertFromFraction(fractionRangeMatch[2], language);
-    if (!Number.isNaN(minVal) && !Number.isNaN(maxVal)) {
-      quantity = minVal.toString();
-      minQty = minVal;
-      maxQty = maxVal;
-    }
-  }
+  let {
+    quantity: rangeQuantity,
+    minQty,
+    maxQty,
+  } = resolveRangeQuantities(quantity, originalString, language);
+  quantity = rangeQuantity;
 
   if (includeAlternatives && /\bor\b/i.test(ingredient)) {
     const parts = ingredient.split(/\bor\b/i);
@@ -787,7 +808,10 @@ export function parse(ingredientString, language, options = {}) {
           includeUnitSystems,
         });
       }
-      if (altParsed && (altParsed.quantity || altParsed.unit || altParsed.ingredient)) {
+      if (
+        altParsed &&
+        (altParsed.quantity || altParsed.unit || altParsed.ingredient)
+      ) {
         const altEntry = {
           quantity: altParsed.quantity,
           unit: altParsed.unit,
@@ -904,7 +928,10 @@ export function parse(ingredientString, language, options = {}) {
   if (optional) {
     result.optional = true;
     if (result.additional && optionalRegex) {
-      const cleanedAdditional = safeReplace(result.additional, optionalRegex).trim();
+      const cleanedAdditional = safeReplace(
+        result.additional,
+        optionalRegex,
+      ).trim();
       result.additional = cleanedAdditional || null;
     }
   }
@@ -951,7 +978,10 @@ export function parse(ingredientString, language, options = {}) {
           includeAlternatives: false,
           includeUnitSystems,
         });
-        if (altParsed && (altParsed.quantity || altParsed.unit || altParsed.ingredient)) {
+        if (
+          altParsed &&
+          (altParsed.quantity || altParsed.unit || altParsed.ingredient)
+        ) {
           result.alternatives = [
             {
               quantity: altParsed.quantity || result.quantity,
@@ -962,10 +992,15 @@ export function parse(ingredientString, language, options = {}) {
               minQty: altParsed.minQty || result.minQty,
               maxQty: altParsed.maxQty || result.maxQty,
               originalString: altPart,
-              ...(includeUnitSystems && {unitSystem: getUnitSystem(altParsed.unit, language)}),
+              ...(includeUnitSystems && {
+                unitSystem: getUnitSystem(altParsed.unit, language),
+              }),
             },
           ];
-          if (primaryPart && (!result.ingredient || result.ingredient.trim() === '')) {
+          if (
+            primaryPart &&
+            (!result.ingredient || result.ingredient.trim() === '')
+          ) {
             result.ingredient = primaryPart.replace(/^\s*[-–—]\s*/, '').trim();
           }
         }
@@ -1003,7 +1038,11 @@ export function parse(ingredientString, language, options = {}) {
     result.instructions = instructionsFound;
   }
 
-  if (includeAlternatives && result.alternatives && result.alternatives.length > 0) {
+  if (
+    includeAlternatives &&
+    result.alternatives &&
+    result.alternatives.length > 0
+  ) {
     const alt0 = result.alternatives[0];
     if (
       alt0 &&
@@ -1013,7 +1052,9 @@ export function parse(ingredientString, language, options = {}) {
       alt0.quantity !== undefined
     ) {
       const qtyStr = `${alt0.quantity}`.replace('.', '\\.');
-      const unitPieces = [alt0.symbol, alt0.unit, alt0.unitPlural].filter(Boolean).join('|');
+      const unitPieces = [alt0.symbol, alt0.unit, alt0.unitPlural]
+        .filter(Boolean)
+        .join('|');
       const prefixRegex = new RegExp(
         `^${qtyStr}\\s*(?:${unitPieces})?\\s+`,
         'i',
@@ -1025,7 +1066,9 @@ export function parse(ingredientString, language, options = {}) {
   if (
     unit === 'piece' &&
     (!result.additional || !result.additional.includes('inch')) &&
-    /(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?\s*-?\s*inch)/i.test(originalString)
+    /(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?\s*-?\s*inch)/i.test(
+      originalString,
+    )
   ) {
     result.additional = result.additional
       ? `${result.additional}, ${RegExp.$1.trim()}`
@@ -1076,9 +1119,14 @@ export function parse(ingredientString, language, options = {}) {
     result.unitPlural = null;
     result.symbol = null;
     const existingAdditional = result.additional
-      ? result.additional.split(',').map(s => s.trim()).filter(Boolean)
+      ? result.additional
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
       : [];
-    const mergedAdditional = Array.from(new Set([...existingAdditional, rangeText]));
+    const mergedAdditional = Array.from(
+      new Set([...existingAdditional, rangeText]),
+    );
     result.additional = mergedAdditional.join(', ');
     if (includeUnitSystems) {
       result.unitSystem = null;
@@ -1116,7 +1164,10 @@ export function parse(ingredientString, language, options = {}) {
     originalString.includes('/')
   ) {
     if (/\s\/\s/.test(originalString)) {
-      const parts = originalString.split('/').map(part => part.trim()).filter(Boolean);
+      const parts = originalString
+        .split('/')
+        .map(part => part.trim())
+        .filter(Boolean);
       if (parts.length > 1) {
         const primaryPart = parts.shift();
         if (!result.ingredient && primaryPart) {
@@ -1138,13 +1189,6 @@ export function parse(ingredientString, language, options = {}) {
   }
 
   return result;
-}
-
-export function multiLineParse(recipeString, language) {
-  const source = typeof recipeString === 'string' ? recipeString : '';
-  const ingredients = source.split(/[,👉🏻👉\r\n-]/); // eslint-disable-line no-misleading-character-class
-
-  return ingredients.map(x => parse(x, language)).filter(x => x['ingredient']);
 }
 
 export const combine = combineIngredients;

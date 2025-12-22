@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {multiLineParse, parse} from '../src/index';
+import {parse} from '../src/index';
 
 /* global expect, it, describe */
 
@@ -20,6 +20,12 @@ const expectParsed = (input, expected) => {
 };
 
 describe('recipe parser ita', () => {
+  const multiLineParse = (recipeString) => {
+    const source = typeof recipeString === 'string' ? recipeString : '';
+    const ingredients = source.split(/[,👉🏻👉\r\n-]/); // eslint-disable-line no-misleading-character-class
+    return ingredients.map(x => parse(x, 'ita')).filter(x => x['ingredient']);
+  };
+
   it('returns an object', () => {
     expect(typeof parse('1 tazza acqua', 'ita')).to.equal('object');
   });

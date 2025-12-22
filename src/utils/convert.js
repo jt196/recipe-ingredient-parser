@@ -1,12 +1,11 @@
-import {i18nMap} from './i18n';
+import {i18nMap} from '../i18n';
 
 /**
  * Escape text for safe usage inside RegExp character classes.
  * @param {string} value
  * @returns {string}
  */
-const escapeRegex = value =>
-  value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+const escapeRegex = value => value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
 /**
  * Round a numeric string to three decimals while respecting the locale delimiter.
@@ -57,14 +56,16 @@ export function convertFromFraction(value, language) {
 
   // fractional range (recursively convert both sides)
   if (working.includes('-') || working.includes('–')) {
-    const parts = working.split(/-|–/).map(part =>
-      convertFromFraction(part.trim(), language),
-    );
+    const parts = working
+      .split(/-|–/)
+      .map(part => convertFromFraction(part.trim(), language));
     return parts.join('-');
   }
 
   const [a, b] = working.split('/');
-  return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : working;
+  return b
+    ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter)
+    : working;
 }
 
 /**
@@ -111,7 +112,10 @@ export function text2num(s, language) {
   const langMap = i18nMap[language];
   if (!langMap) return null;
 
-  const a = s.toString().trim().split(/[\s-]+/);
+  const a = s
+    .toString()
+    .trim()
+    .split(/[\s-]+/);
   let values = [0, 0];
   a.forEach(x => {
     values = feach(x, values[0], values[1], language);
@@ -214,7 +218,9 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   const numericAndFractionRegex = new RegExp(quantityPattern, 'g');
 
   const numericRangeWithSpaceRegex = new RegExp(
-    `${quantityPattern}\\s*(?:[\\-–]${joinersPattern ? `|(?:${joinersPattern})` : ''})\\s*${quantityPattern}`,
+    `${quantityPattern}\\s*(?:[\\-–]${
+      joinersPattern ? `|(?:${joinersPattern})` : ''
+    })\\s*${quantityPattern}`,
     'g',
   );
 
@@ -246,10 +252,7 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
         return [`${totalQuantity}-${secondQty}`, restOfIngredient];
       }
       const rangeJoinerMatch = rest.match(
-        new RegExp(
-          `^(${joinersPattern})\\s*([^\\s]+)`,
-          'i',
-        ),
+        new RegExp(`^(${joinersPattern})\\s*([^\\s]+)`, 'i'),
       );
       if (joinersPattern && rangeJoinerMatch) {
         const secondQty = convertFromFraction(rangeJoinerMatch[2], language);
