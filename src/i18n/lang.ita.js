@@ -127,6 +127,7 @@ const prepositions = ['di', "d'"];
 const joiners = ['o'];
 
 const toTaste = ['quanto basta'];
+const approx = ['circa', 'circa.', 'cir.', 'approssimativamente', 'quasi', '~'];
 
 export const numbersSmall = {
   zero: 0,
@@ -197,6 +198,7 @@ export const langIta = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

@@ -104,6 +104,15 @@ const prepositions = ['de'];
 const joiners = ['a'];
 
 const toTaste = ['al gusto'];
+const approx = [
+  'aprox',
+  'aprox.',
+  'aproximadamente',
+  'cerca de',
+  'alrededor de',
+  'sobre',
+  '~',
+];
 
 const numbersSmall = {
   cero: 0,
@@ -161,6 +170,7 @@ export const langEsp = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

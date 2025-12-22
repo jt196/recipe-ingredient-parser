@@ -88,6 +88,7 @@ const symbolUnits = {
 const prepositions = ['из'];
 const joiners = ['до'];
 const toTaste = ['по вкусу'];
+const approx = ['примерно', 'прибл', 'прибл.', 'приблизительно', 'около', '~'];
 
 const numbersSmall = {
   ноль: 0,
@@ -140,6 +141,7 @@ export const langRus = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

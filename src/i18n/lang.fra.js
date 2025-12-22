@@ -102,6 +102,15 @@ const symbolUnits = {
 const prepositions = ['de'];
 const joiners = ['à'];
 const toTaste = ['selon le goût'];
+const approx = [
+  'env.',
+  'environ',
+  'approx',
+  'approx.',
+  'approximativement',
+  'presque',
+  '~',
+];
 
 const numbersSmall = {
   zéro: 0,
@@ -155,6 +164,7 @@ export const langFra = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

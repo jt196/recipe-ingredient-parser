@@ -106,6 +106,7 @@ const prepositions = ['of'];
 const joiners = ['to'];
 
 const toTaste = ['to taste'];
+const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
 
 const numbersSmall = {
   zero: 0,
@@ -160,6 +161,7 @@ export const langEng = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

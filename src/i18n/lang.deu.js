@@ -86,6 +86,7 @@ const prepositions = ['von'];
 const joiners = ['bis'];
 
 const toTaste = [];
+const approx = ['ca', 'ca.', 'circa', 'ungefähr', 'etwa', '~'];
 
 const numbersSmall = {
   null: 0,
@@ -142,6 +143,7 @@ export const langDeu = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

@@ -237,6 +237,7 @@ export function parse(ingredientString, language) {
     };
   }
   const langMap = i18nMap[language] || {};
+  const approxWords = langMap.approx || [];
 
   // Initialize variables
   let additional = '';
@@ -258,11 +259,38 @@ export function parse(ingredientString, language) {
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
+  let approx = false;
+  const approxRegex =
+    approxWords.length > 0
+      ? new RegExp(
+          `^(${approxWords
+            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
+            .join('|')})\\b`,
+          'i',
+        )
+      : null;
+
+  if (approxRegex) {
+    const matchApprox = ingredientLine.match(approxRegex);
+    if (matchApprox) {
+      approx = true;
+      ingredientLine = ingredientLine.replace(matchApprox[0], '').trim();
+    }
+  }
+
   let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
     ingredientLine,
     language,
   );
   quantity = convert.convertFromFraction(quantity, language);
+
+  if (approxRegex) {
+    const approxMatch = restOfIngredient.match(approxRegex);
+    if (approxMatch) {
+      approx = true;
+      restOfIngredient = restOfIngredient.replace(approxMatch[0], '').trim();
+    }
+  }
 
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
@@ -288,7 +316,7 @@ export function parse(ingredientString, language) {
     quantity = minQty;
   }
 
-  return {
+  const result = {
     quantity: convertToNumber(quantity, language),
     unit: unit ? unit : null,
     unitPlural: unitPlural ? unitPlural : null,
@@ -299,6 +327,12 @@ export function parse(ingredientString, language) {
     additional: additional ? additional.replace(/\s+/g, ' ').trim() : null, // Add additional field
     originalString, // Include the original string
   };
+
+  if (approx) {
+    result.approx = true;
+  }
+
+  return result;
 }
 
 export function multiLineParse(recipeString, language) {

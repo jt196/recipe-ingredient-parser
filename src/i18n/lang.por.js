@@ -101,6 +101,15 @@ const symbolUnits = {
 const prepositions = ['de'];
 const joiners = ['a'];
 const toTaste = ['a gosto'];
+const approx = [
+  'aprox',
+  'aprox.',
+  'aproximadamente',
+  'cerca de',
+  'por volta de',
+  'quase',
+  '~',
+];
 
 const numbersSmall = {
   zero: 0,
@@ -155,6 +164,7 @@ export const langPor = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

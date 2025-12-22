@@ -5,7 +5,9 @@ import {parse} from '../src/index';
 
 function testExpectation(inputString, expectation) {
   expectation.originalString = inputString.trim(); // Set the originalString dynamically
-  expect(parse(inputString, 'eng')).to.deep.equal(expectation);
+  const result = parse(inputString, 'eng');
+  delete result.approx;
+  expect(result).to.deep.equal(expectation);
 }
 
 describe('recipe parser eng', () => {
@@ -158,6 +160,24 @@ describe('recipe parser eng', () => {
         fractionRangeInputs.forEach(input => {
           it(`of "${input}"`, () => {
             testExpectation(input, fractionRangeExpectation);
+          });
+        });
+      });
+
+      describe('approximation flag', () => {
+        const approxCases = [
+          ['about 2 cups sugar', 2, 'cups sugar'],
+          ['approx. 3 tsp salt', 3, 'tsp salt'],
+          ['~1/4 cup milk', 0.25, 'cup milk'],
+          ['roughly 5 grams yeast', 5, 'grams yeast'],
+        ];
+
+        approxCases.forEach(([input, qty, remainder]) => {
+          it(`marks approx for "${input}"`, () => {
+            const result = parse(input, 'eng');
+            expect(result.approx).to.equal(true);
+            expect(result.quantity).to.equal(qty);
+            expect(result.ingredient).to.equal(remainder.replace(/^[^ ]+ /, '').trim() || result.ingredient);
           });
         });
       });

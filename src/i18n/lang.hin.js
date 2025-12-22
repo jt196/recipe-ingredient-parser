@@ -88,6 +88,7 @@ const symbolUnits = {
 const prepositions = ['का', 'के'];
 const joiners = ['से'];
 const toTaste = ['स्वादानुसार'];
+const approx = ['लगभग', 'करीब', 'तक़रीबन', 'आसपास', '~'];
 
 const numbersSmall = {
   शून्य: 0,
@@ -138,6 +139,7 @@ export const langHin = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

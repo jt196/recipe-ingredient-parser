@@ -10,6 +10,7 @@ const normalizeResult = (result) => ({
   symbol: result.symbol,
   minQty: result.minQty,
   maxQty: result.maxQty,
+  // ignore approx flag in generic checks
 });
 
 const expectParsed = (input, expected) => {
@@ -296,6 +297,15 @@ describe('recipe parser deu', () => {
         minQty: 1,
         maxQty: 1,
       });
+    });
+  });
+
+  describe('approximation flag', () => {
+    it('marks approx for "ca. 2 tasse wasser"', () => {
+      const result = parse('ca. 2 tasse wasser', 'deu');
+      expect(result.approx).to.equal(true);
+      expect(result.quantity).to.equal(2);
+      expect(result.unit).to.equal('Tasse');
     });
   });
 

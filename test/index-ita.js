@@ -11,6 +11,7 @@ const normalizeResult = (result) => ({
   symbol: result.symbol,
   minQty: result.minQty,
   maxQty: result.maxQty,
+  // ignore approx flag in generic checks
 });
 
 const expectParsed = (input, expected) => {
@@ -226,6 +227,15 @@ describe('recipe parser ita', () => {
         ingredient: 'zucchero a velo',
         minQty: 0.333,
         maxQty: 0.333,
+      });
+    });
+
+    describe('approximation flag', () => {
+      it('marks approx for "circa 2 tazza acqua"', () => {
+        const result = parse('circa 2 tazza acqua', 'ita');
+        expect(result.approx).to.equal(true);
+        expect(result.quantity).to.equal(2);
+        expect(result.unit).to.equal('tazza');
       });
     });
   });

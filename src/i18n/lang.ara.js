@@ -88,6 +88,7 @@ const symbolUnits = {
 const prepositions = ['من'];
 const joiners = ['إلى'];
 const toTaste = ['حسب الذوق'];
+const approx = ['حوالي', 'قرابة', 'تقريباً', 'نحو', '~'];
 
 const numbersSmall = {
   صفر: 0,
@@ -139,6 +140,7 @@ export const langAra = {
   prepositions,
   joiners,
   toTaste,
+  approx,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
