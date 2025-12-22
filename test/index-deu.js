@@ -320,6 +320,25 @@ describe('recipe parser deu', () => {
     });
   });
 
+  describe('to serve flag', () => {
+    it('marks trailing comma form', () => {
+      const result = parse('1 tasse sauce, zum servieren', 'deu');
+      expect(result.toServe).to.equal(true);
+      expect(result.unit).to.equal('Tasse');
+      expect(result.quantity).to.equal(1);
+      expect(result.ingredient).to.equal('sauce');
+      expect(result.additional).to.equal(null);
+    });
+    it('marks bracketed form', () => {
+      const result = parse('frischer koriander (zum anrichten)', 'deu');
+      expect(result.toServe).to.equal(true);
+      expect(result.unit).to.equal(null);
+      expect(result.quantity).to.equal(0);
+      expect(result.ingredient).to.equal('frischer koriander');
+      expect(result.additional).to.equal(null);
+    });
+  });
+
   it('translates unit when no unit provided', () => {
     expectParsed('1 tortilla', {
       unit: null,

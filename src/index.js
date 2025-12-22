@@ -239,6 +239,7 @@ export function parse(ingredientString, language) {
   const langMap = i18nMap[language] || {};
   const approxWords = langMap.approx || [];
   const optionalWords = langMap.optional || [];
+  const toServeWords = langMap.toServe || [];
 
   // Initialize variables
   let additional = '';
@@ -271,15 +272,6 @@ export function parse(ingredientString, language) {
         )
       : null;
 
-  if (approxRegex) {
-    const matchApprox = ingredientLine.match(approxRegex);
-    if (matchApprox) {
-      approx = true;
-      ingredientLine = ingredientLine.replace(matchApprox[0], '').trim();
-    }
-  }
-
-  let optional = false;
   const optionalRegex =
     optionalWords.length > 0
       ? new RegExp(
@@ -289,12 +281,53 @@ export function parse(ingredientString, language) {
           'gi',
         )
       : null;
-  if (optionalRegex && optionalRegex.test(originalString)) {
+
+  const toServeRegex =
+    toServeWords.length > 0
+      ? new RegExp(
+          `\\b(${toServeWords
+            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
+            .join('|')})\\b`,
+          'gi',
+        )
+      : null;
+
+  const safeTest = (regex, text) => {
+    if (!regex || typeof text !== 'string') return false;
+    regex.lastIndex = 0;
+    return regex.test(text);
+  };
+
+  const safeReplace = (text, regex) => {
+    if (!regex || typeof text !== 'string') return text;
+    regex.lastIndex = 0;
+    return text.replace(regex, '');
+  };
+
+  if (approxRegex) {
+    const matchApprox = ingredientLine.match(approxRegex);
+    if (matchApprox) {
+      approx = true;
+      ingredientLine = ingredientLine.replace(matchApprox[0], '').trim();
+    }
+  }
+
+  let optional = false;
+  if (safeTest(optionalRegex, originalString)) {
     optional = true;
   }
-  if (optionalRegex && optionalRegex.test(ingredientLine)) {
+  if (safeTest(optionalRegex, ingredientLine)) {
     optional = true;
-    ingredientLine = ingredientLine.replace(optionalRegex, '').trim();
+    ingredientLine = safeReplace(ingredientLine, optionalRegex).trim();
+  }
+
+  let toServe = false;
+  if (safeTest(toServeRegex, originalString)) {
+    toServe = true;
+  }
+  if (safeTest(toServeRegex, ingredientLine)) {
+    toServe = true;
+    ingredientLine = safeReplace(ingredientLine, toServeRegex).trim();
   }
 
   let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
@@ -310,9 +343,13 @@ export function parse(ingredientString, language) {
       restOfIngredient = restOfIngredient.replace(approxMatch[0], '').trim();
     }
   }
-  if (optionalRegex && optionalRegex.test(restOfIngredient)) {
+  if (safeTest(optionalRegex, restOfIngredient)) {
     optional = true;
-    restOfIngredient = restOfIngredient.replace(optionalRegex, '').trim();
+    restOfIngredient = safeReplace(restOfIngredient, optionalRegex).trim();
+  }
+  if (safeTest(toServeRegex, restOfIngredient)) {
+    toServe = true;
+    restOfIngredient = safeReplace(restOfIngredient, toServeRegex).trim();
   }
 
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
@@ -357,7 +394,16 @@ export function parse(ingredientString, language) {
   if (optional) {
     result.optional = true;
     if (result.additional && optionalRegex) {
-      const cleanedAdditional = result.additional.replace(optionalRegex, '').trim();
+      const cleanedAdditional = safeReplace(result.additional, optionalRegex).trim();
+      result.additional = cleanedAdditional || null;
+    }
+  }
+  if (toServe) {
+    result.toServe = true;
+    if (result.additional && toServeRegex) {
+      const cleanedAdditional = safeReplace(result.additional, toServeRegex)
+        .replace(/^[,\s]+|[,\s]+$/g, '')
+        .trim();
       result.additional = cleanedAdditional || null;
     }
   }

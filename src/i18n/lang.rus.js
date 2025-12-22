@@ -90,6 +90,7 @@ const joiners = ['до'];
 const toTaste = ['по вкусу'];
 const approx = ['примерно', 'прибл', 'прибл.', 'приблизительно', 'около', '~'];
 const optional = ['по желанию', 'опционально', 'если нужно'];
+const toServe = ['для подачи'];
 
 const numbersSmall = {
   ноль: 0,
@@ -144,6 +145,7 @@ export const langRus = {
   toTaste,
   approx,
   optional,
+  toServe,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

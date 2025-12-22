@@ -11,6 +11,8 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - Languages: add localized approx lists (eng/deu/ita etc.).
 
 2) Optional / serving flags
+- [x] Optional flag implemented (eng/deu/ita; localized keyword lists added)
+- [x] "To serve" usage flag implemented (`toServe` flag; eng/deu/ita; keyword lists added across locales)
 - Examples: `optional`, `to serve`, `(optional)`, `Serving(s)/portion`.
 - Plan: capture `optional` markers into a new flag field (e.g., `optional=true`) and keep ingredient clean; “serving(s)/portion” handling will be covered under units expansion (see #4).
 - Tests: `1 cup cream (optional)` -> `optional=true`. `Fresh coriander, to serve` -> `servingUse=true`, ingredient `Fresh coriander`. `Serving suggestion:` should not be parsed as unit.

@@ -240,15 +240,34 @@ describe('recipe parser ita', () => {
       });
     });
 
-    describe('optional flag', () => {
-      it('marks optional trailing', () => {
-        const result = parse('1 tazza acqua (opzionale)', 'ita');
-        expect(result.optional).to.equal(true);
-        expect(result.unit).to.equal('tazza');
-        expect(result.ingredient).to.equal('acqua');
-        expect(result.additional).to.equal(null);
-      });
+  describe('optional flag', () => {
+    it('marks optional trailing', () => {
+      const result = parse('1 tazza acqua (opzionale)', 'ita');
+      expect(result.optional).to.equal(true);
+      expect(result.unit).to.equal('tazza');
+      expect(result.ingredient).to.equal('acqua');
+      expect(result.additional).to.equal(null);
     });
+  });
+
+  describe('to serve flag', () => {
+    it('marks trailing comma form', () => {
+      const result = parse('1 tazza salsa, per servire', 'ita');
+      expect(result.toServe).to.equal(true);
+      expect(result.unit).to.equal('tazza');
+      expect(result.quantity).to.equal(1);
+      expect(result.ingredient).to.equal('salsa');
+      expect(result.additional).to.equal(null);
+    });
+    it('marks bracketed form', () => {
+      const result = parse('prezzemolo fresco (da servire)', 'ita');
+      expect(result.toServe).to.equal(true);
+      expect(result.unit).to.equal(null);
+      expect(result.quantity).to.equal(0);
+      expect(result.ingredient).to.equal('prezzemolo fresco');
+      expect(result.additional).to.equal(null);
+    });
+  });
   });
 
   describe('translates the literal units', () => {

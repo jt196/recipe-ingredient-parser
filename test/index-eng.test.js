@@ -8,6 +8,7 @@ function testExpectation(inputString, expectation) {
   const result = parse(inputString, 'eng');
   delete result.approx;
   delete result.optional;
+  delete result.toServe;
   expect(result).to.deep.equal(expectation);
 }
 
@@ -204,6 +205,25 @@ describe('recipe parser eng', () => {
           expect(result.quantity).to.equal(2);
           expect(result.unit).to.equal('tablespoon');
           expect(result.ingredient).to.equal('cream');
+          expect(result.additional).to.equal(null);
+        });
+      });
+
+      describe('to serve flag', () => {
+        it('marks trailing comma form', () => {
+          const result = parse('1 cup cream, to serve', 'eng');
+          expect(result.toServe).to.equal(true);
+          expect(result.quantity).to.equal(1);
+          expect(result.unit).to.equal('cup');
+          expect(result.ingredient).to.equal('cream');
+          expect(result.additional).to.equal(null);
+        });
+        it('marks bracketed form', () => {
+          const result = parse('fresh coriander (to serve)', 'eng');
+          expect(result.toServe).to.equal(true);
+          expect(result.quantity).to.equal(0);
+          expect(result.unit).to.equal(null);
+          expect(result.ingredient).to.equal('fresh coriander');
           expect(result.additional).to.equal(null);
         });
       });

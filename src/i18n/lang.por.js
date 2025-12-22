@@ -111,6 +111,7 @@ const approx = [
   '~',
 ];
 const optional = ['opcional', 'se desejado'];
+const toServe = ['para servir'];
 
 const numbersSmall = {
   zero: 0,
@@ -167,6 +168,7 @@ export const langPor = {
   toTaste,
   approx,
   optional,
+  toServe,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

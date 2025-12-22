@@ -90,6 +90,7 @@ const joiners = ['إلى'];
 const toTaste = ['حسب الذوق'];
 const approx = ['حوالي', 'قرابة', 'تقريباً', 'نحو', '~'];
 const optional = ['اختياري', 'إذا رغبت'];
+const toServe = ['للتقديم'];
 
 const numbersSmall = {
   صفر: 0,
@@ -143,6 +144,7 @@ export const langAra = {
   toTaste,
   approx,
   optional,
+  toServe,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

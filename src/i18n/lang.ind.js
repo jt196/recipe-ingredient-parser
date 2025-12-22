@@ -90,6 +90,7 @@ const joiners = ['sampai'];
 const toTaste = ['secukupnya'];
 const approx = ['sekitar', 'kira-kira', 'kurang lebih', '±', '~'];
 const optional = ['opsional', 'jika diinginkan'];
+const toServe = ['untuk disajikan', 'untuk sajian'];
 
 const numbersSmall = {
   nol: 0,
@@ -143,6 +144,7 @@ export const langInd = {
   toTaste,
   approx,
   optional,
+  toServe,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

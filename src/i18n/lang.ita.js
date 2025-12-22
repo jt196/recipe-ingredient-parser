@@ -129,6 +129,7 @@ const joiners = ['o'];
 const toTaste = ['quanto basta'];
 const approx = ['circa', 'circa.', 'cir.', 'approssimativamente', 'quasi', '~'];
 const optional = ['opzionale', 'facoltativo', 'se desiderato'];
+const toServe = ['per servire', 'da servire'];
 
 export const numbersSmall = {
   zero: 0,
@@ -201,6 +202,7 @@ export const langIta = {
   toTaste,
   approx,
   optional,
+  toServe,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

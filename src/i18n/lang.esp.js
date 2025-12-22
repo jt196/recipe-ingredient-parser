@@ -105,6 +105,7 @@ const joiners = ['a'];
 
 const toTaste = ['al gusto'];
 const optional = ['opcional', 'si se desea', 'a elección'];
+const toServe = ['para servir'];
 const approx = [
   'aprox',
   'aprox.',
@@ -172,6 +173,7 @@ export const langEsp = {
   joiners,
   toTaste,
   optional,
+  toServe,
   approx,
   numbersSmall,
   numbersMagnitude,
