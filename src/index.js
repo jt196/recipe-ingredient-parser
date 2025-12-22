@@ -428,6 +428,10 @@ export function parse(ingredientString, language, options = {}) {
   let originalString = ingredientString.trim(); // Save the original string
   let ingredientLine = originalString; // Initialize working copy
 
+  // Remove leading list markers like "- " or "• " that can appear in exported text
+  ingredientLine = ingredientLine.replace(/^\s*[-•]\s+/, '').trim();
+  originalString = ingredientLine;
+
   // Capture parenthetical content (supports nesting) and comma-separated extras
   let additionalParts = [];
   const {cleaned, segments} = extractParentheticalSegments(ingredientLine);

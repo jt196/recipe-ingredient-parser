@@ -737,6 +737,15 @@ describe('recipe parser eng', () => {
     });
   });
 
+  describe('leading list markers', () => {
+    it('ignores leading dash bullet', () => {
+      const result = parse('- 500 g water', 'eng');
+      expect(result.quantity).to.equal(500);
+      expect(result.unit).to.equal('gram');
+      expect(result.ingredient).to.equal('water');
+    });
+  });
+
   describe('brackets handling', () => {
     it('keeps nested bracket content intact in additional', () => {
       const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');
