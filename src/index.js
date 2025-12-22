@@ -1192,3 +1192,4 @@ export function parse(ingredientString, language, options = {}) {
 }
 
 export const combine = combineIngredients;
+export {getSymbol} from './utils/parser-helpers';
