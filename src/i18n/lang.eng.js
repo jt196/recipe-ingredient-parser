@@ -193,6 +193,9 @@ const instructions = [
   'small',
   'medium',
   'large',
+  'divided',
+  'husked',
+  'frozen',
 ];
 const adverbs = ['finely', 'thinly', 'coarsely', 'freshly', 'roughly'];
 const unitSystems = {

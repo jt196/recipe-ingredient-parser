@@ -179,6 +179,8 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     // drop control chars that leak from bad copies
     .replace(/[\u0000-\u001f\u007f-\u009f]/g, '')
+    // fix mojibake for 1/2 (¬Ω) that sometimes appears in exports
+    .replace(/¬Ω/g, '1/2')
     // fix common mojibake for fraction slash and stray Â
     .replace(/â„/g, '/')
     .replace(/Â/g, '')
@@ -224,8 +226,8 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   const unicodeQuantityPartsRegex = /(\d*)\s*([^\p{ASCII}]+)/u;
 
   // found a unicode quantity inside our regex, for ex: '⅝', '1½', or '1 ½'
-  const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
-  if (unicodeQuantityMatch) {
+  const unicodeQuantityMatch = unicodeFractionRegex.exec(ingredientLine);
+  if (unicodeQuantityMatch && unicodeQuantityMatch.index === 0) {
     const match = unicodeQuantityMatch[0]; // full match e.g. "1 ½" or "½"
     const parts = match.match(unicodeQuantityPartsRegex); // Extract numericPart and unicodePart
     if (parts && parts.length === 3) {

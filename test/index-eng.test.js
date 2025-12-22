@@ -837,6 +837,121 @@ describe('recipe parser eng', () => {
       expect(result.alternatives[0].ingredient).to.equal('quinoa');
     });
 
+    it('parses or-alternative with its own quantity and unit', () => {
+      const result = parse(
+        '1/4 teaspoon Cutting Edge Cultures - or 1/2 cup of kefir whey',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(0.25);
+      expect(result.unit).to.equal('teaspoon');
+      expect(result.ingredient).to.equal('Cutting Edge Cultures');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(0.5);
+      expect(result.alternatives[0].unit).to.equal('cup');
+      expect(result.alternatives[0].ingredient).to.equal('kefir whey');
+    });
+
+    it('parses unicode half with or-alternative correctly', () => {
+      const result = parse(
+        '1/4 teaspoon Cutting Edge Cultures - or ½ cup of kefir whey',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(0.25);
+      expect(result.unit).to.equal('teaspoon');
+      expect(result.ingredient).to.equal('Cutting Edge Cultures');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(0.5);
+      expect(result.alternatives[0].unit).to.equal('cup');
+      expect(result.alternatives[0].ingredient).to.equal('kefir whey');
+    });
+
+    it('parses mojibake half with or-alternative correctly', () => {
+      const result = parse(
+        '1/4 teaspoon Cutting Edge Cultures - or ¬Ω cup of kefir whey',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(0.25);
+      expect(result.unit).to.equal('teaspoon');
+      expect(result.ingredient).to.equal('Cutting Edge Cultures');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(0.5);
+      expect(result.alternatives[0].unit).to.equal('cup');
+      expect(result.alternatives[0].ingredient).to.equal('kefir whey');
+    });
+
+    it('inherits quantity and unit for or-alternative without its own numbers', () => {
+      const result = parse('75g yellow split peas or toor dal', 'eng', opts);
+      expect(result.quantity).to.equal(75);
+      expect(result.unit).to.equal('gram');
+      expect(result.ingredient).to.equal('yellow split peas');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(75);
+      expect(result.alternatives[0].unit).to.equal('gram');
+      expect(result.alternatives[0].ingredient).to.equal('toor dal');
+    });
+
+    it('prefers unit-bearing second number and keeps alt ingredient', () => {
+      const result = parse(
+        '1 14-oz can storebought pizza sauce or homemade marinara sauce',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(14);
+      expect(result.unit).to.equal('ounce');
+      expect(result.ingredient).to.equal('storebought pizza sauce');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(14);
+      expect(result.alternatives[0].unit).to.equal('ounce');
+      expect(result.alternatives[0].ingredient).to.equal('homemade marinara sauce');
+    });
+
+    it('parses half package with attached size descriptor cleanly', () => {
+      const result = parse(
+        '1/2 of a 3.5-ounce package prepared achiote seasoning',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(0.5);
+      expect(result.unit).to.equal('package');
+      expect(result.ingredient).to.equal('3.5-ounce prepared achiote seasoning');
+      expect(result.additional).to.equal(null);
+    });
+
+    it('promotes leftover text to ingredient after instruction stripping', () => {
+      const res = parse('120 grams chopped, roasted nuts (optional)', 'eng', opts);
+      expect(res.quantity).to.equal(120);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.equal('nuts');
+      expect(res.instructions).to.deep.equal(['chopped', 'roasted']);
+      expect(res.optional).to.equal(true);
+      expect(res.additional).to.equal(null);
+    });
+
+    it('keeps prep notes, avoids treating them as alternatives', () => {
+      const res = parse(
+        '8 ounces cold, unsalted butter, cut into 1-inch chunks (about 16 tablespoons; 225g)',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(8);
+      expect(res.unit).to.equal('ounce');
+      expect(res.ingredient).to.equal('unsalted butter');
+      expect(res.instructions).to.deep.equal(['cold']);
+      expect(res.additional).to.equal('cut into 1-inch chunks');
+      expect(res.alternatives?.[0].unit).to.equal('tablespoon');
+    });
+
+    it('keeps weight range as additional when prefixed by count', () => {
+      const result = parse('1 3-4 lb whole chicken', 'eng', opts);
+      expect(result.quantity).to.equal(1);
+      expect(result.unit).to.equal(null);
+      expect(result.ingredient).to.equal('whole chicken');
+      expect(result.additional).to.equal('3-4 lb');
+    });
+
     it('keeps primary fraction and adds alt from parentheses', () => {
       const result = parse('1/3 cup warm water (95 to 105 degrees F)', 'eng', opts);
       expect(result.quantity).to.equal(0.333);

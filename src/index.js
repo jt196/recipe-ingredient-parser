@@ -245,6 +245,11 @@ function extractMultiplier(line, language) {
   if (stackedMatch) {
     const candidateRest = stackedMatch[2].trim();
 
+    // Avoid treating size descriptors like "1 3-inch ..." as multipliers.
+    if (/^\d+\s*[-–]?\s*inch(?:es)?\b/i.test(candidateRest)) {
+      return {multiplier: 1, line: working};
+    }
+
     // Skip obvious ranges like "10 - 20" / "10 to 20".
     const {joiners = []} = i18nMap[language] || {};
     const escape = str => str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -264,17 +269,21 @@ function extractMultiplier(line, language) {
     }
 
     const numberWithUnit = candidateRest.match(
-      /^(\d+(?:[.,]\d+)?)(?:\s*)([A-Za-z\p{L}])/u,
+      /^(\d+(?:[.,]\d+)?)(?:\s*[-–]?\s*)([A-Za-z\p{L}])/u,
     );
     if (numberWithUnit) {
       const [candidateQty, candidateRemainder] =
         convert.findQuantityAndConvertIfUnicode(candidateRest, language);
-      const hasUnit =
-        candidateQty &&
-        candidateRemainder &&
-        getUnit(candidateRemainder, language).length > 0;
+      const candidateUnitParts =
+        candidateQty && candidateRemainder ? getUnit(candidateRemainder, language) : [];
+      const hasUnit = candidateUnitParts.length > 0;
 
-      if (hasUnit) {
+      // Treat leading size descriptors (inch/centimeter/millimeter) as part of the ingredient, not multipliers.
+      const sizeLikeUnit =
+        candidateUnitParts[0] &&
+        ['inch', 'centimeter', 'millimeter'].includes(candidateUnitParts[0]);
+
+      if (hasUnit && !sizeLikeUnit) {
         const multiplier = convertToNumber(stackedMatch[1], language) || 1;
         return {multiplier, line: candidateRest};
       }
@@ -448,8 +457,12 @@ export function parse(ingredientString, language, options = {}) {
 
   const alternatives = [];
   const tryAddAlternative = fragment => {
-    if (!/\d/.test(fragment)) return false;
     if (!includeAlternatives || !fragment || !fragment.trim()) return false;
+    if (!/\d/.test(fragment)) return false;
+    if (/\bpage\s+\d+/i.test(fragment)) return false;
+    if (/\bsee note\b/i.test(fragment)) return false;
+    if (/\bif frozen\b/i.test(fragment)) return false;
+    if (/\bcut\b/i.test(fragment) || /\bchunk/i.test(fragment)) return false;
     const alt = parse(fragment, language, {
       includeUnitSystems,
       includeAlternatives: false,
@@ -466,6 +479,8 @@ export function parse(ingredientString, language, options = {}) {
         unitPlural: alt.unitPlural,
         symbol: alt.symbol,
         ingredient: alt.ingredient,
+        additional: alt.additional,
+        instructions: alt.instructions,
         minQty: alt.minQty,
         maxQty: alt.maxQty,
         originalString: alt.originalString,
@@ -502,9 +517,36 @@ export function parse(ingredientString, language, options = {}) {
         if (/\d/.test(lastPart)) {
           const altEntry = tryAddAlternative(lastPart);
           if (altEntry) {
+            alternatives.push(altEntry);
             const primarySegment = ingredientLine.split('/')[0].trim();
             ingredientLine = `${primarySegment} ${altEntry.ingredient || ''}`.trim();
           }
+        }
+      }
+    }
+  }
+  // Fallback: if slash-present alt was filtered out, at least keep the primary side.
+  if (includeAlternatives && originalString.includes('/') && alternatives.length === 0) {
+    const slashParts = originalString.split('/');
+    if (slashParts.length >= 2) {
+      const lastPart = slashParts[slashParts.length - 1];
+      const firstPart = slashParts[0];
+      const hasUnitish = part => /\d[^\s]*[A-Za-z]/.test(part);
+      const spacedSlash = /\s\/\s/.test(originalString);
+      if (spacedSlash || (hasUnitish(firstPart) && hasUnitish(lastPart))) {
+        const primarySegment = ingredientLine.split('/')[0].trim();
+        const altEntry = tryAddAlternative(lastPart.trim());
+        if (altEntry && primarySegment) {
+          alternatives.push(altEntry);
+          ingredientLine = `${primarySegment} ${altEntry.ingredient || ''}`.trim();
+          if (altEntry.additional) {
+            additionalParts.push(altEntry.additional);
+          }
+          if (Array.isArray(altEntry.instructions) && altEntry.instructions.length) {
+            additionalParts.push(...altEntry.instructions);
+          }
+        } else if (primarySegment) {
+          ingredientLine = primarySegment;
         }
       }
     }
@@ -616,6 +658,9 @@ export function parse(ingredientString, language, options = {}) {
     restOfIngredient = safeReplace(restOfIngredient, toServeRegex).trim();
   }
 
+  // Normalize stray leading dashes left after quantity stripping (e.g., "14-oz" -> "oz")
+  restOfIngredient = restOfIngredient.replace(/^[-–]\s*/, '').trim();
+
   // Capture leading size descriptors like "3-inch" before the unit (e.g., "1 3-inch stick")
   const sizeDescriptorRegex =
     /^(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*-?\s*inch(?:es)?\b[-\s]*/i;
@@ -626,6 +671,7 @@ export function parse(ingredientString, language, options = {}) {
   }
 
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
+  const restBeforeUnit = restOfIngredient;
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
     restOfIngredient,
     language,
@@ -635,10 +681,30 @@ export function parse(ingredientString, language, options = {}) {
     ? restOfIngredient.replace(originalUnit, '').trim()
     : restOfIngredient.replace(unit, '').trim();
   ingredient = ingredient.replace(/\.(\s|$)/g, '$1').trim();
+  ingredient = ingredient.replace(/^(?:can|tin)\s+/i, '').trim();
   const preposition = getPreposition(ingredient.split(' ')[0], language);
   if (preposition) {
     const regex = new RegExp('^' + preposition);
     ingredient = ingredient.replace(regex, '').trim();
+  }
+
+  // Drop leading articles like "a" / "an" that can survive after preposition stripping.
+  ingredient = ingredient.replace(/^(?:a|an)\s+/i, '').trim();
+
+  // If an instruction/state word (or other known markers) is glued to the previous token, insert a space so it can be detected.
+  const glueTargets = [...(instructionWords || []), 'prepared'];
+  if (glueTargets.length > 0) {
+    const escapedInstr = glueTargets.map(w =>
+      w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+    );
+    const instrGlueRegex = new RegExp(
+      `([A-Za-z])(${escapedInstr.join('|')})\\b`,
+      'gi',
+    );
+    ingredient = ingredient.replace(instrGlueRegex, '$1 $2');
+    additionalParts = additionalParts.map(part =>
+      typeof part === 'string' ? part.replace(instrGlueRegex, '$1 $2') : part,
+    );
   }
 
   if (includeAlternatives && !ingredient && alternatives.length > 0) {
@@ -660,6 +726,38 @@ export function parse(ingredientString, language, options = {}) {
   ingredient = instructionExtraction.ingredientText;
   additionalParts = instructionExtraction.additionalParts;
   const instructionsFound = instructionExtraction.instructions;
+
+  // If instructions stripped the ingredient text but we still have leftover parts, promote the first leftover to ingredient.
+  if ((!ingredient || ingredient.trim() === '') && additionalParts.length > 0) {
+    const idx = additionalParts.findIndex(part => {
+      const cleaned = safeReplace(
+        safeReplace(part || '', optionalRegex),
+        toServeRegex,
+      ).trim();
+      return cleaned.length > 0;
+    });
+    if (idx !== -1) {
+      const promotedRaw = additionalParts.splice(idx, 1)[0] || '';
+      const promotedClean = safeReplace(
+        safeReplace(promotedRaw, optionalRegex),
+        toServeRegex,
+      ).trim();
+      ingredient = promotedClean || promotedRaw.trim();
+    }
+  }
+
+  // If a leading fraction remains in the ingredient text (e.g., "1/4 Cutting Edge ..."),
+  // prefer it as the primary quantity to avoid later unicode/alt quantities overwriting.
+  const leadingFraction = ingredient.match(
+    /^(\d+\s*\/\s*\d+|[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/u,
+  );
+  if (leadingFraction) {
+    const leadingQty = convert.convertFromFraction(leadingFraction[0], language);
+    if (leadingQty != null) {
+      quantity = leadingQty.toString();
+      ingredient = ingredient.replace(leadingFraction[0], '').trim();
+    }
+  }
   ingredient = ingredient
     .replace(/^(?:\s*[-–—]\s*)+/, '')
     .replace(/(?:\s*[-–—]\s*)+$/, '')
@@ -677,20 +775,48 @@ export function parse(ingredientString, language, options = {}) {
     const primaryIngredient = parts.shift().trim();
     const altIngredient = parts.join('or').trim();
     if (primaryIngredient) {
-      ingredient = primaryIngredient;
+      ingredient = primaryIngredient.replace(/\s*[-–—]\s*$/, '').trim();
     }
     if (altIngredient) {
-      const altEntry = {
-        quantity: 0,
-        unit: null,
-        unitPlural: null,
-        symbol: null,
-        ingredient: altIngredient,
-        minQty: 0,
-        maxQty: 0,
-        originalString: altIngredient,
-      };
-      alternatives.push(altEntry);
+      let altParsed = null;
+      if (/[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/.test(altIngredient)) {
+        altParsed = parse(altIngredient, language, {
+          includeAlternatives: false,
+          includeUnitSystems,
+        });
+      }
+      if (altParsed && (altParsed.quantity || altParsed.unit || altParsed.ingredient)) {
+        const altEntry = {
+          quantity: altParsed.quantity,
+          unit: altParsed.unit,
+          unitPlural: altParsed.unitPlural,
+          symbol: altParsed.symbol,
+          ingredient: altParsed.ingredient,
+          minQty: altParsed.minQty,
+          maxQty: altParsed.maxQty,
+          originalString: altIngredient,
+        };
+        if (includeUnitSystems) {
+          altEntry.unitSystem = getUnitSystem(altEntry.unit, language);
+        }
+        alternatives.push(altEntry);
+      } else {
+        const cleanedAlt = altIngredient.replace(/^\s*[-–—]\s*/, '').trim();
+        const altEntry = {
+          quantity: convertToNumber(quantity, language),
+          unit: unit ? unit : null,
+          unitPlural: unitPlural ? unitPlural : null,
+          symbol: symbol ? symbol : null,
+          ingredient: cleanedAlt,
+          minQty: convertToNumber(minQty, language),
+          maxQty: convertToNumber(maxQty, language),
+          originalString: cleanedAlt,
+        };
+        if (includeUnitSystems) {
+          altEntry.unitSystem = getUnitSystem(altEntry.unit, language);
+        }
+        alternatives.push(altEntry);
+      }
     }
   }
 
@@ -736,6 +862,31 @@ export function parse(ingredientString, language, options = {}) {
     result.unitSystem = getUnitSystem(result.unit, language);
   }
 
+  // Handle leading weight/size ranges after an initial count, e.g., "1 3-4 lb whole chicken".
+  // In these cases treat the range + unit as additional info and keep unit null to avoid "1 lb 3-4 chicken".
+  if (result.quantity === 1 && result.unit && originalUnit && restBeforeUnit) {
+    const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const rangeUnitRegex = new RegExp(
+      `^\\s*\\d+(?:\\s*[–-]\\s*\\d+)?\\s*${escapeRe(originalUnit)}\\b`,
+      'i',
+    );
+    if (rangeUnitRegex.test(restBeforeUnit)) {
+      const rangeText = (restBeforeUnit.match(rangeUnitRegex) || [])[0].trim();
+      const remainder = restBeforeUnit.replace(rangeUnitRegex, '').trim();
+      const mergedAdditional = [rangeText, result.additional]
+        .filter(Boolean)
+        .join(', ');
+      result.additional = mergedAdditional || null;
+      result.ingredient = remainder || restBeforeUnit.trim();
+      result.unit = null;
+      result.unitPlural = null;
+      result.symbol = null;
+      if (includeUnitSystems) {
+        result.unitSystem = null;
+      }
+    }
+  }
+
   if (approx) {
     result.approx = true;
   }
@@ -756,6 +907,22 @@ export function parse(ingredientString, language, options = {}) {
     }
   }
   if (includeAlternatives && alternatives.length > 0) {
+    const primaryQty = result.quantity;
+    const primaryUnit = result.unit;
+    const primaryMin = result.minQty;
+    const primaryMax = result.maxQty;
+    alternatives.forEach(alt => {
+      if (!alt.unit && primaryUnit) {
+        alt.unit = primaryUnit;
+        alt.unitPlural = result.unitPlural;
+        alt.symbol = result.symbol;
+      }
+      if ((alt.quantity === 0 || alt.quantity === null) && primaryQty) {
+        alt.quantity = primaryQty;
+        alt.minQty = primaryMin;
+        alt.maxQty = primaryMax;
+      }
+    });
     result.alternatives = alternatives;
   }
   if (instructionsFound && instructionsFound.length > 0) {
@@ -798,72 +965,6 @@ export function combine(ingredientArray) {
       return acc.concat(ingredient);
     }, [])
     .sort(compareIngredients);
-}
-
-/**
- * Render an ingredient object back to a human-readable string with fractions where possible.
- * @param {Object} ingredient
- * @param {string} language
- * @returns {string}
- */
-export function prettyPrintingPress(ingredient, language) {
-  if (!ingredient || typeof ingredient !== 'object') return '';
-  let quantityString = '';
-  let unit = ingredient.unit;
-  if (ingredient.quantity) {
-    const whole = Math.floor(ingredient.quantity);
-    const remainder =
-      ingredient.quantity % 1
-        ? `${(ingredient.quantity % 1).toPrecision(3)}`.split('.')[1]
-        : undefined;
-    if (+whole !== 0 && typeof whole !== 'undefined') {
-      quantityString = `${whole}`;
-    }
-    if (remainder && typeof remainder !== 'undefined') {
-      let fractional;
-      if (repeatingFractions[remainder]) {
-        fractional = repeatingFractions[remainder];
-      } else {
-        const fraction = '0.' + remainder;
-        const len = fraction.length - 2;
-        let denominator = Math.pow(10, len);
-        let numerator = +fraction * denominator;
-
-        const divisor = gcd(numerator, denominator);
-
-        numerator /= divisor;
-        denominator /= divisor;
-        fractional = Math.floor(numerator) + '/' + Math.floor(denominator);
-      }
-
-      quantityString += quantityString ? ' ' + fractional : fractional;
-    }
-    if (
-      ((+whole !== 0 && typeof remainder !== 'undefined') || +whole > 1) &&
-      unit
-    ) {
-      const lang = i18nMap[language];
-      unit = lang.pluralUnits[unit] || unit;
-    }
-  } else {
-    return ingredient.ingredient;
-  }
-
-  return `${quantityString}${unit ? ' ' + unit : ''} ${ingredient.ingredient}`;
-}
-
-/**
- * Greatest common divisor helper for fraction reduction.
- * @param {number} a
- * @param {number} b
- * @returns {number}
- */
-function gcd(a, b) {
-  if (b < 0.0000001) {
-    return a;
-  }
-
-  return gcd(b, Math.floor(a % b));
 }
 
 // TODO: Maybe change this to existingIngredients: Ingredient | Ingredient[]
