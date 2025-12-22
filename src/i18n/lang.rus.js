@@ -89,6 +89,7 @@ const prepositions = ['из'];
 const joiners = ['до'];
 const toTaste = ['по вкусу'];
 const approx = ['примерно', 'прибл', 'прибл.', 'приблизительно', 'около', '~'];
+const optional = ['по желанию', 'опционально', 'если нужно'];
 
 const numbersSmall = {
   ноль: 0,
@@ -142,6 +143,7 @@ export const langRus = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

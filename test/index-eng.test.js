@@ -7,6 +7,7 @@ function testExpectation(inputString, expectation) {
   expectation.originalString = inputString.trim(); // Set the originalString dynamically
   const result = parse(inputString, 'eng');
   delete result.approx;
+  delete result.optional;
   expect(result).to.deep.equal(expectation);
 }
 
@@ -177,8 +178,33 @@ describe('recipe parser eng', () => {
             const result = parse(input, 'eng');
             expect(result.approx).to.equal(true);
             expect(result.quantity).to.equal(qty);
-            expect(result.ingredient).to.equal(remainder.replace(/^[^ ]+ /, '').trim() || result.ingredient);
+            expect(result.ingredient).to.equal(
+              remainder.replace(/^[^ ]+ /, '').trim() || result.ingredient,
+            );
           });
+        });
+      });
+
+      describe('optional flag', () => {
+        it('marks optional trailing brackets', () => {
+          const result = parse('1 cup sugar (optional)', 'eng');
+          expect(result.optional).to.equal(true);
+          expect(result.additional).to.equal(null);
+          expect(result.ingredient).to.equal('sugar');
+        });
+        it('marks optional trailing comma', () => {
+          const result = parse('1 cup sugar, optional', 'eng');
+          expect(result.optional).to.equal(true);
+          expect(result.additional).to.equal(null);
+          expect(result.ingredient).to.equal('sugar');
+        });
+        it('marks optional leading', () => {
+          const result = parse('optional 2 tbsp cream', 'eng');
+          expect(result.optional).to.equal(true);
+          expect(result.quantity).to.equal(2);
+          expect(result.unit).to.equal('tablespoon');
+          expect(result.ingredient).to.equal('cream');
+          expect(result.additional).to.equal(null);
         });
       });
     });

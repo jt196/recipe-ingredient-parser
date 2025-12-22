@@ -110,6 +110,7 @@ const approx = [
   'quase',
   '~',
 ];
+const optional = ['opcional', 'se desejado'];
 
 const numbersSmall = {
   zero: 0,
@@ -165,6 +166,7 @@ export const langPor = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

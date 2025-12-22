@@ -238,6 +238,7 @@ export function parse(ingredientString, language) {
   }
   const langMap = i18nMap[language] || {};
   const approxWords = langMap.approx || [];
+  const optionalWords = langMap.optional || [];
 
   // Initialize variables
   let additional = '';
@@ -278,6 +279,24 @@ export function parse(ingredientString, language) {
     }
   }
 
+  let optional = false;
+  const optionalRegex =
+    optionalWords.length > 0
+      ? new RegExp(
+          `(?:^|[,(])\\s*(${optionalWords
+            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
+            .join('|')})\\b`,
+          'gi',
+        )
+      : null;
+  if (optionalRegex && optionalRegex.test(originalString)) {
+    optional = true;
+  }
+  if (optionalRegex && optionalRegex.test(ingredientLine)) {
+    optional = true;
+    ingredientLine = ingredientLine.replace(optionalRegex, '').trim();
+  }
+
   let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
     ingredientLine,
     language,
@@ -290,6 +309,10 @@ export function parse(ingredientString, language) {
       approx = true;
       restOfIngredient = restOfIngredient.replace(approxMatch[0], '').trim();
     }
+  }
+  if (optionalRegex && optionalRegex.test(restOfIngredient)) {
+    optional = true;
+    restOfIngredient = restOfIngredient.replace(optionalRegex, '').trim();
   }
 
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
@@ -330,6 +353,13 @@ export function parse(ingredientString, language) {
 
   if (approx) {
     result.approx = true;
+  }
+  if (optional) {
+    result.optional = true;
+    if (result.additional && optionalRegex) {
+      const cleanedAdditional = result.additional.replace(optionalRegex, '').trim();
+      result.additional = cleanedAdditional || null;
+    }
   }
 
   return result;

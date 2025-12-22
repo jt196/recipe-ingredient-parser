@@ -87,6 +87,7 @@ const joiners = ['bis'];
 
 const toTaste = [];
 const approx = ['ca', 'ca.', 'circa', 'ungefähr', 'etwa', '~'];
+const optional = ['optional', 'falls gewünscht', 'wenn gewünscht'];
 
 const numbersSmall = {
   null: 0,
@@ -144,6 +145,7 @@ export const langDeu = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

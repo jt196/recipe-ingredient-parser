@@ -104,6 +104,7 @@ const prepositions = ['de'];
 const joiners = ['a'];
 
 const toTaste = ['al gusto'];
+const optional = ['opcional', 'si se desea', 'a elección'];
 const approx = [
   'aprox',
   'aprox.',
@@ -170,6 +171,7 @@ export const langEsp = {
   prepositions,
   joiners,
   toTaste,
+  optional,
   approx,
   numbersSmall,
   numbersMagnitude,

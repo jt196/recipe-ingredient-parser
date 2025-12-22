@@ -89,6 +89,7 @@ const prepositions = ['dari'];
 const joiners = ['sampai'];
 const toTaste = ['secukupnya'];
 const approx = ['sekitar', 'kira-kira', 'kurang lebih', '±', '~'];
+const optional = ['opsional', 'jika diinginkan'];
 
 const numbersSmall = {
   nol: 0,
@@ -141,6 +142,7 @@ export const langInd = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

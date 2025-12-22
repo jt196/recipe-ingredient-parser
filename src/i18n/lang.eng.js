@@ -107,6 +107,7 @@ const joiners = ['to'];
 
 const toTaste = ['to taste'];
 const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
+const optional = ['optional', 'option.', 'if desired'];
 
 const numbersSmall = {
   zero: 0,
@@ -162,6 +163,7 @@ export const langEng = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

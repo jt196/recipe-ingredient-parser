@@ -4,7 +4,7 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 
 ## Proposed Work Items
 
-1) Approximation flag
+- [x] Approximation flag
 - Examples: `about 2L ...`, `About 1/2 cup ...`, `~`, `roughly`, `approximately`.
 - Plan: detect leading/inline approx tokens before quantity; add boolean `approx` (or `isApprox`) in parse result; strip token from ingredient text.
 - Tests: `about 2L oil` -> `approx=true`, `quantity=2`, `unit=liter`, ingredient clean. `~1/4 cup sugar`, `roughly 3 tbsp butter`.
@@ -12,7 +12,7 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 
 2) Optional / serving flags
 - Examples: `optional`, `to serve`, `(optional)`, `Serving(s)/portion`.
-- Plan: capture `optional`/`to serve` markers into a new flag field (e.g., `optional=true`, `servingUse=true`) and keep ingredient clean; consider `serving(s)`/`portion(s)` as a non-quantity flag rather than unit.
+- Plan: capture `optional` markers into a new flag field (e.g., `optional=true`) and keep ingredient clean; “serving(s)/portion” handling will be covered under units expansion (see #4).
 - Tests: `1 cup cream (optional)` -> `optional=true`. `Fresh coriander, to serve` -> `servingUse=true`, ingredient `Fresh coriander`. `Serving suggestion:` should not be parsed as unit.
 
 3) State / instruction extraction

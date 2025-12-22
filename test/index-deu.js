@@ -11,6 +11,7 @@ const normalizeResult = (result) => ({
   minQty: result.minQty,
   maxQty: result.maxQty,
   // ignore approx flag in generic checks
+  // ignore optional flag in generic checks
 });
 
 const expectParsed = (input, expected) => {
@@ -306,6 +307,16 @@ describe('recipe parser deu', () => {
       expect(result.approx).to.equal(true);
       expect(result.quantity).to.equal(2);
       expect(result.unit).to.equal('Tasse');
+    });
+  });
+
+  describe('optional flag', () => {
+    it('marks optional trailing', () => {
+      const result = parse('1 tasse wasser (optional)', 'deu');
+      expect(result.optional).to.equal(true);
+      expect(result.unit).to.equal('Tasse');
+      expect(result.ingredient).to.equal('wasser');
+      expect(result.additional).to.equal(null);
     });
   });
 

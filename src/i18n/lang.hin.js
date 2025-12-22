@@ -89,6 +89,7 @@ const prepositions = ['का', 'के'];
 const joiners = ['से'];
 const toTaste = ['स्वादानुसार'];
 const approx = ['लगभग', 'करीब', 'तक़रीबन', 'आसपास', '~'];
+const optional = ['वैकल्पिक', 'ऑप्शनल', 'यदि चाहें'];
 
 const numbersSmall = {
   शून्य: 0,
@@ -140,6 +141,7 @@ export const langHin = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

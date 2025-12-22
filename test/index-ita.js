@@ -12,6 +12,7 @@ const normalizeResult = (result) => ({
   minQty: result.minQty,
   maxQty: result.maxQty,
   // ignore approx flag in generic checks
+  // ignore optional flag in generic checks
 });
 
 const expectParsed = (input, expected) => {
@@ -236,6 +237,16 @@ describe('recipe parser ita', () => {
         expect(result.approx).to.equal(true);
         expect(result.quantity).to.equal(2);
         expect(result.unit).to.equal('tazza');
+      });
+    });
+
+    describe('optional flag', () => {
+      it('marks optional trailing', () => {
+        const result = parse('1 tazza acqua (opzionale)', 'ita');
+        expect(result.optional).to.equal(true);
+        expect(result.unit).to.equal('tazza');
+        expect(result.ingredient).to.equal('acqua');
+        expect(result.additional).to.equal(null);
       });
     });
   });

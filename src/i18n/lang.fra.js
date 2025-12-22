@@ -111,6 +111,7 @@ const approx = [
   'presque',
   '~',
 ];
+const optional = ['optionnel', 'facultatif', 'si désiré'];
 
 const numbersSmall = {
   zéro: 0,
@@ -165,6 +166,7 @@ export const langFra = {
   joiners,
   toTaste,
   approx,
+  optional,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
