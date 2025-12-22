@@ -777,6 +777,49 @@ describe('recipe parser eng', () => {
     });
   });
 
+  describe('alternatives and unit systems (opt-in)', () => {
+    const opts = {includeAlternatives: true, includeUnitSystems: true};
+
+    it('captures bracketed alternative unit with system tagging', () => {
+      const result = parse(
+        '450g (1 lb) of tinned tomatoes',
+        'eng',
+        opts,
+      );
+      expect(result.unit).to.equal('gram');
+      expect(result.unitSystem).to.equal('metric');
+      expect(result.ingredient).to.equal('tinned tomatoes');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].unit).to.equal('pound');
+      expect(result.alternatives[0].unitSystem).to.equal('imperial');
+    });
+
+    it('captures ml alternative and preserves primary ingredient', () => {
+      const result = parse('1 cup oats (250 ml)', 'eng', opts);
+      expect(result.unit).to.equal('cup');
+      expect(result.unitSystem).to.equal('americanVolumetric');
+      expect(result.ingredient).to.equal('oats');
+      expect(result.alternatives[0].quantity).to.equal(250);
+      expect(result.alternatives[0].unit).to.equal('milliliter');
+      expect(result.alternatives[0].unitSystem).to.equal('metric');
+    });
+
+    it('captures slash alternative unit', () => {
+      const result = parse('8 oz / 225g pasta', 'eng', opts);
+      expect(result.unit).to.equal('ounce');
+      expect(result.unitSystem).to.equal('imperial');
+      expect(result.ingredient).to.equal('pasta');
+      expect(result.alternatives[0].unit).to.equal('gram');
+      expect(result.alternatives[0].quantity).to.equal(225);
+    });
+
+    it('captures alternative ingredient via or', () => {
+      const result = parse('2 cups oats or quinoa', 'eng', opts);
+      expect(result.ingredient).to.equal('oats');
+      expect(result.alternatives[0].ingredient).to.equal('quinoa');
+    });
+  });
+
   describe('brackets handling', () => {
     it('keeps nested bracket content intact in additional', () => {
       const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');

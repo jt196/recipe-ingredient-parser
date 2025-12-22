@@ -183,6 +183,22 @@ const instructions = [
   'com raspas',
 ];
 const adverbs = ['finamente', 'grosseiramente', 'delicadamente', 'recém'];
+const unitSystems = {
+  grama: 'metric',
+  quilo: 'metric',
+  miligrama: 'metric',
+  litro: 'metric',
+  mililitro: 'metric',
+  onça: 'imperial',
+  floz: 'imperial',
+  galão: 'imperial',
+  libra: 'imperial',
+  xícara: 'americanVolumetric',
+  quarto: 'americanVolumetric',
+  pinta: 'americanVolumetric',
+  'colher de sopa': 'americanVolumetric',
+  'colher de chá': 'americanVolumetric',
+};
 
 const numbersSmall = {
   zero: 0,
@@ -240,6 +256,9 @@ export const langPor = {
   approx,
   optional,
   toServe,
+  instructions,
+  adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

@@ -145,6 +145,21 @@ const instructions = [
   'معصور',
 ];
 const adverbs = ['مفروم ناعماً', 'مفروم خشناً', 'رفيعاً', 'طازجاً'];
+const unitSystems = {
+  غرام: 'metric',
+  كيلوغرام: 'metric',
+  مليغرام: 'metric',
+  لتر: 'metric',
+  مليلتر: 'metric',
+  أونصة: 'imperial',
+  أونصة_سائلة: 'imperial',
+  غالون: 'imperial',
+  بنت: 'imperial',
+  فنجان: 'americanVolumetric',
+  ربع: 'americanVolumetric',
+  ملعقة_طعام: 'americanVolumetric',
+  ملعقة_شاي: 'americanVolumetric',
+};
 
 const numbersSmall = {
   صفر: 0,
@@ -201,6 +216,7 @@ export const langAra = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

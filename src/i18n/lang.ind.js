@@ -162,6 +162,21 @@ const instructions = [
   'diparut kulit',
 ];
 const adverbs = ['halus', 'kasar', 'tipis', 'segar'];
+const unitSystems = {
+  gram: 'metric',
+  kilogram: 'metric',
+  miligram: 'metric',
+  liter: 'metric',
+  mililiter: 'metric',
+  ons: 'imperial',
+  onsCair: 'imperial',
+  galon: 'imperial',
+  pinta: 'imperial',
+  cangkir: 'americanVolumetric',
+  kuart: 'americanVolumetric',
+  'sendok makan': 'americanVolumetric',
+  'sendok teh': 'americanVolumetric',
+};
 
 const numbersSmall = {
   nol: 0,
@@ -218,6 +233,7 @@ export const langInd = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

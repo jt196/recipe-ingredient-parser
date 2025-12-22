@@ -22,6 +22,7 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - Plan: introduce `states` array (temperature/condition adjectives) and `instructions` array (prep verbs). Strip these from ingredient string but return them. Keep additional notes separate.
 - Tests: `4 tbsp cold unsalted butter, cut into pieces` -> ingredient `unsalted butter`, instructions `[cut into pieces]`, states `[cold]`. `2 cloves garlic, crushed` -> state/instruction captured, ingredient `garlic`, unit `clove`.
 - Languages: extend state/prep lists per language (eng/deu/ita).
+- [x] Done. Instruction/state phrases extracted into `instructions` array with adverb support; localized lists added (eng/deu/ita/esp/fra/por/rus/ara/hin/ind).
 
 4) Units expansion / normalization
 - [x] Done. Added drops/squirt/dash/bunch/serving/portion, litre/millilitre spellings, `t/s`, and localized mappings; eng tests added.
@@ -31,7 +32,8 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 5) Alternate quantities/units/ingredients
 - Examples: alternatives in parentheses or slashes: `1 cup (or 250ml)`, `1 pack / 16oz`, `old fashioned or instant oats`, `or` within ingredient, alternative units after `/`.
 - Plan: capture alternates into a structured `alternatives` array (each with qty/unit/ingredient when parseable, or raw text fallback). Keep primary parse from first quantity/unit. Avoid treating “or” as main ingredient text.
-- Tests: `1 cup oats (250 ml)` -> primary `1 cup oats`, alternatives includes `250 ml`; `2 cups oats or quinoa` -> ingredient `oats`, alternatives contains `quinoa`; `8 oz / 225g pasta` -> primary `8 ounce`, alternative `225 gram`.
+- [x] Done (opt-in). Parser can emit `alternatives` array and `unitSystem` tagging when `includeAlternatives/includeUnitSystems` options are true; supports bracketed/slash/“or” alternatives.
+- Tests: added EN coverage for `1 cup oats (250 ml)`, `8 oz / 225g pasta`, `450g (1 lb) ...`, and ingredient alternates via `or`.
 
 6) Multiple numbers in one line
 - Examples: `2 x 100 g`, `1 1.8kg chicken`, `1 (3-4) pieces`, `1 kilogram to 2 kilograms`.

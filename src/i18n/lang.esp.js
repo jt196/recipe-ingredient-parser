@@ -186,6 +186,22 @@ const instructions = [
   'zesteado',
 ];
 const adverbs = ['finamente', 'gruesamente', 'delgadamente', 'recién'];
+const unitSystems = {
+  gramo: 'metric',
+  kilogramo: 'metric',
+  miligramo: 'metric',
+  litro: 'metric',
+  mililitro: 'metric',
+  onza: 'imperial',
+  floz: 'imperial',
+  galón: 'imperial',
+  libra: 'imperial',
+  taza: 'americanVolumetric',
+  cuarto: 'americanVolumetric',
+  pinta: 'americanVolumetric',
+  cucharada: 'americanVolumetric',
+  cucharadita: 'americanVolumetric',
+};
 
 const numbersSmall = {
   cero: 0,
@@ -247,6 +263,7 @@ export const langEsp = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   approx,
   numbersSmall,
   numbersMagnitude,

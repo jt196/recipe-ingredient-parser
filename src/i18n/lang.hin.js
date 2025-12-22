@@ -160,6 +160,22 @@ const instructions = [
   'जेस्ट किया हुआ',
 ];
 const adverbs = ['बारीक', 'मोटा', 'पतला', 'ताज़ा'];
+const unitSystems = {
+  ग्राम: 'metric',
+  किलोग्राम: 'metric',
+  मिलीग्राम: 'metric',
+  लीटर: 'metric',
+  मिलिलिटर: 'metric',
+  औंस: 'imperial',
+  तरलऔंस: 'imperial',
+  गैलन: 'imperial',
+  पाउंड: 'imperial',
+  कप: 'americanVolumetric',
+  पिंट: 'americanVolumetric',
+  क्वार्ट: 'americanVolumetric',
+  बड़ेचम्मच: 'americanVolumetric',
+  छोटेचम्मच: 'americanVolumetric',
+};
 
 const numbersSmall = {
   शून्य: 0,
@@ -215,6 +231,7 @@ export const langHin = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

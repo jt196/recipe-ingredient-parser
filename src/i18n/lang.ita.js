@@ -202,6 +202,20 @@ const instructions = [
   'zestato',
 ];
 const adverbs = ['finemente', 'grossolanamente', 'sottilmente', 'appena', 'fresco'];
+const unitSystems = {
+  grammo: 'metric',
+  chilogrammo: 'metric',
+  milligrammo: 'metric',
+  litro: 'metric',
+  millilitro: 'metric',
+  oncia: 'imperial',
+  libbra: 'imperial',
+  tazza: 'americanVolumetric',
+  quarto: 'americanVolumetric',
+  pinta: 'americanVolumetric',
+  cucchiaio: 'americanVolumetric',
+  cucchiaino: 'americanVolumetric',
+};
 
 export const numbersSmall = {
   zero: 0,
@@ -277,6 +291,7 @@ export const langIta = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

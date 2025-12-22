@@ -179,6 +179,21 @@ export const getSymbol = (unit, language) => {
 };
 
 /**
+ * Map a canonical unit to a measurement system.
+ * @param {string|null} unit
+ * @returns {string|null}
+ */
+export const getUnitSystem = (unit, language) => {
+  if (!unit) return null;
+  const langMap = i18nMap[language];
+  const unitSystems = langMap?.unitSystems;
+  if (unitSystems && unitSystems[unit]) {
+    return unitSystems[unit];
+  }
+  return null;
+};
+
+/**
  * Convert a numeric-ish value to number, respecting comma decimal locales.
  * @param {string|number|null} value
  * @param {string} language
@@ -317,7 +332,9 @@ function extractInstructions(
  *   - {string|null} additional - Any additional notes or information found.
  *   - {string} originalString - The original input string for reference.
  */
-export function parse(ingredientString, language) {
+export function parse(ingredientString, language, options = {}) {
+  const includeUnitSystems = options.includeUnitSystems || false;
+  const includeAlternatives = options.includeAlternatives || false;
   if (typeof ingredientString !== 'string') {
     return {
       quantity: 0,
@@ -343,7 +360,7 @@ export function parse(ingredientString, language) {
   let ingredientLine = originalString; // Initialize working copy
 
   // Capture parenthetical content (supports nesting) and comma-separated extras
-  const additionalParts = [];
+  let additionalParts = [];
   const {cleaned, segments} = extractParentheticalSegments(ingredientLine);
   if (segments.length) additionalParts.push(...segments);
   ingredientLine = cleaned;
@@ -355,6 +372,63 @@ export function parse(ingredientString, language) {
     if (commaMatch[1]) additionalParts.push(commaMatch[1].trim());
   }
   ingredientLine = ingredientLine.replace(commaAdditionalRegex, '').trim();
+
+  const alternatives = [];
+  const tryAddAlternative = fragment => {
+    if (!includeAlternatives || !fragment || !fragment.trim()) return false;
+    const alt = parse(fragment, language, {
+      includeUnitSystems,
+      includeAlternatives: false,
+    });
+    const meaningful =
+      alt &&
+      (alt.unit ||
+        alt.quantity ||
+        (alt.ingredient && alt.ingredient.trim() !== ''));
+    if (meaningful) {
+      const altEntry = {
+        quantity: alt.quantity,
+        unit: alt.unit,
+        unitPlural: alt.unitPlural,
+        symbol: alt.symbol,
+        ingredient: alt.ingredient,
+        minQty: alt.minQty,
+        maxQty: alt.maxQty,
+        originalString: alt.originalString,
+      };
+      if (includeUnitSystems) {
+        altEntry.unitSystem = getUnitSystem(alt.unit, language);
+      }
+      alternatives.push(altEntry);
+      return true;
+    }
+    return false;
+  };
+
+  if (includeAlternatives && additionalParts.length) {
+    const kept = [];
+    additionalParts.forEach(part => {
+      if (!tryAddAlternative(part)) {
+        kept.push(part);
+      }
+    });
+    additionalParts.length = 0;
+    additionalParts.push(...kept);
+  }
+
+  // Detect simple slash alternative e.g., "8 oz / 225g pasta"
+  if (includeAlternatives && originalString.includes('/')) {
+    const slashParts = originalString.split('/');
+    if (slashParts.length >= 2) {
+      const lastPart = slashParts[slashParts.length - 1];
+      if (/\d/.test(lastPart)) {
+        const added = tryAddAlternative(lastPart);
+        if (added) {
+          ingredientLine = ingredientLine.split('/')[0].trim();
+        }
+      }
+    }
+  }
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
@@ -465,6 +539,15 @@ export function parse(ingredientString, language) {
     ingredient = ingredient.replace(regex, '').trim();
   }
 
+  if (includeAlternatives && !ingredient && alternatives.length > 0) {
+    const altWithIngredient = alternatives.find(
+      alt => alt.ingredient && alt.ingredient.trim() !== '',
+    );
+    if (altWithIngredient) {
+      ingredient = altWithIngredient.ingredient;
+    }
+  }
+
   // Extract instruction/state phrases (with optional adverbs) from ingredient and additional parts
   const instructionExtraction = extractInstructions(
     ingredient,
@@ -475,6 +558,28 @@ export function parse(ingredientString, language) {
   ingredient = instructionExtraction.ingredientText;
   additionalParts = instructionExtraction.additionalParts;
   const instructionsFound = instructionExtraction.instructions;
+
+  if (includeAlternatives && /\bor\b/i.test(ingredient)) {
+    const parts = ingredient.split(/\bor\b/i);
+    const primaryIngredient = parts.shift().trim();
+    const altIngredient = parts.join('or').trim();
+    if (primaryIngredient) {
+      ingredient = primaryIngredient;
+    }
+    if (altIngredient) {
+      const altEntry = {
+        quantity: 0,
+        unit: null,
+        unitPlural: null,
+        symbol: null,
+        ingredient: altIngredient,
+        minQty: 0,
+        maxQty: 0,
+        originalString: altIngredient,
+      };
+      alternatives.push(altEntry);
+    }
+  }
 
   let minQty = quantity; // default to quantity
   let maxQty = quantity; // default to quantity
@@ -500,6 +605,10 @@ export function parse(ingredientString, language) {
     originalString, // Include the original string
   };
 
+  if (includeUnitSystems) {
+    result.unitSystem = getUnitSystem(result.unit, language);
+  }
+
   if (approx) {
     result.approx = true;
   }
@@ -518,6 +627,9 @@ export function parse(ingredientString, language) {
         .trim();
       result.additional = cleanedAdditional || null;
     }
+  }
+  if (includeAlternatives && alternatives.length > 0) {
+    result.alternatives = alternatives;
   }
   if (instructionsFound && instructionsFound.length > 0) {
     result.instructions = instructionsFound;

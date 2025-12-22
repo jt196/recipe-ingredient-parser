@@ -182,6 +182,21 @@ const instructions = [
   'pressé',
 ];
 const adverbs = ['finement', 'grossièrement', 'finement tranché', 'fraîchement'];
+const unitSystems = {
+  gramme: 'metric',
+  kilogramme: 'metric',
+  milligramme: 'metric',
+  litre: 'metric',
+  millilitre: 'metric',
+  once: 'imperial',
+  floz: 'imperial',
+  gallon: 'imperial',
+  pinte: 'imperial',
+  tasse: 'americanVolumetric',
+  quart: 'americanVolumetric',
+  'cuillère à soupe': 'americanVolumetric',
+  'cuillère à café': 'americanVolumetric',
+};
 
 const numbersSmall = {
   zéro: 0,
@@ -238,6 +253,9 @@ export const langFra = {
   approx,
   optional,
   toServe,
+  instructions,
+  adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

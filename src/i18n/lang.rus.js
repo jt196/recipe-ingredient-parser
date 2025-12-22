@@ -155,6 +155,21 @@ const instructions = [
   'с цедрой',
 ];
 const adverbs = ['мелко', 'крупно', 'тонко', 'свежемолотый'];
+const unitSystems = {
+  грамм: 'metric',
+  килограмм: 'metric',
+  миллиграмм: 'metric',
+  литр: 'metric',
+  миллилитр: 'metric',
+  унция: 'imperial',
+  жидкаяУнция: 'imperial',
+  галлон: 'imperial',
+  пинта: 'imperial',
+  чашка: 'americanVolumetric',
+  кварта: 'americanVolumetric',
+  столоваяЛожка: 'americanVolumetric',
+  чайнаяЛожка: 'americanVolumetric',
+};
 
 const numbersSmall = {
   ноль: 0,
@@ -210,6 +225,9 @@ export const langRus = {
   approx,
   optional,
   toServe,
+  instructions,
+  adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

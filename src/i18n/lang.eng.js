@@ -197,6 +197,22 @@ const instructions = [
   'tender',
 ];
 const adverbs = ['finely', 'thinly', 'coarsely', 'freshly'];
+const unitSystems = {
+  gram: 'metric',
+  kilogram: 'metric',
+  milligram: 'metric',
+  liter: 'metric',
+  milliliter: 'metric',
+  ounce: 'imperial',
+  floz: 'imperial',
+  gallon: 'imperial',
+  pound: 'imperial',
+  cup: 'americanVolumetric',
+  quart: 'americanVolumetric',
+  pint: 'americanVolumetric',
+  tablespoon: 'americanVolumetric',
+  teaspoon: 'americanVolumetric',
+};
 
 const numbersSmall = {
   zero: 0,
@@ -256,6 +272,7 @@ export const langEng = {
   toServe,
   instructions,
   adverbs,
+  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

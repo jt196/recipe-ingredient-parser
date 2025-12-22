@@ -143,6 +143,21 @@ const instructions = [
   'vermischt',
 ];
 const adverbs = ['fein', 'grob', 'dünn', 'frisch'];
+const unitSystems = {
+  Gramm: 'metric',
+  Kilogramm: 'metric',
+  Milligramm: 'metric',
+  Liter: 'metric',
+  Milliliter: 'metric',
+  Unze: 'imperial',
+  Pfund: 'imperial',
+  Gallone: 'imperial',
+  Tasse: 'americanVolumetric',
+  Quart: 'americanVolumetric',
+  Pint: 'americanVolumetric',
+  Esslöffel: 'americanVolumetric',
+  Teelöffel: 'americanVolumetric',
+};
 const toServe = ['zum servieren', 'zum anrichten'];
 
 const numbersSmall = {
@@ -204,6 +219,7 @@ export const langDeu = {
   optional,
   instructions,
   adverbs,
+  unitSystems,
   toServe,
   numbersSmall,
   numbersMagnitude,
