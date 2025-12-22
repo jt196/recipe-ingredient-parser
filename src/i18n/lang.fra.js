@@ -36,6 +36,13 @@ const units = {
   botte: ['botte', 'bottes'],
   portion: ['portion', 'portions'],
   pouce: ['pouce', 'po', 'pouces'],
+  bruine: ['bruine'],
+  centimètre: ['centimètre', 'cm', 'cm.'],
+  oreille: ['oreille', 'oreilles'],
+  peu: ['peu'],
+  bouton: ['bouton'],
+  pouceSuppl: ['pouce'],
+  paquets: ['paquets'],
 };
 
 const pluralUnits = {
@@ -74,6 +81,13 @@ const pluralUnits = {
   botte: 'bottes',
   portion: 'portions',
   pouce: 'pouces',
+  bruine: 'bruines',
+  centimètre: 'centimètres',
+  oreille: 'oreilles',
+  peu: 'peu',
+  bouton: 'boutons',
+  pouceSuppl: 'pouces',
+  paquets: 'paquets',
 };
 
 const symbolUnits = {
@@ -109,6 +123,13 @@ const symbolUnits = {
   botte: '',
   portion: '',
   pouce: 'po',
+  bruine: '',
+  centimètre: 'cm',
+  oreille: '',
+  peu: '',
+  bouton: '',
+  pouceSuppl: '',
+  paquets: '',
 };
 
 const prepositions = ['de'];
@@ -124,7 +145,7 @@ const approx = [
   '~',
 ];
 const optional = ['optionnel', 'facultatif', 'si désiré'];
-const toServe = ['pour servir'];
+const toServe = ['pour servir', 'pour garnir', 'garnir', 'décorer'];
 const instructions = [
   'haché',
   'coupé en dés',
@@ -180,8 +201,59 @@ const instructions = [
   'coupé en cubes',
   'zesté',
   'pressé',
+  'sec',
+  'nivelé',
+  'nivelé',
+  'acheté en magasin',
+  'à température ambiante',
+  'pour le graissage',
+  'pour graisser la boîte',
+  'pour la poêle',
+  'lapidé',
+  'cuit',
+  'en miettes',
+  'croustillant',
+  'croustillant',
+  'séché',
+  'séché à sec',
+  'emballé',
+  'frais',
+  'bonne qualité',
+  'entassé',
+  'copieux',
+  'fait maison',
+  'glacé',
+  'glacé',
+  'jus de',
+  'pour la friture',
+  'réservé',
+  'brut',
+  'salé',
+  'non salé',
+  'épais',
+  'mince',
+  'coupe épaisse',
+  'non sucré',
+  'non assaisonné',
+  'non ciré',
+  'tendre',
+  'pressé',
+  'jus',
+  'zesté',
+  'cassé',
+  'fissuré',
+  'déveiné',
+  'décortiqué',
+  'en cubes',
+  'déchiré',
 ];
-const adverbs = ['finement', 'grossièrement', 'finement tranché', 'fraîchement'];
+const adverbs = [
+  'finement',
+  'grossièrement',
+  'finement tranché',
+  'fraîchement',
+  'fermement',
+];
 const unitSystems = {
   gramme: 'metric',
   kilogramme: 'metric',

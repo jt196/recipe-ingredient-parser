@@ -32,6 +32,13 @@ const units = {
   maço: ['maço', 'maços', 'ramo', 'ramos'],
   porção: ['porção', 'porções', 'porcao', 'porcoes'],
   polegada: ['polegada', 'pol', 'pol.'],
+  chuvisco: ['chuvisco'],
+  centímetro: ['centímetro', 'centimetro', 'cm', 'cm.'],
+  orelha: ['orelha', 'orelhas'],
+  alguns: ['alguns'],
+  botão: ['botão'],
+  dedão: ['dedão'],
+  pacotes: ['pacote', 'pacotes'],
 };
 
 const pluralUnits = {
@@ -67,6 +74,13 @@ const pluralUnits = {
   maço: 'maços',
   porção: 'porções',
   polegada: 'polegadas',
+  chuvisco: 'chuviscos',
+  centímetro: 'centímetros',
+  orelha: 'orelhas',
+  alguns: 'alguns',
+  botão: 'botões',
+  dedão: 'dedões',
+  pacotes: 'pacotes',
 };
 
 const symbolUnits = {
@@ -102,6 +116,13 @@ const symbolUnits = {
   maço: '',
   porção: '',
   polegada: 'pol',
+  chuvisco: '',
+  centímetro: 'cm',
+  orelha: '',
+  alguns: '',
+  botão: '',
+  dedão: '',
+  pacotes: '',
 };
 
 const prepositions = ['de'];
@@ -117,7 +138,7 @@ const approx = [
   '~',
 ];
 const optional = ['opcional', 'se desejado'];
-const toServe = ['para servir'];
+const toServe = ['para servir', 'para enfeitar', 'enfeitar', 'decorar'];
 const instructions = [
   'picado',
   'cortado em cubos',
@@ -178,8 +199,53 @@ const instructions = [
   'quebrado',
   'espremido',
   'com raspas',
+  'seco',
+  'nivelado',
+  'nivelado',
+  'comprado em loja',
+  'à temperatura ambiente',
+  'para lubrificação',
+  'para untar a lata',
+  'para a panela',
+  'apedrejado',
+  'cozido',
+  'desmoronou',
+  'crocante',
+  'nítido',
+  'seco',
+  'curado a seco',
+  'embalado',
+  'fresco',
+  'de boa qualidade',
+  'amontoado',
+  'saudável',
+  'caseiro',
+  'gelado',
+  'gelado',
+  'suco de',
+  'para fritar',
+  'reservado',
+  'cru',
+  'salgado',
+  'sem sal',
+  'espesso',
+  'afinar',
+  'corte grosso',
+  'sem açúcar',
+  'sem tempero',
+  'não encerado',
+  'macio',
+  'espremido',
+  'suco',
+  'entusiasmado',
+  'quebrado',
+  'rachado',
+  'desenvolvido',
+  'descascado',
+  'em cubos',
+  'rasgado',
 ];
-const adverbs = ['finamente', 'grosseiramente', 'delicadamente', 'recém'];
+const adverbs = ['finamente', 'grosseiramente', 'delicadamente', 'recém', 'firmemente'];
 const unitSystems = {
   grama: 'metric',
   quilo: 'metric',

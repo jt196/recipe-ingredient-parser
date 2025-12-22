@@ -39,6 +39,13 @@ const units = {
   manojo: ['manojo', 'manojos', 'ramo', 'ramos'],
   porción: ['porción', 'porciones', 'porcion', 'porciones'],
   pulgada: ['pulgada', 'pulg.', 'pulgadas'],
+  llovizna: ['llovizna'],
+  centímetro: ['centímetro', 'centimetro', 'cm', 'cm.'],
+  oreja: ['oreja', 'orejas'],
+  pocos: ['pocos'],
+  perilla: ['perilla'],
+  pulgar: ['pulgar'],
+  paquetes: ['paquetes'],
 };
 
 const pluralUnits = {
@@ -74,6 +81,13 @@ const pluralUnits = {
   manojo: 'manojos',
   porción: 'porciones',
   pulgada: 'pulgadas',
+  llovizna: 'lloviznas',
+  centímetro: 'centímetros',
+  oreja: 'orejas',
+  pocos: 'pocos',
+  perilla: 'perillas',
+  pulgar: 'pulgares',
+  paquetes: 'paquetes',
 };
 
 const symbolUnits = {
@@ -109,6 +123,13 @@ const symbolUnits = {
   manojo: '',
   porción: '',
   pulgada: 'pulg.',
+  llovizna: '',
+  centímetro: 'cm',
+  oreja: '',
+  pocos: '',
+  perilla: '',
+  pulgar: '',
+  paquetes: '',
 };
 
 const prepositions = ['de'];
@@ -117,7 +138,7 @@ const joiners = ['a'];
 
 const toTaste = ['al gusto'];
 const optional = ['opcional', 'si se desea', 'a elección'];
-const toServe = ['para servir'];
+const toServe = ['para servir', 'para decorar', 'para adornar', 'decorar'];
 const approx = [
   'aprox',
   'aprox.',
@@ -187,8 +208,59 @@ const instructions = [
   'grande',
   'exprimido',
   'zesteado',
+  'seco',
+  'nivelado',
+  'nivelado',
+  'comprado en la tienda',
+  'a temperatura ambiente',
+  'para engrasar',
+  'para engrasar la lata',
+  'para la sartén',
+  'drogado',
+  'cocido',
+  'se desmoronó',
+  'crujiente',
+  'crujiente',
+  'seco',
+  'curado en seco',
+  'lleno',
+  'fresco',
+  'buena calidad',
+  'casero',
+  'amontonado',
+  'abundante',
+  'helado',
+  'helado',
+  'jugo de',
+  'para freír',
+  'reservado',
+  'crudo',
+  'salado',
+  'sin sal',
+  'grueso',
+  'delgado',
+  'corte grueso',
+  'sin azúcar',
+  'sin condimentar',
+  'sin encerar',
+  'licitación',
+  'exprimido',
+  'jugo',
+  'entusiasmado',
+  'roto',
+  'agrietado',
+  'desvenado',
+  'descascarado',
+  'cubicado',
+  'rasgado',
 ];
-const adverbs = ['finamente', 'gruesamente', 'delgadamente', 'recién'];
+const adverbs = [
+  'finamente',
+  'gruesamente',
+  'delgadamente',
+  'recién',
+  'firmemente',
+];
 const unitSystems = {
   gramo: 'metric',
   kilogramo: 'metric',

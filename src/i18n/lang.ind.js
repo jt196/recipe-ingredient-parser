@@ -29,6 +29,13 @@ const units = {
   irisan: ['irisan', 'slice', 'slices'],
   ikat: ['ikat', 'ikatan'],
   porsi: ['porsi', 'porsian'],
+  gerimis: ['gerimis'],
+  sentimeter: ['sentimeter', 'cm', 'cm.'],
+  telinga: ['telinga', 'telinga'],
+  sedikit: ['sedikit'],
+  tombol: ['tombol'],
+  ibuJari: ['ibu jari'],
+  paketBaru: ['paket', 'paket'],
 };
 
 const pluralUnits = {
@@ -62,6 +69,13 @@ const pluralUnits = {
   irisan: 'irisan',
   ikat: 'ikat',
   porsi: 'porsi',
+  gerimis: 'gerimis',
+  sentimeter: 'sentimeter',
+  telinga: 'telinga',
+  sedikit: 'sedikit',
+  tombol: 'tombol',
+  ibuJari: 'ibu jari',
+  paketBaru: 'paket',
 };
 
 const symbolUnits = {
@@ -95,6 +109,13 @@ const symbolUnits = {
   irisan: '',
   ikat: '',
   porsi: '',
+  gerimis: '',
+  sentimeter: 'cm',
+  telinga: '',
+  sedikit: '',
+  tombol: '',
+  ibuJari: '',
+  paketBaru: '',
 };
 
 const prepositions = ['dari'];
@@ -102,7 +123,13 @@ const joiners = ['sampai'];
 const toTaste = ['secukupnya'];
 const approx = ['sekitar', 'kira-kira', 'kurang lebih', '±', '~'];
 const optional = ['opsional', 'jika diinginkan'];
-const toServe = ['untuk disajikan', 'untuk sajian'];
+const toServe = [
+  'untuk disajikan',
+  'untuk sajian',
+  'untuk hiasan',
+  'untuk hiasan',
+  'untuk menghias',
+];
 const instructions = [
   'cincang',
   'dipotong dadu',
@@ -160,8 +187,53 @@ const instructions = [
   'dipecah',
   'diperas',
   'diparut kulit',
+  'kering',
+  'diratakan',
+  'diratakan',
+  'dibeli di toko',
+  'pada suhu kamar',
+  'untuk mengoles',
+  'untuk mengoles loyang',
+  'untuk panci',
+  'dilempari batu',
+  'matang',
+  'hancur',
+  'renyah',
+  'garing',
+  'kering',
+  'disembuhkan secara kering',
+  'penuh sesak',
+  'segar',
+  'berkualitas baik',
+  'menumpuk',
+  'hangat',
+  'buatan sendiri',
+  'sedingin es',
+  'sedingin es',
+  'jus dari',
+  'untuk menggoreng',
+  'disimpan',
+  'mentah',
+  'asin',
+  'tanpa garam',
+  'tebal',
+  'tipis',
+  'potongan tebal',
+  'yg tak diberi gula',
+  'tak berbumbu',
+  'belum di-wax',
+  'lembut',
+  'diperas',
+  'dijus',
+  'bersemangat',
+  'rusak',
+  'retak',
+  'deined',
+  'dikupas',
+  'potong dadu',
+  'robek',
 ];
-const adverbs = ['halus', 'kasar', 'tipis', 'segar'];
+const adverbs = ['halus', 'kasar', 'tipis', 'segar', 'dengan tegas'];
 const unitSystems = {
   gram: 'metric',
   kilogram: 'metric',

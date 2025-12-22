@@ -49,6 +49,13 @@ const units = {
   rametto: ['rametto', 'rametti'],
   rotolo: ['rotolo'],
   pugno: ['pugno', 'pugni'],
+  pioviggine: ['pioviggine'],
+  centimetro: ['centimetro', 'centimetri', 'cm', 'cm.'],
+  orecchio: ['orecchio', 'orecchie'],
+  pochi: ['pochi'],
+  manopola: ['manopola'],
+  pollice: ['pollice', 'pollici'],
+  pacchetto: ['pacchetto', 'pacchetti'],
 
   // noce: ['noce'],
   bicchierino: ['bicchierino'],
@@ -99,6 +106,13 @@ const pluralUnits = {
 
   //noce: 'noci'
   pugno: 'pugni',
+  pioviggine: 'pioviggine',
+  centimetro: 'centimetri',
+  orecchio: 'orecchie',
+  pochi: 'pochi',
+  manopola: 'manopole',
+  pollice: 'pollici',
+  pacchetto: 'pacchetti',
 };
 
 const symbolUnits = {
@@ -123,6 +137,13 @@ const symbolUnits = {
   vasetto: '',
   goccia: '',
   spruzzo: '',
+  pioviggine: '',
+  centimetro: 'cm',
+  orecchio: '',
+  pochi: '',
+  manopola: '',
+  pollice: '',
+  pacchetto: '',
   grammo: 'g',
   cucchiaino: 'cc',
   chilogrammo: 'kg',
@@ -138,7 +159,13 @@ const joiners = ['o'];
 const toTaste = ['quanto basta'];
 const approx = ['circa', 'circa.', 'cir.', 'approssimativamente', 'quasi', '~'];
 const optional = ['opzionale', 'facoltativo', 'se desiderato'];
-const toServe = ['per servire', 'da servire'];
+const toServe = [
+  'per servire',
+  'da servire',
+  'per guarnire',
+  'per guarnire',
+  'decorare',
+];
 const instructions = [
   'tritato',
   'tagliato a dadini',
@@ -203,8 +230,60 @@ const instructions = [
   'spezzato',
   'spremuto',
   'zestato',
+  'Asciutto',
+  'livellato',
+  'livellato',
+  'comprato in negozio',
+  'a temperatura ambiente',
+  'per ingrassaggio',
+  'per ungere la teglia',
+  'per la padella',
+  'lapidato',
+  'cotto',
+  'sbriciolato',
+  'croccante',
+  'croccante',
+  'essiccato',
+  'stagionato a secco',
+  'imballato',
+  'fresco',
+  'buona qualità',
+  'colmo',
+  'abbondante',
+  'fatto in casa',
+  'ghiacciato',
+  'ghiacciato',
+  'succo di',
+  'per friggere',
+  'prenotato',
+  'crudo',
+  'salato',
+  'non salato',
+  'spesso',
+  'magro',
+  'taglio spesso',
+  'non zuccherato',
+  'non stagionato',
+  'non cerato',
+  'tenero',
+  'spremuto',
+  'spremuto',
+  'scorzato',
+  'rotto',
+  'incrinato',
+  'sviluppato',
+  'decorticato',
+  'a cubetti',
+  'strappato',
 ];
-const adverbs = ['finemente', 'grossolanamente', 'sottilmente', 'appena', 'fresco'];
+const adverbs = [
+  'finemente',
+  'grossolanamente',
+  'sottilmente',
+  'appena',
+  'fresco',
+  'fermamente',
+];
 const unitSystems = {
   grammo: 'metric',
   chilogrammo: 'metric',

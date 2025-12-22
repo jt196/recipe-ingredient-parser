@@ -25,6 +25,13 @@ const units = {
   Flasche: ['flaschen', 'flasche', 'flasche(n)', 'flasche/n'],
   Bund: ['bund', 'bunde', 'bund(e)', 'bund/e'],
   Portion: ['portion', 'portionen'],
+  Nieselregen: ['nieselregen'],
+  Zentimeter: ['zentimeter', 'cm'],
+  Ohr: ['ohr', 'ohren'],
+  wenige: ['wenige'],
+  Knopf: ['knopf'],
+  Daumen: ['daumen'],
+  Paket: ['paket', 'pakete'],
 };
 
 const pluralUnits = {
@@ -54,6 +61,13 @@ const pluralUnits = {
   Flasche: 'Flaschen',
   Bund: 'Bund',
   Portion: 'Portionen',
+  Nieselregen: 'Nieselregen',
+  Zentimeter: 'Zentimeter',
+  Ohr: 'Ohren',
+  wenige: 'wenige',
+  Knopf: 'Knöpfe',
+  Daumen: 'Daumen',
+  Paket: 'Pakete',
 };
 
 const symbolUnits = {
@@ -83,6 +97,13 @@ const symbolUnits = {
   Flasche: '',
   Bund: '',
   Portion: '',
+  Nieselregen: '',
+  Zentimeter: 'cm',
+  Ohr: '',
+  wenige: '',
+  Knopf: '',
+  Daumen: '',
+  Paket: '',
 };
 
 const prepositions = ['von'];
@@ -144,8 +165,53 @@ const instructions = [
   'gerissen',
   'gerührt',
   'vermischt',
+  'trocken',
+  'nivelliert',
+  'nivelliert',
+  'im Laden gekauft',
+  'bei Raumtemperatur',
+  'zum Einfetten',
+  'zum Einfetten der Dose',
+  'für die Pfanne',
+  'gesteinigt',
+  'gekocht',
+  'zerbröckelt',
+  'knusprig',
+  'knackig',
+  'getrocknet',
+  'trockengepökelt',
+  'verpackt',
+  'frisch',
+  'gute Qualität',
+  'gehäuft',
+  'herzhaft',
+  'hausgemacht',
+  'eiskalt',
+  'eiskalt',
+  'Saft von',
+  'zum Braten',
+  'reserviert',
+  'roh',
+  'gesalzen',
+  'ungesalzen',
+  'dick',
+  'dünn',
+  'dick geschnitten',
+  'ungesüßt',
+  'ungewürzt',
+  'ungewachst',
+  'zart',
+  'gequetscht',
+  'entsaftet',
+  'gewürzt',
+  'gebrochen',
+  'geknackt',
+  'entdarmt',
+  'geschält',
+  'gewürfelt',
+  'zerrissen',
 ];
-const adverbs = ['fein', 'grob', 'dünn', 'frisch'];
+const adverbs = ['fein', 'grob', 'dünn', 'frisch', 'fest'];
 const unitSystems = {
   Gramm: 'metric',
   Kilogramm: 'metric',
@@ -161,7 +227,13 @@ const unitSystems = {
   Esslöffel: 'americanVolumetric',
   Teelöffel: 'americanVolumetric',
 };
-const toServe = ['zum servieren', 'zum anrichten'];
+const toServe = [
+  'zum servieren',
+  'zum anrichten',
+  'zum garnieren',
+  'zum garnieren',
+  'zum dekorieren',
+];
 
 const numbersSmall = {
   null: 0,

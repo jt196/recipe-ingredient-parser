@@ -33,7 +33,7 @@ const units = {
   liter: ['liter', 'l', 'l.', 'lt', 'lt.', 'litre', 'litres'],
   milligram: ['milligram', 'mg', 'mg.'],
   milliliter: ['milliliter', 'ml', 'ml.', 'millilitre', 'millilitres'],
-  packet: [
+  pack: [
     'package',
     'pkg',
     'pkgs',
@@ -101,6 +101,7 @@ const pluralUnits = {
   stick: 'sticks',
   handful: 'handfuls',
   inch: 'inches',
+  pack: 'packs',
   centimetre: 'centimetres',
   ear: ['ears'],
   knob: ['knobs'],
@@ -138,6 +139,7 @@ const symbolUnits = {
   stick: '',
   handful: '',
   inch: '',
+  pack: '',
   centimetre: 'cm',
 };
 
@@ -252,9 +254,10 @@ const instructions = [
   'packed',
   'fresh',
   'good-quality',
+  'homemade',
+  'home-made',
   'heaped',
   'hearty',
-  'homemade',
   'ice-cold',
   'ice cold',
   'juice of',
