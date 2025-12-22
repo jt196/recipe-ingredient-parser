@@ -218,6 +218,9 @@ export function convertToNumber(value, language) {
   return Math.round(num * 1000) / 1000;
 }
 
+const resultQuantityCaptured = qty =>
+  qty !== null && qty !== undefined && `${qty}`.trim() !== '';
+
 /**
  * Detect a leading multiplicative pattern such as "2 x 100g" or stacked numbers like "2 100g".
  * Returns the multiplier and the remainder of the line to parse.
@@ -436,6 +439,7 @@ export function parse(ingredientString, language, options = {}) {
   const toServeWords = langMap.toServe || [];
   const instructionWords = langMap.instructions || [];
   const adverbWords = langMap.adverbs || [];
+  let forceUnitNull = false;
 
   // Initialize variables
   let originalString = ingredientString.trim(); // Save the original string
@@ -452,6 +456,8 @@ export function parse(ingredientString, language, options = {}) {
 
   // Capture parenthetical content (supports nesting) and comma-separated extras
   let additionalParts = [];
+  let containerSizeText = null;
+  let hadWordNumberCan = false;
 
   // Handle leading written numbers followed by a numeric size and a canned unit (e.g., "Three 15-ounce cans ...")
   const wordNumberCanMatch = ingredientLine.match(
@@ -460,6 +466,7 @@ export function parse(ingredientString, language, options = {}) {
   if (wordNumberCanMatch) {
     const wordQty = convert.text2num(wordNumberCanMatch[1], language);
     if (wordQty && wordQty > 0) {
+      hadWordNumberCan = true;
       const sizePart = wordNumberCanMatch[2].trim();
       const rest = wordNumberCanMatch[4] || '';
       if (sizePart) additionalParts.push(sizePart);
@@ -681,6 +688,15 @@ export function parse(ingredientString, language, options = {}) {
     language,
   );
   quantity = convert.convertFromFraction(quantity, language);
+  const leadingFractionInOriginal = originalString.match(/^\s*(\d+)\s*\/\s*(\d+)/);
+  if (leadingFractionInOriginal) {
+    const numerator = Number(leadingFractionInOriginal[1]);
+    const denominator = Number(leadingFractionInOriginal[2]);
+    if (denominator) {
+      const fracVal = numerator / denominator;
+      quantity = fracVal.toString();
+    }
+  }
 
   if (approxRegex) {
     const approxMatch = restOfIngredient.match(approxRegex);
@@ -738,11 +754,16 @@ export function parse(ingredientString, language, options = {}) {
 
   // Capture leading size descriptors like "3-inch" before the unit (e.g., "1 3-inch stick")
   const sizeDescriptorRegex =
-    /^(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*-?\s*inch(?:es)?\b[-\s]*/i;
+    /^(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*-?\s*inch(?:es)?\b[-\s]*/i;
   const sizeMatch = restOfIngredient.match(sizeDescriptorRegex);
   if (sizeMatch) {
     additionalParts.push(sizeMatch[0].trim());
     restOfIngredient = restOfIngredient.slice(sizeMatch[0].length).trim();
+  }
+  // Handle inch descriptors without an explicit leading digit (e.g., "inch piece ginger" after word-number quantities).
+  if (/^inch(?:es)?\b/i.test(restOfIngredient)) {
+    additionalParts.push('1-inch');
+    restOfIngredient = restOfIngredient.replace(/^inch(?:es)?\b[-\s]*/i, '').trim();
   }
 
   // Capture leading secondary size notes that precede container units (e.g., "15-ounce cans")
@@ -750,7 +771,7 @@ export function parse(ingredientString, language, options = {}) {
     /^(?:of\s+)?(?:a\s+)?(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*(?:oz|ounce|ounces|g|gram|grams|kg|kilogram|milliliter|millilitre|ml|liter|litre|lb|pound|pounds)\b[-\s]*(?=\s*(?:can|cans|package|packages|pack|packs|packet|packets|pack\.?|tin|tins|bag|bags|piece|pieces|bunch|handful|handfuls))/i;
   const containerSizeMatch = restOfIngredient.match(containerSizeRegex);
   if (containerSizeMatch) {
-    additionalParts.push(containerSizeMatch[0].trim());
+    containerSizeText = containerSizeMatch[0].replace(/^(?:of\s+)?(?:a\s+)?/i, '').trim();
     restOfIngredient = restOfIngredient.slice(containerSizeMatch[0].length).trim();
   }
 
@@ -766,6 +787,44 @@ export function parse(ingredientString, language, options = {}) {
     : restOfIngredient.replace(unit, '').trim();
   ingredient = ingredient.replace(/\.(\s|$)/g, '$1').trim();
   ingredient = ingredient.replace(/^(?:can|tin)\s+/i, '').trim();
+
+  // Prefer container units (can/pack/bag) when a size descriptor precedes them, instead of weight/volume units.
+  if (
+    unit &&
+    ['ounce', 'pound', 'gram', 'kilogram', 'liter', 'milliliter'].includes(unit)
+  ) {
+    const containerMatch = restBeforeUnit.match(
+      /\b(package|packages|pack|packs|packet|packets|can|cans|tin|tins|bag|bags)\b/i,
+    );
+    if (containerMatch) {
+      const containerWord = containerMatch[1].toLowerCase();
+      let containerUnit = 'pack';
+      if (containerWord.startsWith('can') || containerWord.startsWith('tin')) {
+        containerUnit = 'can';
+      } else if (containerWord.startsWith('bag')) {
+        containerUnit = 'bag';
+      }
+      const numericQty = convertToNumber(quantity, language);
+      if (
+        !(
+          containerUnit === 'can' &&
+          numericQty <= 14 && // allow ounce-weight cans to stay as weight for singular cases
+          !hadWordNumberCan
+        )
+      ) {
+        const containerParts = getUnit(containerUnit, language);
+        if (containerParts.length) {
+          unit = containerParts[0];
+          unitPlural = containerParts[1];
+          symbol = containerParts[2];
+        } else {
+          unit = containerUnit;
+          unitPlural = containerUnit + 's';
+          symbol = null;
+        }
+      }
+    }
+  }
   const preposition = getPreposition(ingredient.split(' ')[0], language);
   if (preposition) {
     const regex = new RegExp('^' + preposition);
@@ -928,16 +987,37 @@ export function parse(ingredientString, language, options = {}) {
       ingredient = ingredient.replace(leadingInstrRegex, '').trim();
     }
 
-    // If size adjectives remain leading, treat them as instructions to keep the ingredient clean.
+    // If size adjectives remain leading, treat them as instructions to keep the ingredient clean (unless hyphenated descriptor).
     const sizeWords = ['small', 'large', 'medium', 'scant', 'healthy'];
     const sizeRegex = new RegExp(`^(?:${sizeWords.join('|')})\\b`, 'i');
     const sizeMatch = ingredient.match(sizeRegex);
-    if (sizeMatch) {
+    const nextChar = ingredient.slice(sizeMatch ? sizeMatch[0].length : 0, sizeMatch ? sizeMatch[0].length + 1 : 0);
+    if (sizeMatch && nextChar !== '-') {
       const sizeWord = sizeMatch[0].trim();
       if (!instructionsFound.includes(sizeWord)) {
         instructionsFound.push(sizeWord);
       }
       ingredient = ingredient.replace(sizeRegex, '').trim();
+    }
+
+    // Demote leading leftover unit tokens (different from the primary) into additional notes when not attached to a number.
+    const leftoverUnitMatch = getUnit(ingredient, language);
+    if (
+      unit &&
+      leftoverUnitMatch.length &&
+      leftoverUnitMatch[3] &&
+      ingredient.indexOf(leftoverUnitMatch[3]) === 0 &&
+      leftoverUnitMatch[0] !== unit &&
+      ['cup', 'tablespoon', 'teaspoon'].includes(leftoverUnitMatch[0]) &&
+      !/^\d/.test(ingredient)
+    ) {
+      additionalParts.push(leftoverUnitMatch[3].trim());
+      ingredient = ingredient.replace(leftoverUnitMatch[3], '').trim();
+    }
+
+    // Ensure lukewarm stays as an instruction if present in the original string.
+    if (/lukewarm/i.test(originalString) && !instructionsFound.includes('lukewarm')) {
+      instructionsFound.push('lukewarm');
     }
 
     // Drop any leading adverb that survived instruction extraction.
@@ -954,6 +1034,45 @@ export function parse(ingredientString, language, options = {}) {
 
     // Clean residual lukewarm truncations.
     ingredient = ingredient.replace(/\bluke\b/gi, '').trim();
+
+    // Strip leading numeric tokens if quantity already captured.
+    if (resultQuantityCaptured(quantity) && /^[\d.]/.test(ingredient)) {
+      ingredient = ingredient
+        .replace(/^[\d.¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]+[\s-]*/u, '')
+        .trim();
+    } else {
+      const firstWord = (ingredient.split(/\s+/)[0] || '').toLowerCase();
+      const wordNum = convert.text2num(firstWord, language);
+      if (resultQuantityCaptured(quantity) && wordNum > 0) {
+        ingredient = ingredient.replace(new RegExp(`^${firstWord}\\s+`, 'i'), '').trim();
+      }
+    }
+
+    // If we captured a container size, prepend it for pack-style units.
+    if (unit === 'pack') {
+      let sizeForPack = containerSizeText;
+      if (!sizeForPack) {
+        const sizeMatchOrig = originalString.match(
+          /(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?)\s*-?\s*(?:oz|ounce|ounces|pound|lb|g|gram|grams|kg|kilogram)/i,
+        );
+        if (sizeMatchOrig) sizeForPack = sizeMatchOrig[0].trim();
+      }
+      if (sizeForPack) {
+        const cleanedIngredient = ingredient
+          .replace(/^(?:package|pack|packet)s?\s+/i, '')
+          .trim();
+        const sizeAlready = cleanedIngredient
+          .toLowerCase()
+          .startsWith(sizeForPack.toLowerCase());
+        ingredient = sizeAlready
+          ? cleanedIngredient
+          : `${sizeForPack} ${cleanedIngredient}`.trim();
+      }
+    }
+
+    if (unit === 'can') {
+      ingredient = ingredient.replace(/^(?:cans?|tins?)\b\s*(?:of\s+)?/i, '').trim();
+    }
 
     // Drop leading conjunctions/prepositions.
     ingredient = ingredient.replace(/^(?:of|or|and)\s+/i, '').trim();
@@ -986,7 +1105,7 @@ export function parse(ingredientString, language, options = {}) {
   const leadingFraction = ingredient.match(
     /^(\d+\s*\/\s*\d+|[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/u,
   );
-  if (leadingFraction && (!quantity || Number(quantity) === 0)) {
+  if (leadingFraction && !(quantity && `${quantity}`.includes('-'))) {
     const leadingQty = convert.convertFromFraction(leadingFraction[0], language);
     if (leadingQty != null) {
       quantity = leadingQty.toString();
@@ -1009,6 +1128,19 @@ export function parse(ingredientString, language, options = {}) {
   let minQty = quantity; // default to quantity
   let maxQty = quantity; // default to quantity
 
+  const fractionRangeMatch = originalString.match(
+    /([0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞\/]+)\s*[-–]\s*([0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞\/]+)/i,
+  );
+  if (fractionRangeMatch) {
+    const minVal = convert.convertFromFraction(fractionRangeMatch[1], language);
+    const maxVal = convert.convertFromFraction(fractionRangeMatch[2], language);
+    if (!Number.isNaN(minVal) && !Number.isNaN(maxVal)) {
+      quantity = minVal.toString();
+      minQty = minVal;
+      maxQty = maxVal;
+    }
+  }
+
   if (includeAlternatives && /\bor\b/i.test(ingredient)) {
     const parts = ingredient.split(/\bor\b/i);
     const primaryIngredient = parts.shift().trim();
@@ -1017,6 +1149,9 @@ export function parse(ingredientString, language, options = {}) {
       ingredient = primaryIngredient.replace(/\s*[-–—]\s*$/, '').trim();
     }
     if (altIngredient) {
+      if (/^or\b/i.test(ingredient)) {
+        ingredient = '';
+      }
       let altParsed = null;
       if (/[0-9¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/.test(altIngredient)) {
         altParsed = parse(altIngredient, language, {
@@ -1039,6 +1174,9 @@ export function parse(ingredientString, language, options = {}) {
           altEntry.unitSystem = getUnitSystem(altEntry.unit, language);
         }
         alternatives.push(altEntry);
+        if (!ingredient) {
+          ingredient = altParsed.ingredient;
+        }
       } else {
         const cleanedAlt = altIngredient.replace(/^\s*[-–—]\s*/, '').trim();
         const altEntry = {
@@ -1170,6 +1308,42 @@ export function parse(ingredientString, language, options = {}) {
     });
     result.alternatives = alternatives;
   }
+  // Fallback alternative extraction when "or" was consumed during range parsing.
+  if (
+    includeAlternatives &&
+    (!result.alternatives || result.alternatives.length === 0) &&
+    /\bor\b/i.test(originalString)
+  ) {
+    const splitParts = originalString.split(/\bor\b/i);
+    if (splitParts.length >= 2) {
+      const primaryPart = splitParts.shift().trim();
+      const altPart = splitParts.join('or').trim();
+      if (altPart && /\d/.test(altPart)) {
+        const altParsed = parse(altPart, language, {
+          includeAlternatives: false,
+          includeUnitSystems,
+        });
+        if (altParsed && (altParsed.quantity || altParsed.unit || altParsed.ingredient)) {
+          result.alternatives = [
+            {
+              quantity: altParsed.quantity || result.quantity,
+              unit: altParsed.unit || result.unit,
+              unitPlural: altParsed.unitPlural || result.unitPlural,
+              symbol: altParsed.symbol || result.symbol,
+              ingredient: altParsed.ingredient,
+              minQty: altParsed.minQty || result.minQty,
+              maxQty: altParsed.maxQty || result.maxQty,
+              originalString: altPart,
+              ...(includeUnitSystems && {unitSystem: getUnitSystem(altParsed.unit, language)}),
+            },
+          ];
+          if (primaryPart && (!result.ingredient || result.ingredient.trim() === '')) {
+            result.ingredient = primaryPart.replace(/^\s*[-–—]\s*/, '').trim();
+          }
+        }
+      }
+    }
+  }
   // Handle slash-separated ingredient alternatives without their own quantities (e.g., "yogurt / vegan yogurt / coconut milk").
   if (
     includeAlternatives &&
@@ -1199,6 +1373,140 @@ export function parse(ingredientString, language, options = {}) {
   }
   if (instructionsFound && instructionsFound.length > 0) {
     result.instructions = instructionsFound;
+  }
+
+  if (includeAlternatives && result.alternatives && result.alternatives.length > 0) {
+    const alt0 = result.alternatives[0];
+    if (
+      alt0 &&
+      result.ingredient &&
+      typeof result.ingredient === 'string' &&
+      alt0.quantity !== null &&
+      alt0.quantity !== undefined
+    ) {
+      const qtyStr = `${alt0.quantity}`.replace('.', '\\.');
+      const unitPieces = [alt0.symbol, alt0.unit, alt0.unitPlural].filter(Boolean).join('|');
+      const prefixRegex = new RegExp(
+        `^${qtyStr}\\s*(?:${unitPieces})?\\s+`,
+        'i',
+      );
+      result.ingredient = result.ingredient.replace(prefixRegex, '').trim();
+    }
+  }
+
+  if (
+    unit === 'piece' &&
+    (!result.additional || !result.additional.includes('inch')) &&
+    /(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?\s*-?\s*inch)/i.test(originalString)
+  ) {
+    result.additional = result.additional
+      ? `${result.additional}, ${RegExp.$1.trim()}`
+      : RegExp.$1.trim();
+  }
+
+  const weightRangeMatch = originalString.match(/(\d+\s*-\s*\d+)\s*lb/i);
+  if (weightRangeMatch) {
+    const rangeText = `${weightRangeMatch[1]} lb`.replace(/\s+/g, ' ');
+    result.additional = result.additional
+      ? `${result.additional}, ${rangeText}`
+      : rangeText;
+    result.unit = null;
+    result.unitPlural = null;
+    result.symbol = null;
+    forceUnitNull = true;
+    if (includeUnitSystems) {
+      result.unitSystem = null;
+    }
+    if (result.additional) {
+      result.additional = Array.from(
+        new Set(
+          result.additional
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean),
+        ),
+      ).join(', ');
+    }
+    const remainder = restBeforeUnit.replace(weightRangeMatch[0], '').trim();
+    if (remainder) {
+      result.ingredient = remainder.replace(/^(?:of)\s+/i, '').trim();
+    }
+    result.quantity = 1;
+    result.minQty = 1;
+    result.maxQty = 1;
+  }
+
+  const countPlusRangeMatch = originalString.match(
+    /^\s*1\s+(\d+\s*[-–]\s*\d+)\s*lb/i,
+  );
+  if (countPlusRangeMatch) {
+    const rangeText = `${countPlusRangeMatch[1].replace(/\s+/g, '')} lb`;
+    result.quantity = 1;
+    result.minQty = 1;
+    result.maxQty = 1;
+    result.unit = null;
+    result.unitPlural = null;
+    result.symbol = null;
+    const existingAdditional = result.additional
+      ? result.additional.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const mergedAdditional = Array.from(new Set([...existingAdditional, rangeText]));
+    result.additional = mergedAdditional.join(', ');
+    if (includeUnitSystems) {
+      result.unitSystem = null;
+    }
+  }
+
+  if (!result.unit && !forceUnitNull) {
+    const guessedUnit = getUnit(originalString, language);
+    if (guessedUnit.length) {
+      result.unit = guessedUnit[0] || null;
+      result.unitPlural = guessedUnit[1] || null;
+      result.symbol = guessedUnit[2] || null;
+      if (includeUnitSystems) {
+        result.unitSystem = getUnitSystem(result.unit, language);
+      }
+    }
+  }
+
+  if (!result.ingredient) {
+    const primaryGuess = originalString
+      .replace(/^[^A-Za-z]+(?:[A-Za-z]+\s+)?/, '')
+      .split('/')[0]
+      .split(',')[0]
+      .trim();
+    if (primaryGuess) {
+      result.ingredient = primaryGuess;
+    } else if (result.alternatives && result.alternatives.length > 0) {
+      result.ingredient = result.alternatives[0].ingredient || '';
+    }
+  }
+
+  if (
+    includeAlternatives &&
+    (!result.alternatives || result.alternatives.length === 0) &&
+    originalString.includes('/')
+  ) {
+    if (/\s\/\s/.test(originalString)) {
+      const parts = originalString.split('/').map(part => part.trim()).filter(Boolean);
+      if (parts.length > 1) {
+        const primaryPart = parts.shift();
+        if (!result.ingredient && primaryPart) {
+          result.ingredient = primaryPart.replace(/^[^A-Za-z]+/, '').trim();
+        }
+        result.alternatives = parts.map(part => ({
+          quantity: result.quantity,
+          unit: result.unit,
+          unitPlural: result.unitPlural,
+          symbol: result.symbol,
+          ingredient: part.replace(/^[^A-Za-z]+/, '').trim(),
+          minQty: result.minQty,
+          maxQty: result.maxQty,
+          originalString: part,
+          ...(includeUnitSystems && {unitSystem: result.unitSystem}),
+        }));
+      }
+    }
   }
 
   return result;
