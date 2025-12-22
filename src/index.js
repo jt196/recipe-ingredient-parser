@@ -240,6 +240,62 @@ function extractParentheticalSegments(text) {
 }
 
 /**
+ * Extract instruction/state phrases (with optional leading adverbs) from text and additional notes.
+ * @param {string} ingredientText
+ * @param {Array<string>} additionalParts
+ * @param {Array<string>} instructionsList
+ * @param {Array<string>} adverbs
+ * @returns {{ingredientText: string, additionalParts: Array<string>, instructions: Array<string>}}
+ */
+function extractInstructions(
+  ingredientText,
+  additionalParts,
+  instructionsList,
+  adverbs,
+) {
+  if (!Array.isArray(instructionsList) || instructionsList.length === 0) {
+    return {ingredientText, additionalParts, instructions: []};
+  }
+
+  const escaped = instructionsList.map(w =>
+    w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+  );
+  const escapedAdverbs = (adverbs || []).map(w =>
+    w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+  );
+
+  const adverbPart =
+    escapedAdverbs.length > 0 ? `(?:${escapedAdverbs.join('|')})\\s+` : '';
+  const regex = new RegExp(
+    `\\b(?:${adverbPart})?(?:${escaped.join('|')})\\b`,
+    'gi',
+  );
+
+  const found = [];
+  const strip = text =>
+    typeof text === 'string'
+      ? text.replace(regex, match => {
+          found.push(match.trim().replace(/\s+/g, ' '));
+          return ' ';
+        })
+      : text;
+
+  const newIngredient = strip(ingredientText);
+  const newAdditionalParts = (additionalParts || []).map(part =>
+    strip(part).trim(),
+  );
+
+  return {
+    ingredientText:
+      typeof newIngredient === 'string'
+        ? newIngredient.replace(/\s+/g, ' ').trim()
+        : ingredientText,
+    additionalParts: newAdditionalParts.filter(Boolean),
+    instructions: found,
+  };
+}
+
+/**
  * Parses a ingredient string to extract ingredient details.
  *
  * This function processes a recipe string to extract and return a structured
@@ -279,6 +335,8 @@ export function parse(ingredientString, language) {
   const approxWords = langMap.approx || [];
   const optionalWords = langMap.optional || [];
   const toServeWords = langMap.toServe || [];
+  const instructionWords = langMap.instructions || [];
+  const adverbWords = langMap.adverbs || [];
 
   // Initialize variables
   let originalString = ingredientString.trim(); // Save the original string
@@ -406,6 +464,18 @@ export function parse(ingredientString, language) {
     const regex = new RegExp('^' + preposition);
     ingredient = ingredient.replace(regex, '').trim();
   }
+
+  // Extract instruction/state phrases (with optional adverbs) from ingredient and additional parts
+  const instructionExtraction = extractInstructions(
+    ingredient,
+    additionalParts,
+    instructionWords,
+    adverbWords,
+  );
+  ingredient = instructionExtraction.ingredientText;
+  additionalParts = instructionExtraction.additionalParts;
+  const instructionsFound = instructionExtraction.instructions;
+
   let minQty = quantity; // default to quantity
   let maxQty = quantity; // default to quantity
 
@@ -448,6 +518,9 @@ export function parse(ingredientString, language) {
         .trim();
       result.additional = cleanedAdditional || null;
     }
+  }
+  if (instructionsFound && instructionsFound.length > 0) {
+    result.instructions = instructionsFound;
   }
 
   return result;

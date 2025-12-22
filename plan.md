@@ -46,6 +46,7 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - Examples: nested brackets, double brackets, bracketed instructions vs. alternates.
 - Plan: make bracket parser take the outermost group and avoid nesting confusion; route bracket content either to `additional`, `alternatives`, or `instructions/states` based on tokens.
 - Tests: `(optional) finely chopped parsley (for garnish)` -> optional flag, instructions `finely chopped`, ingredient `parsley`, additional `for garnish`. Nested `(14.5 oz (410g)) can tomatoes` -> additional captures both weights or alternative structure without breaking ingredient.
+- [x] Done. Added balanced parenthetical extraction to keep nested content in `additional` and strip from ingredient; tests cover nested brackets and optional/to-serve cleanup.
 
 8) Ingredient-only anomalies and units-as-words
 - Examples: `medium/large` not actual units; `inch` as ingredient vs unit; `piece of ginger` where “piece” is unit but “inch” is size; `pinch` merged into ingredient (`1 healthyeach`).

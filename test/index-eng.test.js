@@ -113,7 +113,8 @@ describe('recipe parser eng', () => {
         expect(result.quantity).to.equal(25);
         expect(result.unit).to.equal('gram');
         expect(result.ingredient).to.equal('walnut pieces');
-        expect(result.additional).to.equal('chopped');
+        expect(result.instructions).to.deep.equal(['chopped']);
+        expect(result.additional).to.equal(null);
       });
     });
 
@@ -740,8 +741,58 @@ describe('recipe parser eng', () => {
       );
       expect(result.optional).to.equal(true);
       expect(result.toServe).to.equal(true);
-      expect(result.ingredient).to.equal('finely chopped parsley');
+      expect(result.ingredient).to.equal('parsley');
       expect(result.additional).to.equal('for garnish');
+      expect(result.instructions).to.deep.equal(['finely chopped']);
+    });
+  });
+
+  describe('instructions extraction', () => {
+    it('captures adverb + instruction and removes from ingredient', () => {
+      const result = parse('2 cloves garlic, finely chopped', 'eng');
+      expect(result.ingredient).to.equal('garlic');
+      expect(result.instructions).to.deep.equal(['finely chopped']);
+      expect(result.additional).to.equal(null);
+    });
+
+    it('captures multiple instructions and keeps other flags', () => {
+      const result = parse('about 1 cup ripe tomatoes, peeled and diced', 'eng');
+      expect(result.approx).to.equal(true);
+      expect(result.ingredient).to.equal('tomatoes');
+      expect(result.instructions).to.deep.equal(['ripe', 'peeled', 'diced']);
+    });
+
+    it('pulls instruction from parentheses and preserves optional', () => {
+      const result = parse('1 cup olives (pitted) (optional)', 'eng');
+      expect(result.optional).to.equal(true);
+      expect(result.instructions).to.deep.equal(['pitted']);
+      expect(result.ingredient).to.equal('olives');
+      expect(result.additional).to.equal(null);
+    });
+
+    it('does not drop additional non-instruction notes', () => {
+      const result = parse('1 cup nuts (toasted), finely chopped', 'eng');
+      expect(result.instructions).to.deep.equal(['toasted', 'finely chopped']);
+      expect(result.additional).to.equal(null);
+    });
+  });
+
+  describe('brackets handling', () => {
+    it('keeps nested bracket content intact in additional', () => {
+      const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');
+      expect(result.additional).to.equal('14.5 oz (410g)');
+    });
+
+    it('cleans optional/to serve from additional but keeps other notes', () => {
+      const result = parse(
+        '(optional) finely chopped parsley (for garnish), to serve',
+        'eng',
+      );
+      expect(result.optional).to.equal(true);
+      expect(result.toServe).to.equal(true);
+      expect(result.ingredient).to.equal('parsley');
+      expect(result.additional).to.equal('for garnish');
+      expect(result.instructions).to.deep.equal(['finely chopped']);
     });
   });
 
