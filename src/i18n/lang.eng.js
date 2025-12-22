@@ -145,7 +145,7 @@ const symbolUnits = {
 
 const prepositions = ['of'];
 
-const joiners = ['to'];
+const joiners = ['to', 'or'];
 
 const toTaste = ['to taste'];
 const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
