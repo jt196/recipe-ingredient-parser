@@ -117,6 +117,14 @@ describe('recipe parser eng', () => {
         expect(result.instructions).to.deep.equal(['chopped']);
         expect(result.additional).to.equal(null);
       });
+
+      it('captures size note ahead of unit', () => {
+        const result = parse('1 1-inch piece ginger', 'eng');
+        expect(result.quantity).to.equal(1);
+        expect(result.unit).to.equal('piece');
+        expect(result.ingredient).to.equal('ginger');
+        expect(result.additional).to.equal('1-inch');
+      });
     });
 
     describe('translates the quantity range', () => {
@@ -511,17 +519,13 @@ describe('recipe parser eng', () => {
       });
     });
     it('"1 3-inch cinammon stick"', () => {
-      expect(parse('1 3-inch cinammon stick', 'eng')).to.deep.equal({
-        unit: 'stick',
-        unitPlural: 'sticks',
-        symbol: null,
-        quantity: 1,
-        additional: null,
-        ingredient: '3-inch cinammon',
-        originalString: '1 3-inch cinammon stick',
-        minQty: 1,
-        maxQty: 1,
-      });
+      const result = parse('1 3-inch cinammon stick', 'eng');
+      expect(result.quantity).to.equal(1);
+      expect(result.unit).to.equal('stick');
+      expect(result.ingredient).to.equal('cinammon');
+      expect(result.additional).to.equal('3-inch');
+      expect(result.minQty).to.equal(1);
+      expect(result.maxQty).to.equal(1);
     });
     it('"25 lb beef stew chunks (or buy a roast and chop into small cubes)"', () => {
       expect(

@@ -598,6 +598,15 @@ export function parse(ingredientString, language, options = {}) {
     restOfIngredient = safeReplace(restOfIngredient, toServeRegex).trim();
   }
 
+  // Capture leading size descriptors like "3-inch" before the unit (e.g., "1 3-inch stick")
+  const sizeDescriptorRegex =
+    /^(\d+(?:[.,]\d+)?(?:\s*[–-]\s*\d+(?:[.,]\d+)?)?)\s*-?\s*inch(?:es)?\b[-\s]*/i;
+  const sizeMatch = restOfIngredient.match(sizeDescriptorRegex);
+  if (sizeMatch) {
+    additionalParts.push(sizeMatch[0].trim());
+    restOfIngredient = restOfIngredient.slice(sizeMatch[0].length).trim();
+  }
+
   // grab unit and turn it into non-plural version, for ex: "Tablespoons" OR "Tsbp." --> "tablespoon"
   const [unit, unitPlural, symbol, originalUnit] = getUnit(
     restOfIngredient,
