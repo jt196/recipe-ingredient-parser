@@ -836,6 +836,61 @@ describe('recipe parser eng', () => {
       expect(result.ingredient).to.equal('oats');
       expect(result.alternatives[0].ingredient).to.equal('quinoa');
     });
+
+    it('keeps primary fraction and adds alt from parentheses', () => {
+      const result = parse('1/3 cup warm water (95 to 105 degrees F)', 'eng', opts);
+      expect(result.quantity).to.equal(0.333);
+      expect(result.unit).to.equal('cup');
+      expect(result.ingredient).to.equal('water');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].quantity).to.equal(95);
+      expect(result.alternatives[0].maxQty).to.equal(105);
+    });
+
+    it('keeps mixed-number primary and ignores slash as fraction', () => {
+      const result = parse('1 1/2 cups milk', 'eng', opts);
+      expect(result.quantity).to.equal(1.5);
+      expect(result.unit).to.equal('cup');
+      expect(result.ingredient).to.equal('milk');
+      expect(result.alternatives).to.be.undefined;
+    });
+
+    it('captures alt unit from parentheses with unicode fraction', () => {
+      const result = parse(
+        '23 grams (2½ tablespoons) medium-grind cornmeal',
+        'eng',
+        opts,
+      );
+      expect(result.quantity).to.equal(23);
+      expect(result.unit).to.equal('gram');
+      expect(result.ingredient).to.equal('medium-grind cornmeal');
+      expect(result.alternatives).to.have.length(1);
+      expect(result.alternatives[0].unit).to.equal('tablespoon');
+      expect(result.alternatives[0].quantity).to.equal(2.5);
+    });
+
+    it('parses mixed teaspoon with apostrophe apostrophe noise', () => {
+      const res = parse('1 dash ​​ground cinnamon', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('dash');
+      expect(res.ingredient).to.equal('cinnamon');
+      expect(res.instructions).to.deep.equal(['ground']);
+    });
+
+    it('parses half-cup with zero-width punctuation intact', () => {
+      const res = parse('½ cup raw honey', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('raw honey');
+    });
+
+    it('parses 1⁄2 cup carrot with instruction', () => {
+      const res = parse('1⁄2 cup carrot, shredded', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('carrot');
+      expect(res.instructions).to.deep.equal(['shredded']);
+    });
   });
 
   describe('multipliers and stacked quantities', () => {

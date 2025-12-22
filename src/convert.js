@@ -174,7 +174,12 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     return [null, trimmed];
   }
 
-  let trimmedLine = ingredientLine.trim(); // Ensure the string is trimmed
+  let trimmedLine = ingredientLine
+    // remove zero-width and BOM-like chars
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    // normalize fraction slash
+    .replace(/\u2044/g, '/')
+    .trim(); // Ensure the string is trimmed
 
   const {joiners = [], isCommaDelimited} = langMap;
 
@@ -245,17 +250,21 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     }
   }
 
-  // found a quantity range, for ex: "2 to 3"
-  const quantityRangeMatch = ingredientLine.match(numericRangeWithSpaceRegex);
-  if (quantityRangeMatch) {
-    const rawRange = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex);
+  // choose range only if it appears before any standalone number
+  const rangeMatch = numericRangeWithSpaceRegex.exec(ingredientLine);
+  const rangeIndex = rangeMatch ? rangeMatch.index : -1;
+
+  numericAndFractionRegex.lastIndex = 0;
+  const numberMatch = numericAndFractionRegex.exec(ingredientLine);
+  const numberIndex = numberMatch ? numberMatch.index : -1;
+
+  if (rangeIndex !== -1 && (numberIndex === -1 || rangeIndex <= numberIndex)) {
+    const rawRange = rangeMatch[0];
     const normalizedRange = joinersPattern
       ? rawRange.replace(new RegExp(`${joinersPattern}`), '-')
       : rawRange;
     const quantity = normalizedRange.split(' ').join('');
-    const restOfIngredient = ingredientLine
-      .replace(getFirstMatch(ingredientLine, numericRangeWithSpaceRegex), '')
-      .trim();
+    const restOfIngredient = ingredientLine.replace(rawRange, '').trim();
     return [quantity, restOfIngredient];
   }
 

@@ -351,7 +351,7 @@ function extractInstructions(
   const adverbPart =
     escapedAdverbs.length > 0 ? `(?:${escapedAdverbs.join('|')})\\s+` : '';
   const regex = new RegExp(
-    `\\b(?:${adverbPart})?(?:${escaped.join('|')})\\b`,
+    `(?<!-)\\b(?:${adverbPart})?(?:${escaped.join('|')})\\b(?!-)`,
     'gi',
   );
 
@@ -490,7 +490,7 @@ export function parse(ingredientString, language, options = {}) {
   }
 
   // Detect simple slash alternative e.g., "8 oz / 225g pasta"
-  if (includeAlternatives && originalString.includes('/')) {
+  if (includeAlternatives && /\s\/\s/.test(originalString)) {
     const slashParts = originalString.split('/');
     if (slashParts.length >= 2) {
       const lastPart = slashParts[slashParts.length - 1];
@@ -646,6 +646,11 @@ export function parse(ingredientString, language, options = {}) {
   ingredient = instructionExtraction.ingredientText;
   additionalParts = instructionExtraction.additionalParts;
   const instructionsFound = instructionExtraction.instructions;
+  ingredient = ingredient
+    .replace(/^(?:\s*[-–—]\s*)+/, '')
+    .replace(/(?:\s*[-–—]\s*)+$/, '')
+    .trim();
+  ingredient = ingredient.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 
   if (includeAlternatives && /\bor\b/i.test(ingredient)) {
     const parts = ingredient.split(/\bor\b/i);
