@@ -24,7 +24,6 @@
     "src/**/*.ts",
     "src/convert.js",
     "src/index.js",
-    "src/repeatingFractions.js",
     "src/i18n/lang.eng.js",
     "src/i18n/lang.deu.js",
     "src/i18n/lang.ita.js",
