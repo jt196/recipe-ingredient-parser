@@ -1062,6 +1062,277 @@ describe('recipe parser eng', () => {
     });
   });
 
+  describe('broken2 regressions', () => {
+    const opts = {includeAlternatives: true, includeUnitSystems: true};
+
+    it('parses sized ginger piece with instructions', () => {
+      const res = parse('1 2½-inch piece ginger, peeled, finely grated', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('piece');
+      expect(res.ingredient).to.equal('ginger');
+      expect(res.instructions).to.include.members(['peeled', 'finely grated']);
+      expect(res.additional).to.contain('2½-inch');
+    });
+
+    it('marks optional to-taste fish sauce cleanly', () => {
+      const res = parse('fish sauce optional, to taste', 'eng', opts);
+      expect(res.optional).to.equal(true);
+      expect(res.ingredient).to.equal('fish sauce');
+      expect(res.additional).to.contain('to taste');
+    });
+
+    it('keeps brussels sprouts instructions', () => {
+      const res = parse('1 pound Brussels sprouts trimmed and halved', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('pound');
+      expect(res.ingredient).to.equal('Brussels sprouts');
+      expect(res.instructions).to.include.members(['trimmed', 'halved']);
+    });
+
+    it('stones cherries and keeps stalk note', () => {
+      const res = parse('450 g cherries - stalks removed and stoned', 'eng', opts);
+      expect(res.quantity).to.equal(450);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.equal('cherries');
+      expect(res.instructions).to.include('stoned');
+      expect(res.additional).to.contain('stalks removed');
+    });
+
+    it('preserves to-taste chili powder range', () => {
+      const res = parse(
+        '¼ to ½ cup Chili powder (Gebhardt) to taste, the brand is important',
+        'eng',
+        opts,
+      );
+      expect(res.minQty).to.equal(0.25);
+      expect(res.maxQty).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('Chili powder');
+      expect(res.additional).to.contain('Gebhardt');
+      expect(res.additional).to.contain('to taste');
+    });
+
+    it('handles garnish sticks without quantity', () => {
+      const res = parse('cinnamon sticks for garnish', 'eng', opts);
+      expect(res.quantity).to.equal(0);
+      expect(res.unit).to.equal('stick');
+      expect(res.ingredient).to.equal('cinnamon');
+      expect(res.toServe).to.equal(true);
+    });
+
+    it('keeps ground tomatoes wording', () => {
+      const res = parse(
+        '85 grams cup plus 2 ground tomatoes, preferably 7/11 or DiNapoli',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(85);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.contain('tomato');
+      expect(res.instructions).to.include('ground');
+    });
+
+    it('handles ml with generous cup note', () => {
+      const res = parse('60ml cup (generous) superfine granulated sugar', 'eng', opts);
+      expect(res.quantity).to.equal(60);
+      expect(res.unit).to.equal('milliliter');
+      expect(res.ingredient).to.equal('superfine granulated sugar');
+      expect(res.additional || '').to.contain('generous');
+    });
+
+    it('captures cup primary with gram alternative sugar', () => {
+      const res = parse('3/4 cup/150 grams granulated sugar', 'eng', opts);
+      expect(res.quantity).to.equal(0.75);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('granulated sugar');
+      expect(res.alternatives?.[0].unit).to.equal('gram');
+      expect(res.alternatives?.[0].quantity).to.equal(150);
+    });
+
+    it('captures cup primary with gram alternative almonds', () => {
+      const res = parse('1/2 cup/45 grams sliced almonds', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('almonds');
+      expect(res.instructions).to.include('sliced');
+      expect(res.alternatives?.[0].unit).to.equal('gram');
+      expect(res.alternatives?.[0].quantity).to.equal(45);
+    });
+
+    it('captures milliliter alternative with canola note', () => {
+      const res = parse(
+        '1/4 cup/60 milliliters flavorless oil, such as canola',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(0.25);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('flavorless oil');
+      expect(res.additional).to.contain('canola');
+      expect(res.alternatives?.[0].unit).to.equal('milliliter');
+      expect(res.alternatives?.[0].quantity).to.equal(60);
+    });
+
+    it('keeps to-taste pinch wording', () => {
+      const res = parse('1 tbs pepper adjust to taste', 'eng', opts);
+      expect(res.unit).to.equal('tablespoon');
+      expect(res.ingredient).to.equal('pepper');
+      expect(res.additional).to.contain('to taste');
+    });
+
+    it('cleans healthy pinch each', () => {
+      const res = parse('1 healthy pinch each salt and pepper', 'eng', opts);
+      expect(res.unit).to.equal('pinch');
+      expect(res.ingredient).to.equal('salt and pepper');
+    });
+
+    it('handles large bag salad leaves', () => {
+      const res = parse('1 large bag salad leaves', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('bag');
+      expect(res.ingredient).to.equal('salad leaves');
+      expect(res.instructions).to.include('large');
+    });
+
+    it('parses lukewarm water grams', () => {
+      const res = parse('152g lukewarm water', 'eng', opts);
+      expect(res.quantity).to.equal(152);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.equal('water');
+      expect(res.instructions).to.include('lukewarm');
+    });
+
+    it('parses garlic cloves with or instructions', () => {
+      const res = parse('6 large cloves of garlic, diced or grated', 'eng', opts);
+      expect(res.quantity).to.equal(6);
+      expect(res.unit).to.equal('clove');
+      expect(res.ingredient).to.equal('garlic');
+      expect(res.instructions).to.include.members(['large', 'diced', 'grated']);
+    });
+
+    it('parses handfuls with additional greens list', () => {
+      const res = parse(
+        '8 large handfuls of greens, e.g. baby spinach, spinach, winter leaves, kale',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(8);
+      expect(res.unit).to.equal('handful');
+      expect(res.ingredient).to.equal('greens');
+      expect(res.instructions).to.include('large');
+      expect(res.additional || '').to.contain('baby spinach');
+    });
+
+    it('marks optional riboflavin pinch', () => {
+      const res = parse(
+        'Optional: Pinch of Riboflavin (this adds color, I just estimate it. A little goes a LONG way)',
+        'eng',
+        opts,
+      );
+      expect(res.optional).to.equal(true);
+      expect(res.unit).to.equal('pinch');
+      expect(res.ingredient).to.equal('Riboflavin');
+      expect(res.additional || '').to.contain('adds color');
+    });
+
+    it('parses another sized ginger piece with instructions', () => {
+      const res = parse('One 1-inch piece ginger, peeled and thinly sliced', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('piece');
+      expect(res.ingredient).to.equal('ginger');
+      expect(res.additional || '').to.contain('1-inch');
+      expect(res.instructions).to.include.members(['peeled', 'thinly sliced']);
+    });
+
+    it('captures slices with gram alternative for sand ginger', () => {
+      const res = parse('3 slices or ~2g sand ginger (沙姜)', 'eng', opts);
+      expect(res.quantity).to.equal(3);
+      expect(res.unit).to.equal('slice');
+      expect(res.ingredient).to.equal('sand ginger');
+      expect(res.alternatives?.[0].quantity).to.equal(2);
+      expect(res.alternatives?.[0].unit).to.equal('gram');
+    });
+
+    it('handles garlic clove ranges', () => {
+      const res = parse('3 or 4 garlic cloves, unpeeled', 'eng', opts);
+      expect(res.unit).to.equal('clove');
+      expect(res.minQty).to.equal(3);
+      expect(res.maxQty).to.equal(4);
+      expect(res.ingredient).to.equal('garlic');
+    });
+
+    it('keeps peppercorn instructions', () => {
+      const res = parse('2 tsp freshly ground or whole black peppercorns', 'eng', opts);
+      expect(res.unit).to.equal('teaspoon');
+      expect(res.ingredient).to.equal('black peppercorns');
+      expect(res.instructions).to.include.members(['freshly ground', 'whole']);
+    });
+
+    it('parses raw chopped almonds', () => {
+      const res = parse('480g raw almonds chopped coarsely', 'eng', opts);
+      expect(res.quantity).to.equal(480);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.equal('almonds');
+      expect(res.instructions).to.include.members(['raw', 'chopped']);
+    });
+
+    it('parses scant tablespoon scallion', () => {
+      const res = parse('1 scant tablespoon thinly sliced scallion (green and white)', 'eng', opts);
+      expect(res.unit).to.equal('tablespoon');
+      expect(res.ingredient).to.equal('scallion');
+      expect(res.instructions).to.include('thinly sliced');
+      expect(res.additional || '').to.contain('green and white');
+    });
+
+    it('handles small pack basil with garnish note', () => {
+      const res = parse(
+        'small pack basil, leaves picked, ¾ finely chopped and the rest left whole for garnish',
+        'eng',
+        opts,
+      );
+      expect(res.ingredient).to.equal('basil');
+      expect(res.instructions).to.include('finely chopped');
+      expect(res.instructions).to.include('whole');
+      expect(res.toServe).to.equal(true);
+    });
+
+    it('handles small bunch chives snipped', () => {
+      const res = parse('small bunch chives , snipped', 'eng', opts);
+      expect(res.unit).to.equal('bunch');
+      expect(res.ingredient).to.equal('chives');
+      expect(res.instructions).to.include('snipped');
+    });
+
+    it('parses small bunch cilantro', () => {
+      const res = parse('1 small bunch cilantro', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('bunch');
+      expect(res.ingredient).to.equal('cilantro');
+      expect(res.instructions).to.include('small');
+    });
+
+    it('keeps spicy bean paste intact', () => {
+      const res = parse('2 tablespoons spicy bean paste douban jiang', 'eng', opts);
+      expect(res.unit).to.equal('tablespoon');
+      expect(res.ingredient).to.equal('spicy bean paste douban jiang');
+    });
+
+    it('parses hominy cans and drained instruction', () => {
+      const res = parse('Three 15-ounce cans of hominy, drained', 'eng', opts);
+      expect(res.unit).to.equal('can');
+      expect(res.ingredient).to.equal('hominy');
+      expect(res.instructions).to.include('drained');
+    });
+
+    it('parses dairy alternatives as alternatives', () => {
+      const res = parse('1/2 cup yogurt / vegan yogurt / coconut milk', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('yogurt');
+      expect(res.alternatives?.length).to.be.greaterThan(1);
+    });
+  });
+
   describe('multipliers and stacked quantities', () => {
     it('multiplies explicit x patterns', () => {
       const result = parse('2 x 100 g tomatoes', 'eng');

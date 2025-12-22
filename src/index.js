@@ -84,9 +84,9 @@ function getUnit(input, language) {
   // Look for singular unit matches using defined shorthands.
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {
-      // Create a regex that ensures the shorthand is a whole word (or at word boundaries).
+      // Create a regex that ensures the shorthand is a whole word (or at non-alphanumeric boundaries, incl. slashes).
       const regex = new RegExp(
-        `(?:^|\\s)${shorthand.replace(/\./g, '\\.')}(?:$|\\s)`,
+        `(?:^|[^A-Za-z0-9])${shorthand.replace(/\./g, '\\.')}(?:$|[^A-Za-z0-9])`,
         'gi',
       );
       const match = input.match(regex);
@@ -98,7 +98,10 @@ function getUnit(input, language) {
 
   // Look for plural unit matches.
   for (const pluralUnit of Object.keys(pluralUnits)) {
-    const regex = new RegExp(`\\b${pluralUnits[pluralUnit]}\\b`, 'gi');
+    const regex = new RegExp(
+      `(?:^|[^A-Za-z0-9])${pluralUnits[pluralUnit]}(?:$|[^A-Za-z0-9])`,
+      'gi',
+    );
     const match = input.match(regex);
     if (match) {
       addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
@@ -438,6 +441,21 @@ export function parse(ingredientString, language, options = {}) {
   let originalString = ingredientString.trim(); // Save the original string
   let ingredientLine = originalString; // Initialize working copy
 
+  // Handle leading written numbers followed by a numeric size and a canned unit (e.g., "Three 15-ounce cans ...")
+  const wordNumberCanMatch = ingredientLine.match(
+    /^([A-Za-z]+)\s+([\d.,/¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞-]+)\s+(cans?)\b\s*(.*)/u,
+  );
+  if (wordNumberCanMatch) {
+    const wordQty = convert.text2num(wordNumberCanMatch[1], language);
+    if (wordQty && wordQty > 0) {
+      const sizePart = wordNumberCanMatch[2].trim();
+      const rest = wordNumberCanMatch[4] || '';
+      if (sizePart) additionalParts.push(sizePart);
+      ingredientLine = `${wordQty} ${wordNumberCanMatch[3]} ${rest}`.trim();
+      originalString = ingredientLine;
+    }
+  }
+
   // Remove leading list markers like "- " or "• " that can appear in exported text
   ingredientLine = ingredientLine.replace(/^\s*[-•]\s+/, '').trim();
   originalString = ingredientLine;
@@ -749,6 +767,52 @@ export function parse(ingredientString, language, options = {}) {
     /^un\s+/i.test(ingredient)
   ) {
     ingredient = ingredient.replace(/^un\s+/i, '').trim();
+  }
+
+  // Final cleanups on ingredient text for common trailing markers.
+  if (ingredient) {
+    // Strip lingering optional markers.
+    ingredient = safeReplace(ingredient, optionalRegex).trim();
+
+    // Move "to taste"/"adjust to taste" into additional parts.
+    if (/\badjust to taste\b/i.test(ingredient)) {
+      additionalParts.push('to taste');
+      ingredient = ingredient.replace(/\badjust to taste\b/gi, '').trim();
+    }
+    if (/\bto taste\b/i.test(ingredient)) {
+      additionalParts.push('to taste');
+      ingredient = ingredient.replace(/\bto taste\b/gi, '').trim();
+    }
+
+    // Fix missing spaces after common size adjectives that get glued when units are stripped.
+    const spacerWords = ['small', 'large', 'medium', 'healthy', 'scant'];
+    spacerWords.forEach(word => {
+      const re = new RegExp(`${word}(?=[A-Za-z])`, 'gi');
+      ingredient = ingredient.replace(re, `${word} `);
+    });
+
+    // Remove filler qualifiers that pollute the ingredient.
+    ingredient = ingredient
+      .replace(/\bhealthy\b/gi, '')
+      .replace(/\beach\b/gi, '')
+      .replace(/\bscant\b/gi, '')
+      .replace(/\bluke\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Move leading size descriptors like "1-inch" into additional.
+    const sizeInchMatch = ingredient.match(
+      /^(\d+(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?\s*-?inch)\s+(.*)$/i,
+    );
+    if (sizeInchMatch) {
+      additionalParts.push(sizeInchMatch[1]);
+      ingredient = sizeInchMatch[2].trim();
+    }
+
+    // Drop leading conjunctions/prepositions.
+    ingredient = ingredient.replace(/^(?:of|or|and)\s+/i, '').trim();
+    // Drop trailing dangling conjunctions.
+    ingredient = ingredient.replace(/\b(?:and|or)\s*$/i, '').trim();
   }
 
   // If instructions stripped the ingredient text but we still have leftover parts, promote the first leftover to ingredient.
