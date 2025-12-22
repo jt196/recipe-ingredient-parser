@@ -415,6 +415,9 @@ describe('recipe parser eng', () => {
     it('of "1 teaspoon water"', () => {
       expect(parse('1 teaspoon water', 'eng').unit).to.equal('teaspoon');
     });
+    it('of "1 t/s salt"', () => {
+      expect(parse('1 t/s salt', 'eng').unit).to.equal('teaspoon');
+    });
     it('of "1 gram water"', () => {
       expect(parse('1 gram water', 'eng').unit).to.equal('gram');
     });
@@ -429,6 +432,11 @@ describe('recipe parser eng', () => {
     });
     it('of "1 milliliter water"', () => {
       expect(parse('1 milliliter water', 'eng').unit).to.equal('milliliter');
+    });
+    it('of "500 millilitres water"', () => {
+      expect(parse('500 millilitres water', 'eng').unit).to.equal(
+        'milliliter',
+      );
     });
     it('of "1 large onion"', () => {
       expect(parse('1 large onion', 'eng').unit).to.equal('large');
@@ -447,6 +455,22 @@ describe('recipe parser eng', () => {
     });
     it('"1 pinch water"', () => {
       expect(parse('1 pinch salt', 'eng').unit).to.equal('pinch');
+    });
+    it('"3 drops vanilla"', () => {
+      expect(parse('3 drops vanilla', 'eng').unit).to.equal('drop');
+    });
+    it('"1 dash bitters"', () => {
+      expect(parse('1 dash bitters', 'eng').unit).to.equal('dash');
+    });
+    it('"2 bunches parsley"', () => {
+      const result = parse('2 bunches parsley', 'eng');
+      expect(result.unit).to.equal('bunch');
+      expect(result.unitPlural).to.equal('bunches');
+    });
+    it('"4 servings rice"', () => {
+      const result = parse('4 servings rice', 'eng');
+      expect(result.unit).to.equal('serving');
+      expect(result.unitPlural).to.equal('servings');
     });
     it('"1 (14.5 oz) can tomatoes"', () => {
       expect(parse('1 (14.5 oz) can tomatoes', 'eng')).to.deep.equal({

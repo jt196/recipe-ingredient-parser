@@ -24,6 +24,7 @@ const units = {
   Schuss: ['schuss', 'schusse', 'schüsse', 'schuss(e)', 'schuss/e', 'schuß'],
   Flasche: ['flaschen', 'flasche', 'flasche(n)', 'flasche/n'],
   Bund: ['bund', 'bunde', 'bund(e)', 'bund/e'],
+  Portion: ['portion', 'portionen'],
 };
 
 const pluralUnits = {
@@ -52,6 +53,7 @@ const pluralUnits = {
   Schuss: 'Schuss',
   Flasche: 'Flaschen',
   Bund: 'Bund',
+  Portion: 'Portionen',
 };
 
 const symbolUnits = {
@@ -80,6 +82,7 @@ const symbolUnits = {
   Schuss: '',
   Flasche: '',
   Bund: '',
+  Portion: '',
 };
 
 const prepositions = ['von'];

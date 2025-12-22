@@ -24,7 +24,11 @@ const units = {
   lusin: ['lusin'],
   potong: ['potong', 'pcs', 'pcs.'],
   sejumput: ['sejumput'],
+  tetes: ['tetes'],
+  semprotan: ['semprotan', 'semprot'],
   irisan: ['irisan', 'slice', 'slices'],
+  ikat: ['ikat', 'ikatan'],
+  porsi: ['porsi', 'porsian'],
 };
 
 const pluralUnits = {
@@ -53,7 +57,11 @@ const pluralUnits = {
   lusin: 'lusin',
   potong: 'potong',
   sejumput: 'sejumput',
+  tetes: 'tetes',
+  semprotan: 'semprotan',
   irisan: 'irisan',
+  ikat: 'ikat',
+  porsi: 'porsi',
 };
 
 const symbolUnits = {
@@ -82,7 +90,11 @@ const symbolUnits = {
   lusin: '',
   potong: '',
   sejumput: '',
+  tetes: '',
+  semprotan: '',
   irisan: '',
+  ikat: '',
+  porsi: '',
 };
 
 const prepositions = ['dari'];

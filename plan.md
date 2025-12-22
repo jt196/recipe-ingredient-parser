@@ -24,9 +24,9 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - Languages: extend state/prep lists per language (eng/deu/ita).
 
 4) Units expansion / normalization
-- Missing or requested units: drops, squirt, dash, bunch, serving/portion, litre/millilitre variants, `t/s` abbreviation, `x` multiplicative marker, `ml`/`lts` variants.
-- Plan: add to unit maps (singular/plural/symbol), normalize abbreviations (e.g., `t/s` -> teaspoon), ensure litre/millilitre parsed.
+- [x] Done. Added drops/squirt/dash/bunch/serving/portion, litre/millilitre spellings, `t/s`, and localized mappings; eng tests added.
 - Tests: `3 drops vanilla` -> unit `drop`; `1 bunch parsley` -> unit `bunch`; `t/s salt` -> teaspoon; `2L water` -> liter; `500ml stock` -> milliliter.
+- Note: multiplicative marker (`x`) will be handled separately (see new item 11).
 
 5) Alternate quantities/units/ingredients
 - Examples: alternatives in parentheses or slashes: `1 cup (or 250ml)`, `1 pack / 16oz`, `old fashioned or instant oats`, `or` within ingredient, alternative units after `/`.
@@ -37,6 +37,10 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - Examples: `2 x 100 g`, `1 1.8kg chicken`, `1 (3-4) pieces`, `1 kilogram to 2 kilograms`.
 - Plan: handle simple multiplier (`<n> x <qty>` => qty*n), tolerate compound ranges with parentheses and dual quantities; when ambiguous, preserve ingredient text cleanly and keep quantities as array? (proposal: new `secondaryQuantity` field or record multiplier).
 - Tests: `2 x 100g tomatoes` -> quantity `200`, unit `gram`, ingredient `tomatoes`; `1 (3-4) pieces ginger` -> quantity `1`, additional/min-max range recorded separately; `1-2 kg pork shoulder` already works; ensure no “1/4-1/2” regression.
+
+11) Multiplicative marker (`x`)
+- Scope: clean, focused handling of `<count> x <qty/unit>` patterns without colliding with item #6’s multi-number/range handling. Consider both spaced and unspaced forms (e.g., `2x100 g`, `2 x 100 g`).
+- Tests: `2 x 100 g tomatoes` -> quantity 200, unit gram, ingredient tomatoes; `3x250ml broth` -> quantity 750, unit milliliter.
 
 7) Brackets handling / nested brackets
 - Examples: nested brackets, double brackets, bracketed instructions vs. alternates.

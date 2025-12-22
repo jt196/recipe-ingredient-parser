@@ -26,11 +26,15 @@ const units = {
   douzaine: ['douzaine'],
   pièce: ['pièce', 'pz', 'pz.'],
   pincée: ['pincée', 'pincées'],
+  goutte: ['goutte', 'gouttes'],
+  trait: ['trait', 'traits'],
   tranche: ['tranche', 'tranches'],
   petit: ['petit'],
   moyen: ['moyen'],
   grand: ['grand'],
   poignée: ['poignée', 'poignées'],
+  botte: ['botte', 'bottes'],
+  portion: ['portion', 'portions'],
   pouce: ['pouce', 'po', 'pouces'],
 };
 
@@ -60,11 +64,15 @@ const pluralUnits = {
   douzaine: 'douzaines',
   pièce: 'pièces',
   pincée: 'pincées',
+  goutte: 'gouttes',
+  trait: 'traits',
   tranche: 'tranches',
   petit: 'petits',
   moyen: 'moyens',
   grand: 'grands',
   poignée: 'poignées',
+  botte: 'bottes',
+  portion: 'portions',
   pouce: 'pouces',
 };
 
@@ -94,8 +102,12 @@ const symbolUnits = {
   douzaine: 'dz',
   pièce: 'pz',
   pincée: '',
+  goutte: '',
+  trait: '',
   tranche: '',
   poignée: '',
+  botte: '',
+  portion: '',
   pouce: 'po',
 };
 

@@ -32,8 +32,12 @@ const units = {
   docena: ['docena'],
   pieza: ['pieza', 'pz', 'pz.'],
   pizca: ['pizca', 'pizcas'],
+  gota: ['gota', 'gotas'],
+  chorrito: ['chorrito', 'chorritos'],
   rebanada: ['rebanada', 'rebanadas'],
   puñado: ['puñado', 'puñados'],
+  manojo: ['manojo', 'manojos', 'ramo', 'ramos'],
+  porción: ['porción', 'porciones', 'porcion', 'porciones'],
   pulgada: ['pulgada', 'pulg.', 'pulgadas'],
 };
 
@@ -63,8 +67,12 @@ const pluralUnits = {
   docena: 'docenas',
   pieza: 'piezas',
   pizca: 'pizcas',
+  gota: 'gotas',
+  chorrito: 'chorritos',
   rebanada: 'rebanadas',
   puñado: 'puñados',
+  manojo: 'manojos',
+  porción: 'porciones',
   pulgada: 'pulgadas',
 };
 
@@ -94,8 +102,12 @@ const symbolUnits = {
   docena: 'doc',
   pieza: 'pz',
   pizca: '',
+  gota: '',
+  chorrito: '',
   rebanada: '',
   puñado: '',
+  manojo: '',
+  porción: '',
   pulgada: 'pulg.',
 };
 

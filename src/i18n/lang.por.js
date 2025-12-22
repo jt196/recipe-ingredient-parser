@@ -25,11 +25,15 @@ const units = {
   dúzia: ['dúzia', 'duzia'],
   pedaço: ['pedaço', 'pç', 'pç.'],
   pitada: ['pitada'],
+  gota: ['gota', 'gotas'],
+  borrifo: ['borrifo', 'borrifos'],
   fatia: ['fatia', 'fatias'],
   pequeno: ['pequeno'],
   médio: ['médio'],
   grande: ['grande'],
   punhado: ['punhado', 'punhados'],
+  maço: ['maço', 'maços', 'ramo', 'ramos'],
+  porção: ['porção', 'porções', 'porcao', 'porcoes'],
   polegada: ['polegada', 'pol', 'pol.'],
 };
 
@@ -59,11 +63,15 @@ const pluralUnits = {
   dúzia: 'dúzias',
   pedaço: 'pedaços',
   pitada: 'pitadas',
+  gota: 'gotas',
+  borrifo: 'borrifos',
   fatia: 'fatias',
   pequeno: 'pequenos',
   médio: 'médios',
   grande: 'grandes',
   punhado: 'punhados',
+  maço: 'maços',
+  porção: 'porções',
   polegada: 'polegadas',
 };
 
@@ -93,8 +101,12 @@ const symbolUnits = {
   dúzia: 'dz',
   pedaço: 'pç',
   pitada: '',
+  gota: '',
+  borrifo: '',
   fatia: '',
   punhado: '',
+  maço: '',
+  porção: '',
   polegada: 'pol',
 };
 
