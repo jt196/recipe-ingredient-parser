@@ -39,9 +39,6 @@ const units = {
   bunch: ['bunch', 'bunches'],
   serving: ['serving', 'servings', 'portion', 'portions'],
   slice: ['slice'],
-  small: ['small'],
-  medium: ['medium'],
-  large: ['large'],
   handful: ['handful'],
   inch: ['inch'],
 };
@@ -76,9 +73,6 @@ const pluralUnits = {
   slice: 'slices',
   piece: 'pieces',
   stick: 'sticks',
-  small: 'small',
-  medium: 'medium',
-  large: 'large',
   handful: 'handfuls',
   inch: 'inches',
 };
@@ -195,6 +189,9 @@ const instructions = [
   'juiced',
   'squeezed',
   'tender',
+  'small',
+  'medium',
+  'large',
 ];
 const adverbs = ['finely', 'thinly', 'coarsely', 'freshly'];
 const unitSystems = {

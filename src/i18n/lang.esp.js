@@ -182,6 +182,9 @@ const instructions = [
   'desvenado',
   'en cubos',
   'desmenuzado',
+  'pequeño',
+  'mediano',
+  'grande',
   'exprimido',
   'zesteado',
 ];

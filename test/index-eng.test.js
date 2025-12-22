@@ -98,7 +98,8 @@ describe('recipe parser eng', () => {
         const result = parse('200g medium oatmeal', 'eng');
         expect(result.quantity).to.equal(200);
         expect(result.unit).to.equal('gram');
-        expect(result.ingredient).to.equal('medium oatmeal');
+        expect(result.ingredient).to.equal('oatmeal');
+        expect(result.instructions).to.deep.equal(['medium']);
       });
 
       it('parses "1kg piece of pork belly" correctly', () => {
@@ -440,7 +441,10 @@ describe('recipe parser eng', () => {
       );
     });
     it('of "1 large onion"', () => {
-      expect(parse('1 large onion', 'eng').unit).to.equal('large');
+      const result = parse('1 large onion', 'eng');
+      expect(result.unit).to.equal(null);
+      expect(result.ingredient).to.equal('onion');
+      expect(result.instructions).to.deep.equal(['large']);
     });
     it('of "1 whole onion"', () => {
       expect(parse('1 whole onion', 'eng').unit).to.equal(null);
@@ -530,10 +534,11 @@ describe('recipe parser eng', () => {
         unitPlural: 'pounds',
         symbol: 'lb',
         quantity: 25,
-        additional: 'or buy a roast and chop into small cubes',
+        additional: 'or buy a roast and chop into cubes',
         originalString:
           '25 lb beef stew chunks (or buy a roast and chop into small cubes)',
         ingredient: 'beef stew chunks',
+        instructions: ['small'],
         minQty: 25,
         maxQty: 25,
       });
