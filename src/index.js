@@ -201,6 +201,45 @@ export function convertToNumber(value, language) {
 }
 
 /**
+ * Extract balanced parenthetical segments and return cleaned text and segments.
+ * @param {string} text
+ * @returns {{cleaned: string, segments: string[]}}
+ */
+function extractParentheticalSegments(text) {
+  if (typeof text !== 'string') return {cleaned: '', segments: []};
+  let cleaned = '';
+  const segments = [];
+  let depth = 0;
+  let current = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '(') {
+      if (depth === 0) current = '';
+      else current += ch;
+      depth++;
+      continue;
+    }
+    if (ch === ')') {
+      if (depth > 1) current += ch;
+      depth = Math.max(0, depth - 1);
+      if (depth === 0 && current.trim()) {
+        segments.push(current.trim());
+        current = '';
+      }
+      continue;
+    }
+    if (depth > 0) {
+      current += ch;
+    } else {
+      cleaned += ch;
+    }
+  }
+
+  return {cleaned: cleaned.trim().replace(/\s+/g, ' '), segments};
+}
+
+/**
  * Parses a ingredient string to extract ingredient details.
  *
  * This function processes a recipe string to extract and return a structured
@@ -242,22 +281,22 @@ export function parse(ingredientString, language) {
   const toServeWords = langMap.toServe || [];
 
   // Initialize variables
-  let additional = '';
   let originalString = ingredientString.trim(); // Save the original string
   let ingredientLine = originalString; // Initialize working copy
 
-  // Capture information within parentheses and after commas
-  // Negative lookbehind and ahead for numbers either side of a comma to account for 1,500.
-  // \s should trim whitespace before and after brackets
-  const additionalInfoRegex =
-    /(?:\(\s*([^)]+)\s*\)|(?<![0-9]),\s*([^,]+)\s*(?![0-9]))/g;
-  let additionalInfoMatch;
-  while ((additionalInfoMatch = additionalInfoRegex.exec(originalString))) {
-    if (additional) additional += ', '; // Add a comma between multiple additional notes
-    additional += additionalInfoMatch[1] || additionalInfoMatch[2].trim();
+  // Capture parenthetical content (supports nesting) and comma-separated extras
+  const additionalParts = [];
+  const {cleaned, segments} = extractParentheticalSegments(ingredientLine);
+  if (segments.length) additionalParts.push(...segments);
+  ingredientLine = cleaned;
+
+  // Negative lookbehind/ahead for numbers either side of a comma to account for 1,500.
+  const commaAdditionalRegex = /(?<![0-9]),\s*([^,]+)\s*(?![0-9])/g;
+  let commaMatch;
+  while ((commaMatch = commaAdditionalRegex.exec(ingredientLine))) {
+    if (commaMatch[1]) additionalParts.push(commaMatch[1].trim());
   }
-  // Remove additional information from the working copy to avoid confusing toTasteRecognize
-  ingredientLine = ingredientLine.replace(additionalInfoRegex, '').trim();
+  ingredientLine = ingredientLine.replace(commaAdditionalRegex, '').trim();
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
@@ -384,7 +423,10 @@ export function parse(ingredientString, language) {
     ingredient: ingredient.replace(/\s+/g, ' ').trim(),
     minQty: convertToNumber(minQty, language),
     maxQty: convertToNumber(maxQty, language),
-    additional: additional ? additional.replace(/\s+/g, ' ').trim() : null, // Add additional field
+    additional:
+      additionalParts.length > 0
+        ? additionalParts.join(', ').replace(/\s+/g, ' ').trim()
+        : null,
     originalString, // Include the original string
   };
 

@@ -485,6 +485,13 @@ describe('recipe parser eng', () => {
         maxQty: 1,
       });
     });
+    it('handles nested parentheses without breaking additional', () => {
+      const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');
+      expect(result.quantity).to.equal(1);
+      expect(result.unit).to.equal('can');
+      expect(result.ingredient).to.equal('tomatoes');
+      expect(result.additional).to.equal('14.5 oz (410g)');
+    });
     it('"3 cloves"', () => {
       expect(parse('3 cloves', 'eng')).to.deep.equal({
         unit: null,
@@ -717,6 +724,24 @@ describe('recipe parser eng', () => {
       expect(parse('1 teaspoon of powdered sugar', 'eng').ingredient).to.equal(
         'powdered sugar',
       );
+    });
+  });
+
+  describe('brackets handling', () => {
+    it('keeps nested bracket content intact in additional', () => {
+      const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');
+      expect(result.additional).to.equal('14.5 oz (410g)');
+    });
+
+    it('cleans optional/to serve from additional but keeps other notes', () => {
+      const result = parse(
+        '(optional) finely chopped parsley (for garnish), to serve',
+        'eng',
+      );
+      expect(result.optional).to.equal(true);
+      expect(result.toServe).to.equal(true);
+      expect(result.ingredient).to.equal('finely chopped parsley');
+      expect(result.additional).to.equal('for garnish');
     });
   });
 
