@@ -216,6 +216,75 @@ export function convertToNumber(value, language) {
 }
 
 /**
+ * Detect a leading multiplicative pattern such as "2 x 100g" or stacked numbers like "2 100g".
+ * Returns the multiplier and the remainder of the line to parse.
+ *
+ * @param {string} line
+ * @param {string} language
+ * @returns {{multiplier:number, line:string}}
+ */
+function extractMultiplier(line, language) {
+  if (typeof line !== 'string') return {multiplier: 1, line: ''};
+
+  let working = line.trim();
+
+  // Explicit "x" or "×" multiplier, allow optional spaces.
+  const explicitMatch = working.match(/^(\d+(?:[.,]\d+)?)\s*[x×]\s*(.+)$/i);
+  if (explicitMatch) {
+    const multiplier = convertToNumber(explicitMatch[1], language) || 1;
+    return {multiplier, line: explicitMatch[2].trim()};
+  }
+
+  // Implicit stacked numbers: "2 100g chocolate", "1 1.8kg chicken"
+  // Avoid mixed fractions like "1 1/2 cups".
+  if (/^\d+\s+\d+\/\d+/.test(working)) {
+    return {multiplier: 1, line: working};
+  }
+
+  const stackedMatch = working.match(/^(\d+)\s+(.+)$/);
+  if (stackedMatch) {
+    const candidateRest = stackedMatch[2].trim();
+
+    // Skip obvious ranges like "10 - 20" / "10 to 20".
+    const {joiners = []} = i18nMap[language] || {};
+    const escape = str => str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const joinerPattern = joiners.map(escape).join('|');
+    const rangeRegex = joinerPattern
+      ? new RegExp(`^(?:[\\-–]|(?:${joinerPattern})\\b)\\s*\\d`, 'i')
+      : new RegExp('^[\\-–]\\s*\\d');
+    if (rangeRegex.test(candidateRest)) {
+      return {multiplier: 1, line: working};
+    }
+
+    // Skip mixed-number patterns that start with a fraction.
+    if (
+      /^(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]|\d+\/\d+)/u.test(candidateRest)
+    ) {
+      return {multiplier: 1, line: working};
+    }
+
+    const numberWithUnit = candidateRest.match(
+      /^(\d+(?:[.,]\d+)?)(?:\s*)([A-Za-z\p{L}])/u,
+    );
+    if (numberWithUnit) {
+      const [candidateQty, candidateRemainder] =
+        convert.findQuantityAndConvertIfUnicode(candidateRest, language);
+      const hasUnit =
+        candidateQty &&
+        candidateRemainder &&
+        getUnit(candidateRemainder, language).length > 0;
+
+      if (hasUnit) {
+        const multiplier = convertToNumber(stackedMatch[1], language) || 1;
+        return {multiplier, line: candidateRest};
+      }
+    }
+  }
+
+  return {multiplier: 1, line: working};
+}
+
+/**
  * Extract balanced parenthetical segments and return cleaned text and segments.
  * @param {string} text
  * @returns {{cleaned: string, segments: string[]}}
@@ -501,6 +570,12 @@ export function parse(ingredientString, language, options = {}) {
     ingredientLine = safeReplace(ingredientLine, toServeRegex).trim();
   }
 
+  const {multiplier, line: lineWithoutMultiplier} = extractMultiplier(
+    ingredientLine,
+    language,
+  );
+  ingredientLine = lineWithoutMultiplier;
+
   let [quantity, restOfIngredient] = convert.findQuantityAndConvertIfUnicode(
     ingredientLine,
     language,
@@ -604,6 +679,20 @@ export function parse(ingredientString, language, options = {}) {
         : null,
     originalString, // Include the original string
   };
+
+  if (multiplier !== 1 && Number.isFinite(result.quantity)) {
+    const baseQuantity = result.quantity;
+    const baseMinQty = result.minQty;
+    const baseMaxQty = result.maxQty;
+
+    result.multiplier = multiplier;
+    result.perItemQuantity = baseQuantity;
+    result.perItemMinQty = baseMinQty;
+    result.perItemMaxQty = baseMaxQty;
+    result.quantity = convertToNumber(baseQuantity * multiplier, language);
+    result.minQty = convertToNumber(baseMinQty * multiplier, language);
+    result.maxQty = convertToNumber(baseMaxQty * multiplier, language);
+  }
 
   if (includeUnitSystems) {
     result.unitSystem = getUnitSystem(result.unit, language);

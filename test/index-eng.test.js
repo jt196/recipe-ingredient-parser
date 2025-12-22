@@ -825,6 +825,35 @@ describe('recipe parser eng', () => {
     });
   });
 
+  describe('multipliers and stacked quantities', () => {
+    it('multiplies explicit x patterns', () => {
+      const result = parse('2 x 100 g tomatoes', 'eng');
+      expect(result.quantity).to.equal(200);
+      expect(result.perItemQuantity).to.equal(100);
+      expect(result.unit).to.equal('gram');
+      expect(result.ingredient).to.equal('tomatoes');
+      expect(result.multiplier).to.equal(2);
+      expect(result.minQty).to.equal(200);
+      expect(result.maxQty).to.equal(200);
+    });
+
+    it('multiplies compact x patterns', () => {
+      const result = parse('3x250ml broth', 'eng');
+      expect(result.quantity).to.equal(750);
+      expect(result.perItemQuantity).to.equal(250);
+      expect(result.unit).to.equal('milliliter');
+      expect(result.ingredient).to.equal('broth');
+      expect(result.multiplier).to.equal(3);
+    });
+
+    it('prefers the second number when it carries the unit', () => {
+      const result = parse('1 1.8kg chicken', 'eng');
+      expect(result.quantity).to.equal(1.8);
+      expect(result.unit).to.equal('kilogram');
+      expect(result.ingredient).to.equal('chicken');
+    });
+  });
+
   describe('brackets handling', () => {
     it('keeps nested bracket content intact in additional', () => {
       const result = parse('1 (14.5 oz (410g)) can tomatoes', 'eng');

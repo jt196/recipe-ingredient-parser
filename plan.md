@@ -35,14 +35,16 @@ Source: 134 annotated ingredient lines in `scripts/parsed_ingredients.csv`. Them
 - [x] Done (opt-in). Parser can emit `alternatives` array and `unitSystem` tagging when `includeAlternatives/includeUnitSystems` options are true; supports bracketed/slash/“or” alternatives.
 - Tests: added EN coverage for `1 cup oats (250 ml)`, `8 oz / 225g pasta`, `450g (1 lb) ...`, and ingredient alternates via `or`.
 
-6) Multiple numbers in one line
+- [x] Multiple numbers in one line
 - Examples: `2 x 100 g`, `1 1.8kg chicken`, `1 (3-4) pieces`, `1 kilogram to 2 kilograms`.
 - Plan: handle simple multiplier (`<n> x <qty>` => qty*n), tolerate compound ranges with parentheses and dual quantities; when ambiguous, preserve ingredient text cleanly and keep quantities as array? (proposal: new `secondaryQuantity` field or record multiplier).
 - Tests: `2 x 100g tomatoes` -> quantity `200`, unit `gram`, ingredient `tomatoes`; `1 (3-4) pieces ginger` -> quantity `1`, additional/min-max range recorded separately; `1-2 kg pork shoulder` already works; ensure no “1/4-1/2” regression.
+- Implemented: explicit/implicit multipliers fold into `quantity`/`minQty`/`maxQty` while retaining `perItemQuantity` fields and optional `multiplier` metadata; ranges/unicode fractions guarded to avoid false positives.
 
-11) Multiplicative marker (`x`)
+- [x] Multiplicative marker (`x`)
 - Scope: clean, focused handling of `<count> x <qty/unit>` patterns without colliding with item #6’s multi-number/range handling. Consider both spaced and unspaced forms (e.g., `2x100 g`, `2 x 100 g`).
 - Tests: `2 x 100 g tomatoes` -> quantity 200, unit gram, ingredient tomatoes; `3x250ml broth` -> quantity 750, unit milliliter.
+- Implemented: parses compact and spaced `x` markers; retains per-item quantities and multiplier metadata.
 
 7) Brackets handling / nested brackets
 - Examples: nested brackets, double brackets, bracketed instructions vs. alternates.
