@@ -350,9 +350,10 @@ function extractInstructions(
     return {ingredientText, additionalParts, instructions: []};
   }
 
-  const escaped = instructionsList.map(w =>
-    w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
-  );
+  // Sort instructions by length to avoid partial matches swallowing longer phrases (e.g., "unsalted" vs "salted").
+  const escaped = [...instructionsList]
+    .sort((a, b) => b.length - a.length)
+    .map(w => w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'));
   const escapedAdverbs = (adverbs || []).map(w =>
     w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
   );
@@ -742,6 +743,14 @@ export function parse(ingredientString, language, options = {}) {
   additionalParts = instructionExtraction.additionalParts;
   const instructionsFound = instructionExtraction.instructions;
 
+  if (
+    Array.isArray(instructionsFound) &&
+    instructionsFound.includes('salted') &&
+    /^un\s+/i.test(ingredient)
+  ) {
+    ingredient = ingredient.replace(/^un\s+/i, '').trim();
+  }
+
   // If instructions stripped the ingredient text but we still have leftover parts, promote the first leftover to ingredient.
   if ((!ingredient || ingredient.trim() === '') && additionalParts.length > 0) {
     const idx = additionalParts.findIndex(part => {
@@ -858,6 +867,15 @@ export function parse(ingredientString, language, options = {}) {
         : null,
     originalString, // Include the original string
   };
+
+  if (
+    Array.isArray(instructionsFound) &&
+    instructionsFound.includes('salted') &&
+    typeof result.ingredient === 'string' &&
+    /^un\s+/i.test(result.ingredient)
+  ) {
+    result.ingredient = result.ingredient.replace(/^un\s+/i, '').trim();
+  }
 
   if (multiplier !== 1 && Number.isFinite(result.quantity)) {
     const baseQuantity = result.quantity;

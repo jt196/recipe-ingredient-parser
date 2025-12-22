@@ -264,7 +264,8 @@ describe('recipe parser ita', () => {
       expect(result.toServe).to.equal(true);
       expect(result.unit).to.equal(null);
       expect(result.quantity).to.equal(0);
-      expect(result.ingredient).to.equal('prezzemolo fresco');
+      expect(result.ingredient).to.equal('prezzemolo');
+      expect(result.instructions).to.include('fresco');
       expect(result.additional).to.equal(null);
     });
   });

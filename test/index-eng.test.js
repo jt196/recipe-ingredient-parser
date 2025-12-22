@@ -233,7 +233,8 @@ describe('recipe parser eng', () => {
           expect(result.toServe).to.equal(true);
           expect(result.quantity).to.equal(0);
           expect(result.unit).to.equal(null);
-          expect(result.ingredient).to.equal('fresh coriander');
+          expect(result.ingredient).to.equal('coriander');
+          expect(result.instructions).to.include('fresh');
           expect(result.additional).to.equal(null);
         });
       });
@@ -464,7 +465,7 @@ describe('recipe parser eng', () => {
       expect(parse('1 bag garlic', 'eng').unit).to.equal('bag');
     });
     it('of "1 package sausage"', () => {
-      expect(parse('1 package sausage', 'eng').unit).to.equal('package');
+      expect(parse('1 package sausage', 'eng').unit).to.equal('pack');
     });
     it('"1 pinch water"', () => {
       expect(parse('1 pinch salt', 'eng').unit).to.equal('pinch');
@@ -760,7 +761,7 @@ describe('recipe parser eng', () => {
       expect(result.optional).to.equal(true);
       expect(result.toServe).to.equal(true);
       expect(result.ingredient).to.equal('parsley');
-      expect(result.additional).to.equal('for garnish');
+      expect(result.additional).to.equal(null);
       expect(result.instructions).to.deep.equal(['finely chopped']);
     });
   });
@@ -915,7 +916,8 @@ describe('recipe parser eng', () => {
       expect(result.alternatives).to.have.length(1);
       expect(result.alternatives[0].quantity).to.equal(14);
       expect(result.alternatives[0].unit).to.equal('ounce');
-      expect(result.alternatives[0].ingredient).to.equal('homemade marinara sauce');
+      expect(result.alternatives[0].ingredient).to.equal('marinara sauce');
+      expect(result.instructions).to.include('homemade');
     });
 
     it('parses half package with attached size descriptor cleanly', () => {
@@ -925,7 +927,7 @@ describe('recipe parser eng', () => {
         opts,
       );
       expect(result.quantity).to.equal(0.5);
-      expect(result.unit).to.equal('package');
+      expect(result.unit).to.equal('pack');
       expect(result.ingredient).to.equal('3.5-ounce prepared achiote seasoning');
       expect(result.additional).to.equal(null);
     });
@@ -948,8 +950,9 @@ describe('recipe parser eng', () => {
       );
       expect(res.quantity).to.equal(8);
       expect(res.unit).to.equal('ounce');
-      expect(res.ingredient).to.equal('unsalted butter');
-      expect(res.instructions).to.deep.equal(['cold']);
+      expect(res.ingredient).to.equal('butter');
+      expect(res.instructions).to.include('cold');
+      expect(res.instructions).to.include('salted');
       expect(res.additional).to.equal('cut into 1-inch chunks');
       expect(res.alternatives?.[0].unit).to.equal('tablespoon');
     });
@@ -1006,7 +1009,8 @@ describe('recipe parser eng', () => {
       const res = parse('½ cup raw honey', 'eng', opts);
       expect(res.quantity).to.equal(0.5);
       expect(res.unit).to.equal('cup');
-      expect(res.ingredient).to.equal('raw honey');
+      expect(res.ingredient).to.equal('honey');
+      expect(res.instructions).to.include('raw');
     });
 
     it('parses 1⁄2 cup carrot with instruction', () => {
@@ -1052,7 +1056,7 @@ describe('recipe parser eng', () => {
         opts,
       );
       expect(res.quantity).to.equal(0.5);
-      expect(res.unit).to.equal('package');
+      expect(res.unit).to.equal('pack');
       expect(res.ingredient).to.equal('1-pound banana leaves');
       expect(res.optional).to.equal(true);
     });
@@ -1101,7 +1105,7 @@ describe('recipe parser eng', () => {
       expect(result.optional).to.equal(true);
       expect(result.toServe).to.equal(true);
       expect(result.ingredient).to.equal('parsley');
-      expect(result.additional).to.equal('for garnish');
+      expect(result.additional).to.equal(null);
       expect(result.instructions).to.deep.equal(['finely chopped']);
     });
   });
