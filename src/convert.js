@@ -177,8 +177,15 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   let trimmedLine = ingredientLine
     // remove zero-width and BOM-like chars
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    // drop control chars that leak from bad copies
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, '')
+    // fix common mojibake for fraction slash and stray Â
+    .replace(/â„/g, '/')
+    .replace(/Â/g, '')
     // normalize fraction slash
     .replace(/\u2044/g, '/')
+    // normalize spaced fractions like "1 /2"
+    .replace(/(\d)\s*\/\s*(\d)/g, '$1/$2')
     .trim(); // Ensure the string is trimmed
 
   const {joiners = [], isCommaDelimited} = langMap;
@@ -196,7 +203,7 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
 
   const delimiter = isCommaDelimited ? ',' : '\\.';
   const magnitudeSeperator = isCommaDelimited ? '\\.' : ',';
-  const quantityPattern = `(\\d+\\/\\d+|\\d+\\s\\d+\\/\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`;
+  const quantityPattern = `(\\d+\\s*\\/\\s*\\d+|\\d+\\s+\\d+\\s*\\/\\s*\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`;
   const joinersEscaped = joiners.map(escapeRegex);
   const joinersPattern = joinersEscaped.length ? joinersEscaped.join('|') : '';
 

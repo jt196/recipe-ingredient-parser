@@ -448,6 +448,7 @@ export function parse(ingredientString, language, options = {}) {
 
   const alternatives = [];
   const tryAddAlternative = fragment => {
+    if (!/\d/.test(fragment)) return false;
     if (!includeAlternatives || !fragment || !fragment.trim()) return false;
     const alt = parse(fragment, language, {
       includeUnitSystems,
@@ -473,7 +474,7 @@ export function parse(ingredientString, language, options = {}) {
         altEntry.unitSystem = getUnitSystem(alt.unit, language);
       }
       alternatives.push(altEntry);
-      return true;
+      return altEntry;
     }
     return false;
   };
@@ -489,15 +490,21 @@ export function parse(ingredientString, language, options = {}) {
     additionalParts.push(...kept);
   }
 
-  // Detect simple slash alternative e.g., "8 oz / 225g pasta"
-  if (includeAlternatives && /\s\/\s/.test(originalString)) {
+  // Detect alternative separated by slash (units on both sides or spaced slash)
+  if (includeAlternatives && originalString.includes('/')) {
     const slashParts = originalString.split('/');
     if (slashParts.length >= 2) {
       const lastPart = slashParts[slashParts.length - 1];
-      if (/\d/.test(lastPart)) {
-        const added = tryAddAlternative(lastPart);
-        if (added) {
-          ingredientLine = ingredientLine.split('/')[0].trim();
+      const firstPart = slashParts[0];
+      const hasUnitish = part => /\d[^\s]*[A-Za-z]/.test(part);
+      const spacedSlash = /\s\/\s/.test(originalString);
+      if (spacedSlash || (hasUnitish(firstPart) && hasUnitish(lastPart))) {
+        if (/\d/.test(lastPart)) {
+          const altEntry = tryAddAlternative(lastPart);
+          if (altEntry) {
+            const primarySegment = ingredientLine.split('/')[0].trim();
+            ingredientLine = `${primarySegment} ${altEntry.ingredient || ''}`.trim();
+          }
         }
       }
     }
@@ -555,6 +562,13 @@ export function parse(ingredientString, language, options = {}) {
       ingredientLine = ingredientLine.replace(matchApprox[0], '').trim();
     }
   }
+
+  // Convert stray non-dash separators between digits into fraction slash (but ignore hyphen/dash ranges)
+  ingredientLine = ingredientLine.replace(
+    /(\d)\s*[^\dA-Za-z\s\-–.,]\s*(\d)/g,
+    '$1/$2',
+  );
+  ingredientLine = ingredientLine.replace(/(\d)\s*â[^\dA-Za-z]+(\d)/g, '$1/$2');
 
   let optional = false;
   if (safeTest(optionalRegex, originalString)) {
@@ -649,6 +663,12 @@ export function parse(ingredientString, language, options = {}) {
   ingredient = ingredient
     .replace(/^(?:\s*[-–—]\s*)+/, '')
     .replace(/(?:\s*[-–—]\s*)+$/, '')
+    .trim();
+  ingredient = ingredient
+    .replace(/(\d)\s*-\s*(?=[A-Za-z])/g, '$1-')
+    .replace(/(\d)([A-Za-z])/g, '$1 $2')
+    .replace(/pound(?=[A-Za-z])/g, 'pound ')
+    .replace(/\s+/g, ' ')
     .trim();
   ingredient = ingredient.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 

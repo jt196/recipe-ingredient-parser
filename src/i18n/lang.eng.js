@@ -128,6 +128,7 @@ const instructions = [
   'strained',
   'julienned',
   'halved',
+  'quartered',
   'peeled',
   'pitted',
   'seeded',
@@ -193,7 +194,7 @@ const instructions = [
   'medium',
   'large',
 ];
-const adverbs = ['finely', 'thinly', 'coarsely', 'freshly'];
+const adverbs = ['finely', 'thinly', 'coarsely', 'freshly', 'roughly'];
 const unitSystems = {
   gram: 'metric',
   kilogram: 'metric',

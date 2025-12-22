@@ -891,6 +891,46 @@ describe('recipe parser eng', () => {
       expect(res.ingredient).to.equal('carrot');
       expect(res.instructions).to.deep.equal(['shredded']);
     });
+
+    it('handles spaced slash fractions', () => {
+      const res = parse('1 /2 cup Sprinkling Crumbs (page 237 )', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('Sprinkling Crumbs');
+    });
+
+    it('parses mojibake fraction slash', () => {
+      const res = parse('1 â„ 4 cup (60 mL) kefir or active whey', 'eng', opts);
+      expect(res.quantity).to.equal(0.25);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('kefir');
+      expect(res.alternatives?.[0].unit).to.equal('milliliter');
+    });
+
+    it('parses multiplier with slash alternative units', () => {
+      const res = parse(
+        '2 x 150g/5½oz salmon fillets, skinned and thinly sliced',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(300);
+      expect(res.unit).to.equal('gram');
+      expect(res.ingredient).to.equal('salmon fillets');
+      expect(res.alternatives?.[0].quantity).to.equal(5.5);
+      expect(res.alternatives?.[0].unit).to.equal('ounce');
+    });
+
+    it('keeps ingredient clean with leading alt size', () => {
+      const res = parse(
+        '1/2 1-pound package banana leaves, defrosted if frozen (optional)',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('package');
+      expect(res.ingredient).to.equal('1-pound banana leaves');
+      expect(res.optional).to.equal(true);
+    });
   });
 
   describe('multipliers and stacked quantities', () => {
