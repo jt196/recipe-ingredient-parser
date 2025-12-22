@@ -16,13 +16,33 @@ const units = {
   pound: ['pound', 'lb', 'lb.', 'lbs', 'lbs.', 'Lb', 'Lbs', 'Lb.', 'Lbs.'],
   quart: ['quart', 'qt', 'qt.', 'qts', 'qts.'],
   tablespoon: ['tablespoon', 'tbs', 'tbsp', 'tbspn', 'tbs.', 'tbsp.', 'tbspn.'],
-  teaspoon: ['teaspoon', 'tsp', 'tspn', 't', 't.', 'tsp.', 'tspn.', 't/s'],
+  teaspoon: [
+    'teaspoon',
+    'tsp',
+    'tspn',
+    't',
+    't.',
+    'tsp.',
+    'tspn.',
+    't/s',
+    'ts',
+    'ts.',
+  ],
   gram: ['gram', 'g', 'g.'],
   kilogram: ['kilogram', 'kg', 'kg.'],
   liter: ['liter', 'l', 'l.', 'lt', 'lt.', 'litre', 'litres'],
   milligram: ['milligram', 'mg', 'mg.'],
   milliliter: ['milliliter', 'ml', 'ml.', 'millilitre', 'millilitres'],
-  package: ['package', 'pkg', 'pkgs', 'pkg.', 'pkgs.', 'pack'],
+  packet: [
+    'package',
+    'pkg',
+    'pkgs',
+    'pkg.',
+    'pkgs.',
+    'pack',
+    'packet',
+    'packets',
+  ],
   bag: ['bag', 'bg', 'bg.'],
   box: ['box'],
   bottle: ['bottle', 'btl', 'btl.'],
@@ -41,6 +61,12 @@ const units = {
   slice: ['slice'],
   handful: ['handful'],
   inch: ['inch'],
+  drizzle: ['drizzle'],
+  centimetre: ['centimeter', 'centimetre', 'cm', 'cm.'],
+  ear: ['ear'],
+  few: ['few'],
+  knob: ['knob'],
+  thumb: ['thumb'],
 };
 
 const pluralUnits = {
@@ -75,6 +101,10 @@ const pluralUnits = {
   stick: 'sticks',
   handful: 'handfuls',
   inch: 'inches',
+  centimetre: 'centimetres',
+  ear: ['ears'],
+  knob: ['knobs'],
+  thumb: ['thumbs'],
 };
 
 const symbolUnits = {
@@ -108,6 +138,7 @@ const symbolUnits = {
   stick: '',
   handful: '',
   inch: '',
+  centimetre: 'cm',
 };
 
 const prepositions = ['of'];
@@ -117,7 +148,13 @@ const joiners = ['to'];
 const toTaste = ['to taste'];
 const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
 const optional = ['optional', 'option.', 'if desired'];
-const toServe = ['to serve', 'for serving'];
+const toServe = [
+  'to serve',
+  'for serving',
+  'for garnish',
+  'to garnish',
+  'to decorate',
+];
 const instructions = [
   'chopped',
   'diced',
@@ -196,8 +233,51 @@ const instructions = [
   'divided',
   'husked',
   'frozen',
+  'dry',
+  'leveled',
+  'levelled',
+  'store-bought',
+  'at room temperature',
+  'for greasing',
+  'for greasing the tin',
+  'for the pan',
+  'stoned',
+  'cooked',
+  'crumbled',
+  'crispy',
+  'crisp',
+  'dried',
+  'dry',
+  'dry-cured',
+  'packed',
+  'fresh',
+  'good-quality',
+  'heaped',
+  'hearty',
+  'homemade',
+  'ice-cold',
+  'ice cold',
+  'juice of',
+  'for frying',
+  'reserved',
+  'raw',
+  'salted',
+  'unsalted',
+  'thick',
+  'thin',
+  'thick-cut',
+  'unsweetened',
+  'unseasoned',
+  'unwaxed',
 ];
-const adverbs = ['finely', 'thinly', 'coarsely', 'freshly', 'roughly'];
+const adverbs = [
+  'finely',
+  'thinly',
+  'coarsely',
+  'freshly',
+  'roughly',
+  'firmly',
+];
 const unitSystems = {
   gram: 'metric',
   kilogram: 'metric',

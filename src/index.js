@@ -463,6 +463,15 @@ export function parse(ingredientString, language, options = {}) {
     if (/\bsee note\b/i.test(fragment)) return false;
     if (/\bif frozen\b/i.test(fragment)) return false;
     if (/\bcut\b/i.test(fragment) || /\bchunk/i.test(fragment)) return false;
+    if (
+      Array.isArray(instructionWords) &&
+      instructionWords.some(word => {
+        const escaped = word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+        return new RegExp(`^\\s*${escaped}\\b`, 'i').test(fragment);
+      })
+    ) {
+      return false;
+    }
     const alt = parse(fragment, language, {
       includeUnitSystems,
       includeAlternatives: false,
@@ -605,9 +614,15 @@ export function parse(ingredientString, language, options = {}) {
     }
   }
 
+  // Normalize ampersand-separated mixed numbers like "1 & 1/2"
+  ingredientLine = ingredientLine.replace(
+    /(\d)\s*&\s*(\d+\/\d+)/g,
+    '$1 $2',
+  );
+
   // Convert stray non-dash separators between digits into fraction slash (but ignore hyphen/dash ranges)
   ingredientLine = ingredientLine.replace(
-    /(\d)\s*[^\dA-Za-z\s\-–.,]\s*(\d)/g,
+    /(\d)\s*[^\dA-Za-z\s\-–.,&]\s*(\d)/g,
     '$1/$2',
   );
   ingredientLine = ingredientLine.replace(/(\d)\s*â[^\dA-Za-z]+(\d)/g, '$1/$2');

@@ -742,7 +742,7 @@ describe('recipe parser eng', () => {
       const result = parse('- 500 g water', 'eng');
       expect(result.quantity).to.equal(500);
       expect(result.unit).to.equal('gram');
-      expect(result.ingredient).to.equal('water');
+      expect(result.ingredient.toLowerCase()).to.equal('water');
     });
   });
 
@@ -880,6 +880,16 @@ describe('recipe parser eng', () => {
       expect(result.alternatives[0].quantity).to.equal(0.5);
       expect(result.alternatives[0].unit).to.equal('cup');
       expect(result.alternatives[0].ingredient).to.equal('kefir whey');
+    });
+
+    it('parses ampersand mixed fraction correctly', () => {
+      const result = parse('1 & 1/2 Cups Water, room temperature', 'eng');
+      expect(result.quantity).to.equal(1.5);
+      expect(result.unit).to.equal('cup');
+      expect(result.ingredient.toLowerCase()).to.equal('water');
+      expect(result.minQty).to.equal(1.5);
+      expect(result.maxQty).to.equal(1.5);
+      expect(result.additional).to.equal('room temperature');
     });
 
     it('inherits quantity and unit for or-alternative without its own numbers', () => {

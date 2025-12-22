@@ -186,6 +186,8 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     .replace(/Â/g, '')
     // normalize fraction slash
     .replace(/\u2044/g, '/')
+    // normalize ampersand-separated mixed numbers like "1 & 1/2" -> "1 1/2"
+    .replace(/(\d)\s*&\s*(\d+\/\d+)/g, '$1 $2')
     // normalize spaced fractions like "1 /2"
     .replace(/(\d)\s*\/\s*(\d)/g, '$1/$2')
     .trim(); // Ensure the string is trimmed
