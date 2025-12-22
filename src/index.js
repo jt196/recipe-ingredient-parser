@@ -2,8 +2,18 @@ import * as convert from './convert';
 import {i18nMap} from './i18n';
 import {repeatingFractions} from './repeatingFractions';
 
+/**
+ * Detect "to taste" style units and return a normalized shorthand with metadata.
+ *
+ * @param {string} input
+ * @param {string} language
+ * @returns {[string,string|undefined,boolean]} tuple of [unitShorthand, matchedText, isExtendedMatch]
+ */
 export function toTasteRecognize(input, language) {
-  const {toTaste} = i18nMap[language];
+  if (typeof input !== 'string') return ['', '', false];
+  const langMap = i18nMap[language];
+  if (!langMap || !langMap.toTaste) return ['', '', false];
+  const {toTaste} = langMap;
 
   for (const toTasteItem of toTaste) {
     const firstLetter = toTasteItem.match(/\b(\w)/g);
@@ -45,7 +55,10 @@ export function toTasteRecognize(input, language) {
  * @returns {Array} An array in the form [unit, pluralUnit, symbol, match] or [] if no match.
  */
 function getUnit(input, language) {
-  const {units, pluralUnits, symbolUnits, problematicUnits} = i18nMap[language];
+  if (typeof input !== 'string') return [];
+  const langMap = i18nMap[language];
+  if (!langMap) return [];
+  const {units, pluralUnits, symbolUnits, problematicUnits} = langMap;
   const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
   // This will collect all unit matches in the form: [unit, pluralUnit, symbol, match]
@@ -165,14 +178,23 @@ export const getSymbol = (unit, language) => {
   return langMap.symbolUnits[normalizedKey] || '';
 };
 
+/**
+ * Convert a numeric-ish value to number, respecting comma decimal locales.
+ * @param {string|number|null} value
+ * @param {string} language
+ * @returns {number}
+ */
 export function convertToNumber(value, language) {
-  const {isCommaDelimited} = i18nMap[language];
-  if (!value) return 0;
+  const {isCommaDelimited} = i18nMap[language] || {};
+  if (value === null || value === undefined) return 0;
 
-  let num =
+  const raw =
     typeof value === 'string'
-      ? parseFloat(value.replace(isCommaDelimited ? ',' : '.', '.'))
+      ? value.replace(isCommaDelimited ? ',' : '.', '.')
       : value;
+  const num = Number(raw);
+
+  if (Number.isNaN(num)) return 0;
 
   // Round to 3 decimals max
   return Math.round(num * 1000) / 1000;
@@ -201,6 +223,21 @@ export function convertToNumber(value, language) {
  *   - {string} originalString - The original input string for reference.
  */
 export function parse(ingredientString, language) {
+  if (typeof ingredientString !== 'string') {
+    return {
+      quantity: 0,
+      unit: null,
+      unitPlural: null,
+      symbol: null,
+      ingredient: '',
+      minQty: 0,
+      maxQty: 0,
+      additional: null,
+      originalString: '',
+    };
+  }
+  const langMap = i18nMap[language] || {};
+
   // Initialize variables
   let additional = '';
   let originalString = ingredientString.trim(); // Save the original string
@@ -265,13 +302,20 @@ export function parse(ingredientString, language) {
 }
 
 export function multiLineParse(recipeString, language) {
-  const ingredients = recipeString.split(/[,👉🏻👉\r\n-]/); // eslint-disable-line no-misleading-character-class
+  const source = typeof recipeString === 'string' ? recipeString : '';
+  const ingredients = source.split(/[,👉🏻👉\r\n-]/); // eslint-disable-line no-misleading-character-class
 
   return ingredients.map(x => parse(x, language)).filter(x => x['ingredient']);
 }
 
+/**
+ * Combine duplicate ingredients by unit/name, summing quantities and ranges.
+ * @param {Array} ingredientArray
+ * @returns {Array}
+ */
 export function combine(ingredientArray) {
-  const combinedIngredients = ingredientArray.reduce((acc, ingredient) => {
+  const list = Array.isArray(ingredientArray) ? ingredientArray : [];
+  const combinedIngredients = list.reduce((acc, ingredient) => {
     const key = ingredient.ingredient + ingredient.unit; // when combining different units, remove this from the key and just use the name
     const existingIngredient = acc[key];
 
@@ -292,7 +336,14 @@ export function combine(ingredientArray) {
     .sort(compareIngredients);
 }
 
+/**
+ * Render an ingredient object back to a human-readable string with fractions where possible.
+ * @param {Object} ingredient
+ * @param {string} language
+ * @returns {string}
+ */
 export function prettyPrintingPress(ingredient, language) {
+  if (!ingredient || typeof ingredient !== 'object') return '';
   let quantityString = '';
   let unit = ingredient.unit;
   if (ingredient.quantity) {
@@ -337,6 +388,12 @@ export function prettyPrintingPress(ingredient, language) {
   return `${quantityString}${unit ? ' ' + unit : ''} ${ingredient.ingredient}`;
 }
 
+/**
+ * Greatest common divisor helper for fraction reduction.
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */
 function gcd(a, b) {
   if (b < 0.0000001) {
     return a;
@@ -346,6 +403,12 @@ function gcd(a, b) {
 }
 
 // TODO: Maybe change this to existingIngredients: Ingredient | Ingredient[]
+/**
+ * Sum quantities/min/max for two matching ingredient entries.
+ * @param {Object} existingIngredients
+ * @param {Object} ingredient
+ * @returns {Object}
+ */
 function combineTwoIngredients(existingIngredients, ingredient) {
   const quantity =
     existingIngredients.quantity !== null && ingredient.quantity !== null
@@ -362,6 +425,12 @@ function combineTwoIngredients(existingIngredients, ingredient) {
   return Object.assign({}, existingIngredients, {quantity, minQty, maxQty});
 }
 
+/**
+ * Alphabetical sort by ingredient name.
+ * @param {Object} a
+ * @param {Object} b
+ * @returns {number}
+ */
 function compareIngredients(a, b) {
   if (a.ingredient === b.ingredient) {
     return 0;

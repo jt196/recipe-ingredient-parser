@@ -1,44 +1,80 @@
 import {i18nMap} from './i18n';
 
+/**
+ * Escape text for safe usage inside RegExp character classes.
+ * @param {string} value
+ * @returns {string}
+ */
+const escapeRegex = value =>
+  value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+/**
+ * Round a numeric string to three decimals while respecting the locale delimiter.
+ * @param {string|number} val
+ * @param {string} delimiter '.' or ','
+ * @returns {string}
+ */
 function keepThreeDecimals(val, delimiter) {
   const strVal = val.toString();
-  return (
-    strVal.split('.')[0] + delimiter + strVal.split('.')[1].substring(0, 3)
-  );
+  if (!strVal.includes('.')) return strVal;
+  const [whole, fraction = ''] = strVal.split('.');
+  return `${whole}${delimiter}${fraction.substring(0, 3)}`;
 }
 
+/**
+ * Convert fractional strings (including unicode fractions and ranges) into decimal strings.
+ * Returns the original value for non-fractional inputs.
+ *
+ * @param {string|number|null} value
+ * @param {string} language
+ * @returns {string|number|null}
+ */
 export function convertFromFraction(value, language) {
-  const {isCommaDelimited} = i18nMap[language];
+  if (value === null || value === undefined) return value;
+  if (typeof value === 'number') return value;
 
+  const langMap = i18nMap[language] || {isCommaDelimited: false};
+  const {isCommaDelimited} = langMap;
   const delimiter = isCommaDelimited ? ',' : '.';
 
-  if (value && Object.prototype.hasOwnProperty.call(unicodeObj, value)) {
-    value = unicodeObj[value];
+  let working = String(value).trim();
+  if (!working) return working;
+
+  if (Object.prototype.hasOwnProperty.call(unicodeObj, working)) {
+    working = unicodeObj[working];
   }
 
   // number comes in, for example: 1 1/3
-  if (value && value.split(' ').length > 1) {
-    const [whole, fraction] = value.split(' ');
+  if (working.includes(' ')) {
+    const [whole, fraction] = working.split(' ');
     const [a, b] = fraction.split('/');
     const remainder = parseFloat(a) / parseFloat(b);
-    const wholeAndFraction = parseInt(whole)
-      ? parseInt(whole) + remainder
+    const wholeAndFraction = parseInt(whole, 10)
+      ? parseInt(whole, 10) + remainder
       : remainder;
     return keepThreeDecimals(wholeAndFraction, delimiter);
-  } else if (!value) {
-    return value;
-  } else if (value.includes('-') || value.includes('–')) {
-    const parts = value.split(/-|–/).map(part =>
+  }
+
+  // fractional range (recursively convert both sides)
+  if (working.includes('-') || working.includes('–')) {
+    const parts = working.split(/-|–/).map(part =>
       convertFromFraction(part.trim(), language),
     );
     return parts.join('-');
-  } else {
-    const [a, b] = value.split('/');
-    return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : a;
   }
+
+  const [a, b] = working.split('/');
+  return b ? keepThreeDecimals(parseFloat(a) / parseFloat(b), delimiter) : working;
 }
 
+/**
+ * Return the first regex match or an empty string.
+ * @param {string} line
+ * @param {RegExp} regex
+ * @returns {string}
+ */
 export function getFirstMatch(line, regex) {
+  if (!line) return '';
   const match = line.match(regex);
   return (match && match[0]) || '';
 }
@@ -63,8 +99,19 @@ const unicodeObj = {
   '⅑': '1/9',
   '⅒': '1/10',
 };
+/**
+ * Convert a spelled-out number into its numeric equivalent.
+ * Returns null when unable to parse.
+ *
+ * @param {string|number} s
+ * @param {string} language
+ * @returns {number|null}
+ */
 export function text2num(s, language) {
-  const a = s.toString().split(/[\s-]+/);
+  const langMap = i18nMap[language];
+  if (!langMap) return null;
+
+  const a = s.toString().trim().split(/[\s-]+/);
   let values = [0, 0];
   a.forEach(x => {
     values = feach(x, values[0], values[1], language);
@@ -77,8 +124,17 @@ export function text2num(s, language) {
   }
 }
 
+/**
+ * Helper for text2num to accumulate values by word.
+ * @param {string} w
+ * @param {number} g
+ * @param {number} n
+ * @param {string} language
+ * @returns {number[]}
+ */
 export function feach(w, g, n, language) {
   const {numbersSmall, numbersMagnitude} = i18nMap[language];
+  if (!numbersSmall || !numbersMagnitude) return [-1, -1];
 
   let x = numbersSmall[w];
   if (x != null) {
@@ -101,10 +157,26 @@ export function feach(w, g, n, language) {
   return [g, n];
 }
 
+/**
+ * Extract a leading quantity (including unicode fractions and ranges) and the remainder of the ingredient line.
+ *
+ * @param {string} ingredientLine
+ * @param {string} language
+ * @returns {[string|null, string]} tuple of [quantityStringOrNull, restOfIngredient]
+ */
 export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
+  if (typeof ingredientLine !== 'string') {
+    return [null, ''];
+  }
+  const langMap = i18nMap[language];
+  if (!langMap) {
+    const trimmed = ingredientLine.trim();
+    return [null, trimmed];
+  }
+
   let trimmedLine = ingredientLine.trim(); // Ensure the string is trimmed
 
-  const {joiners, isCommaDelimited} = i18nMap[language];
+  const {joiners = [], isCommaDelimited} = langMap;
 
   // Check if the line starts with "a " and handle it as quantity "1"
   if (trimmedLine.toLowerCase().startsWith('a ')) {
@@ -120,14 +192,13 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   const delimiter = isCommaDelimited ? ',' : '\\.';
   const magnitudeSeperator = isCommaDelimited ? '\\.' : ',';
   const quantityPattern = `(\\d+\\/\\d+|\\d+\\s\\d+\\/\\d+|\\d+(?:${magnitudeSeperator}?\\d+)*${delimiter}\\d+|\\d+)`;
-  const joinersEscaped = joiners.map(j => j.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'));
+  const joinersEscaped = joiners.map(escapeRegex);
+  const joinersPattern = joinersEscaped.length ? joinersEscaped.join('|') : '';
 
   const numericAndFractionRegex = new RegExp(quantityPattern, 'g');
 
   const numericRangeWithSpaceRegex = new RegExp(
-    `${quantityPattern}\\s*(?:[\\-–]|(?:${joinersEscaped.join(
-      '|',
-    )}))\\s*${quantityPattern}`,
+    `${quantityPattern}\\s*(?:[\\-–]${joinersPattern ? `|(?:${joinersPattern})` : ''})\\s*${quantityPattern}`,
     'g',
   );
 
@@ -138,12 +209,13 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
     '',
   );
   const wordUntilSpace = /[^\s]+/g;
+  const unicodeQuantityPartsRegex = /(\d*)\s*([^\p{ASCII}]+)/u;
 
   // found a unicode quantity inside our regex, for ex: '⅝', '1½', or '1 ½'
   const unicodeQuantityMatch = ingredientLine.match(unicodeFractionRegex);
   if (unicodeQuantityMatch) {
     const match = unicodeQuantityMatch[0]; // full match e.g. "1 ½" or "½"
-    const parts = match.match(/(\d*)\s*([^\u0000-\u007F]+)/); // Extract numericPart and unicodePart
+    const parts = match.match(unicodeQuantityPartsRegex); // Extract numericPart and unicodePart
     if (parts && parts.length === 3) {
       const numericPart = parseFloat(parts[1] || '0');
       const unicodeStr = unicodeObj[parts[2]]; // e.g., '1/2'
@@ -159,11 +231,11 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
       }
       const rangeJoinerMatch = rest.match(
         new RegExp(
-          `^(${joinersEscaped.join('|')})\\s*([^\\s]+)`,
+          `^(${joinersPattern})\\s*([^\\s]+)`,
           'i',
         ),
       );
-      if (rangeJoinerMatch) {
+      if (joinersPattern && rangeJoinerMatch) {
         const secondQty = convertFromFraction(rangeJoinerMatch[2], language);
         const restOfIngredient = rest.replace(rangeJoinerMatch[0], '').trim();
         return [`${totalQuantity}-${secondQty}`, restOfIngredient];
@@ -176,10 +248,11 @@ export function findQuantityAndConvertIfUnicode(ingredientLine, language) {
   // found a quantity range, for ex: "2 to 3"
   const quantityRangeMatch = ingredientLine.match(numericRangeWithSpaceRegex);
   if (quantityRangeMatch) {
-    const quantity = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex)
-      .replace(new RegExp(`${joinersEscaped.join('|')}`), '-')
-      .split(' ')
-      .join('');
+    const rawRange = getFirstMatch(ingredientLine, numericRangeWithSpaceRegex);
+    const normalizedRange = joinersPattern
+      ? rawRange.replace(new RegExp(`${joinersPattern}`), '-')
+      : rawRange;
+    const quantity = normalizedRange.split(' ').join('');
     const restOfIngredient = ingredientLine
       .replace(getFirstMatch(ingredientLine, numericRangeWithSpaceRegex), '')
       .trim();

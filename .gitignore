@@ -3,3 +3,7 @@ node_modules
 lib
 testDist
 yarn-error.log
+
+# ───── Script output ────────────────────────────────────
+parsed_ingredients*.csv
+export-ingredients.js
