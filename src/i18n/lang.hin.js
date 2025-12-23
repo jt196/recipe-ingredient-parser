@@ -118,6 +118,14 @@ const symbolUnits = {
 const prepositions = ['का', 'के'];
 const joiners = ['से'];
 const toTaste = ['स्वादानुसार'];
+const toTasteAdditional = [
+  'और',
+  'समायोजित करें',
+  'मसाला',
+  'या',
+  'या अधिक',
+  'थोड़ा और',
+];
 const approx = ['लगभग', 'करीब', 'तक़रीबन', 'आसपास', '~'];
 const optional = ['वैकल्पिक', 'ऑप्शनल', 'यदि चाहें'];
 const toServe = [
@@ -297,6 +305,7 @@ export const langHin = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

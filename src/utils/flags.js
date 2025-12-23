@@ -51,9 +51,7 @@ export function buildFlagRegexes({
             .map(letters => `${letters.split('').join('\\.?')}\\.?`);
           const parts = [...escapedWords, ...abbrevParts];
           const body = parts.length ? `(?:${parts.join('|')})` : '';
-          return body
-            ? new RegExp(`\\b(?:adjust\\s+to\\s+)?${body}\\b`, 'gi')
-            : null;
+          return body ? new RegExp(`\\b${body}\\b`, 'gi') : null;
         })()
       : null;
 

@@ -157,6 +157,14 @@ const prepositions = ['di', "d'"];
 const joiners = ['o'];
 
 const toTaste = ['quanto basta'];
+const toTasteAdditional = [
+  'più',
+  'aggiustare',
+  'condire',
+  'o',
+  'o più',
+  'ancora',
+];
 const approx = ['circa', 'circa.', 'cir.', 'approssimativamente', 'quasi', '~'];
 const optional = ['opzionale', 'facoltativo', 'se desiderato'];
 const toServe = [
@@ -368,6 +376,7 @@ export const langIta = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

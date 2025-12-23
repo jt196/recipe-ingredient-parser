@@ -137,6 +137,7 @@ const prepositions = ['de'];
 const joiners = ['a'];
 
 const toTaste = ['al gusto'];
+const toTasteAdditional = ['más', 'ajustar', 'sazonar', 'o', 'o más', 'un poco más'];
 const optional = ['opcional', 'si se desea', 'a elección'];
 const toServe = ['para servir', 'para decorar', 'para adornar', 'decorar'];
 const approx = [
@@ -334,6 +335,7 @@ export const langEsp = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   optional,
   toServe,
   instructions,

@@ -135,6 +135,14 @@ const symbolUnits = {
 const prepositions = ['de'];
 const joiners = ['à'];
 const toTaste = ['selon le goût'];
+const toTasteAdditional = [
+  'plus',
+  'ajuster',
+  'assaisonner',
+  'ou',
+  'ou plus',
+  'encore un peu',
+];
 const approx = [
   'env.',
   'environ',
@@ -322,6 +330,7 @@ export const langFra = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

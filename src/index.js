@@ -190,7 +190,6 @@ export function parse(ingredientString, language, options = {}) {
     toTaste = true;
     ingredientLine = safeReplace(ingredientLine, toTasteRegex).trim();
   }
-  ingredientLine = ingredientLine.replace(/\badjust\s+to\s+taste\b/gi, '').trim();
 
   const {multiplier, line: lineWithoutMultiplier} = extractMultiplier(
     ingredientLine,
@@ -234,9 +233,6 @@ export function parse(ingredientString, language, options = {}) {
     toTaste = true;
     restOfIngredient = safeReplace(restOfIngredient, toTasteRegex).trim();
   }
-  restOfIngredient = restOfIngredient
-    .replace(/\badjust\s+to\s+taste\b/gi, '')
-    .trim();
 
   if (toTaste && !resultQuantityCaptured(quantity)) {
     forceUnitNull = true;
@@ -571,19 +567,13 @@ export function parse(ingredientString, language, options = {}) {
     // Clean residual lukewarm truncations.
     ingredient = ingredient.replace(/\bluke\b/gi, '').trim();
 
-    if (toTaste) {
-      ingredient = ingredient.replace(/\badjust\b/gi, '').trim();
-      additionalParts = additionalParts
-        .map(part =>
-          typeof part === 'string'
-            ? part.replace(/\badjust\b/gi, '').trim()
-            : part,
-        )
-        .filter(
-          part =>
-            part &&
-            (typeof part !== 'string' || (part || '').trim().length > 0),
-        );
+    if (toTaste && toTasteAdditionalRegex) {
+      ingredient = safeReplace(ingredient, toTasteAdditionalRegex).trim();
+      additionalParts = additionalParts.map(part =>
+        typeof part === 'string'
+          ? safeReplace(part, toTasteAdditionalRegex).trim()
+          : part,
+      );
     }
 
     // Strip leading numeric tokens if quantity already captured.

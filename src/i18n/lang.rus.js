@@ -118,6 +118,14 @@ const symbolUnits = {
 const prepositions = ['из'];
 const joiners = ['до'];
 const toTaste = ['по вкусу'];
+const toTasteAdditional = [
+  'больше',
+  'по желанию',
+  'приправить',
+  'или',
+  'или больше',
+  'еще немного',
+];
 const approx = ['примерно', 'прибл', 'прибл.', 'приблизительно', 'около', '~'];
 const optional = ['по желанию', 'опционально', 'если нужно'];
 const toServe = ['для подачи', 'для украшения', 'украсить', 'украшать'];
@@ -288,6 +296,7 @@ export const langRus = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

@@ -109,7 +109,15 @@ const symbolUnits = {
 const prepositions = ['von'];
 const joiners = ['bis'];
 
-const toTaste = [];
+const toTaste = ['nach geschmack'];
+const toTasteAdditional = [
+  'mehr',
+  'anpassen',
+  'abschmecken',
+  'oder',
+  'oder mehr',
+  'noch mehr',
+];
 const approx = ['ca', 'ca.', 'circa', 'ungefähr', 'etwa', '~'];
 const optional = ['optional', 'falls gewünscht', 'wenn gewünscht'];
 const instructions = [
@@ -290,6 +298,7 @@ export const langDeu = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   instructions,

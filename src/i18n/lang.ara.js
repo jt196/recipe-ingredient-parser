@@ -118,6 +118,7 @@ const symbolUnits = {
 const prepositions = ['من'];
 const joiners = ['إلى'];
 const toTaste = ['حسب الذوق'];
+const toTasteAdditional = ['المزيد', 'حسب الرغبة', 'تتبيل', 'أو', 'أو أكثر', 'المزيد قليلاً'];
 const approx = ['حوالي', 'قرابة', 'تقريباً', 'نحو', '~'];
 const optional = ['اختياري', 'إذا رغبت'];
 const toServe = ['للتقديم', 'للتزيين', 'لتزيين', 'لتزيين'];
@@ -277,6 +278,7 @@ export const langAra = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

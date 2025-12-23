@@ -121,6 +121,14 @@ const symbolUnits = {
 const prepositions = ['dari'];
 const joiners = ['sampai'];
 const toTaste = ['secukupnya'];
+const toTasteAdditional = [
+  'lebih',
+  'sesuaikan',
+  'bumbui',
+  'atau',
+  'atau lebih',
+  'tambah lagi',
+];
 const approx = ['sekitar', 'kira-kira', 'kurang lebih', '±', '~'];
 const optional = ['opsional', 'jika diinginkan'];
 const toServe = [
@@ -300,6 +308,7 @@ export const langInd = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

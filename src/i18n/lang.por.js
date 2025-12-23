@@ -128,6 +128,14 @@ const symbolUnits = {
 const prepositions = ['de'];
 const joiners = ['a'];
 const toTaste = ['a gosto'];
+const toTasteAdditional = [
+  'mais',
+  'ajustar',
+  'temperar',
+  'ou',
+  'ou mais',
+  'um pouco mais',
+];
 const approx = [
   'aprox',
   'aprox.',
@@ -316,6 +324,7 @@ export const langPor = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,

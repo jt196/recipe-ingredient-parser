@@ -1198,6 +1198,32 @@ describe('recipe parser eng', () => {
       expect(res.additional).to.equal(null);
     });
 
+    it('keeps to-taste pinch wording', () => {
+      const res = parse('1 tbs pepper season to taste', 'eng', opts);
+      expect(res.unit).to.equal('tablespoon');
+      expect(res.ingredient).to.equal('pepper');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional).to.equal(null);
+    });
+
+    it('to taste with instructions', () => {
+      const res = parse('Freshly ground black pepper, to taste', 'eng', opts);
+      expect(res.unit).to.equal(null);
+      expect(res.ingredient).to.equal('black pepper');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional).to.equal(null);
+      expect(res.instructions).to.include.members(['Freshly ground']);
+    });
+
+    it('to taste with instructions', () => {
+      const res = parse('Freshly ground black pepper (to taste)', 'eng', opts);
+      expect(res.unit).to.equal(null);
+      expect(res.ingredient).to.equal('black pepper');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional).to.equal(null);
+      expect(res.instructions).to.include.members(['Freshly ground']);
+    });
+
     it('cleans healthy pinch each', () => {
       const res = parse('1 healthy pinch each salt and pepper', 'eng', opts);
       expect(res.unit).to.equal('pinch');
