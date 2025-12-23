@@ -817,6 +817,36 @@ export function parse(ingredientString, language, options = {}) {
     }
   }
 
+  if (result.additional && additionalStopwords.length > 0) {
+    const filtered = result.additional
+      .split(',')
+      .map(part => part.trim())
+      .filter(part => part && !additionalStopwords.includes(part.toLowerCase()));
+    result.additional = filtered.length ? filtered.join(', ') : null;
+  }
+  if (!approx && approxWords.length > 0) {
+    const approxAnywhere = new RegExp(
+      `\\b(${approxWords
+        .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
+        .join('|')})\\b`,
+      'i',
+    );
+    if (approxAnywhere.test(result.ingredient || '')) {
+      approx = true;
+      result.ingredient = (result.ingredient || '')
+        .replace(approxAnywhere, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    if (result.additional && approxAnywhere.test(result.additional)) {
+      approx = true;
+      result.additional = result.additional
+        .replace(approxAnywhere, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (result.additional === '') result.additional = null;
+    }
+  }
   if (approx) {
     result.approx = true;
   }
