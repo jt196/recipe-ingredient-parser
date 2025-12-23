@@ -28,6 +28,7 @@ export function processAlternatives({
   const tryAddAlternative = fragment => {
     if (!includeAlternatives || !fragment || !fragment.trim()) return false;
     if (!/\d/.test(fragment)) return false;
+    if (/\bnote\b/i.test(fragment)) return false;
     if (/\bpage\s+\d+/i.test(fragment)) return false;
     if (/\bsee note\b/i.test(fragment)) return false;
     if (/\bif frozen\b/i.test(fragment)) return false;

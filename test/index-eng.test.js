@@ -888,9 +888,37 @@ describe('recipe parser eng', () => {
       expect(result.unit).to.equal('gram');
       expect(result.ingredient).to.equal('yellow split peas');
       expect(result.alternatives).to.have.length(1);
-      expect(result.alternatives[0].quantity).to.equal(75);
-      expect(result.alternatives[0].unit).to.equal('gram');
+      expect(result.alternatives[0].quantity).to.equal(null);
+      expect(result.alternatives[0].unit).to.equal(null);
       expect(result.alternatives[0].ingredient).to.equal('toor dal');
+    });
+
+    it('keeps alt ingredient only when no numbers present', () => {
+      const res = parse('1/2 teaspoon black or white pepper', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('teaspoon');
+      expect(res.ingredient).to.equal('black');
+      expect(res.alternatives?.[0].ingredient).to.equal('white pepper');
+      expect(res.alternatives?.[0].quantity).to.equal(null);
+      expect(res.alternatives?.[0].unit).to.equal(null);
+      expect(res.alternatives?.[0].unitSystem).to.equal(null);
+    });
+
+    it('keeps alt quantity/unit when explicitly provided', () => {
+      const res = parse('1/2 teaspoon black or 1 tsp white pepper', 'eng', opts);
+      expect(res.alternatives?.[0].quantity).to.equal(1);
+      expect(res.alternatives?.[0].unit).to.equal('teaspoon');
+      expect(res.alternatives?.[0].ingredient).to.equal('white pepper');
+    });
+
+    it('captures parenthetical alt unit without inheriting primary unit', () => {
+      const res = parse('1/2 teaspoon (3g) black pepper', 'eng', opts);
+      expect(res.quantity).to.equal(0.5);
+      expect(res.unit).to.equal('teaspoon');
+      expect(res.ingredient).to.equal('black pepper');
+      expect(res.alternatives?.[0].quantity).to.equal(3);
+      expect(res.alternatives?.[0].unit).to.equal('gram');
+      expect(res.alternatives?.[0].ingredient).to.equal(null);
     });
 
     it('prefers unit-bearing second number and keeps alt ingredient', () => {
@@ -903,8 +931,8 @@ describe('recipe parser eng', () => {
       expect(result.unit).to.equal('ounce');
       expect(result.ingredient).to.equal('storebought pizza sauce');
       expect(result.alternatives).to.have.length(1);
-      expect(result.alternatives[0].quantity).to.equal(14);
-      expect(result.alternatives[0].unit).to.equal('ounce');
+      expect(result.alternatives[0].quantity).to.equal(null);
+      expect(result.alternatives[0].unit).to.equal(null);
       expect(result.alternatives[0].ingredient).to.equal('marinara sauce');
       expect(result.instructions).to.include('homemade');
     });
@@ -972,6 +1000,21 @@ describe('recipe parser eng', () => {
       expect(result.alternatives).to.have.length(1);
       expect(result.alternatives[0].quantity).to.equal(95);
       expect(result.alternatives[0].maxQty).to.equal(105);
+    });
+
+    it('does not leak alt units into primary ingredient', () => {
+      const res = parse(
+        '3 cup (750 ml) coconut water (Indonesian: air kelapa) (Note 1)',
+        'eng',
+        opts,
+      );
+      expect(res.quantity).to.equal(3);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('coconut water');
+      expect(res.additional || '').to.contain('Indonesian: air kelapa');
+      expect(res.additional || '').to.contain('Note 1');
+      expect(res.alternatives?.[0].unit).to.equal('milliliter');
+      expect(res.alternatives?.[0].ingredient).to.equal(null);
     });
 
     it('keeps mixed-number primary and ignores slash as fraction', () => {

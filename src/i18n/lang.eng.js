@@ -67,6 +67,7 @@ const units = {
   few: ['few'],
   knob: ['knob'],
   thumb: ['thumb'],
+  block: ['block'],
 };
 
 const pluralUnits = {
@@ -103,9 +104,10 @@ const pluralUnits = {
   inch: 'inches',
   pack: 'packs',
   centimetre: 'centimetres',
-  ear: ['ears'],
-  knob: ['knobs'],
-  thumb: ['thumbs'],
+  ear: 'ears',
+  knob: 'knobs',
+  thumb: 'thumbs',
+  block: 'blocks',
 };
 
 const symbolUnits = {
@@ -284,6 +286,8 @@ const instructions = [
   'unsweetened',
   'unseasoned',
   'unwaxed',
+  'firm',
+  'soft',
 ];
 const adverbs = [
   'finely',

@@ -727,17 +727,17 @@ export function parse(ingredientString, language, options = {}) {
       } else {
         const cleanedAlt = altIngredient.replace(/^\s*[-–—]\s*/, '').trim();
         const altEntry = {
-          quantity: convertToNumber(quantity, language),
-          unit: unit ? unit : null,
-          unitPlural: unitPlural ? unitPlural : null,
-          symbol: symbol ? symbol : null,
+          quantity: null,
+          unit: null,
+          unitPlural: null,
+          symbol: null,
           ingredient: cleanedAlt,
-          minQty: convertToNumber(minQty, language),
-          maxQty: convertToNumber(maxQty, language),
+          minQty: null,
+          maxQty: null,
           originalString: cleanedAlt,
         };
         if (includeUnitSystems) {
-          altEntry.unitSystem = getUnitSystem(altEntry.unit, language);
+          altEntry.unitSystem = null;
         }
         alternatives.push(altEntry);
       }
@@ -868,26 +868,51 @@ export function parse(ingredientString, language, options = {}) {
     result.additional = filtered.length ? filtered.join(', ') : null;
   }
   if (includeAlternatives && alternatives.length > 0) {
-    const primaryQty = result.quantity;
-    const primaryUnit = result.unit;
-    const primaryMin = result.minQty;
-    const primaryMax = result.maxQty;
-    alternatives.forEach(alt => {
-      if (!alt.unit && primaryUnit) {
-        alt.unit = primaryUnit;
-        alt.unitPlural = result.unitPlural;
-        alt.symbol = result.symbol;
+    const cleanedAlternatives = alternatives.map(alt => {
+      const hasQty = resultQuantityCaptured(alt.quantity);
+      const nextAlt = {...alt};
+
+      if (!hasQty) {
+        nextAlt.quantity = null;
+        nextAlt.minQty = null;
+        nextAlt.maxQty = null;
+        nextAlt.unit = null;
+        nextAlt.unitPlural = null;
+        nextAlt.symbol = null;
+        if (includeUnitSystems) nextAlt.unitSystem = null;
+      } else {
+        nextAlt.quantity = convertToNumber(nextAlt.quantity, language);
+        nextAlt.minQty = convertToNumber(nextAlt.minQty, language);
+        nextAlt.maxQty = convertToNumber(nextAlt.maxQty, language);
+        if (includeUnitSystems && !nextAlt.unitSystem) {
+          nextAlt.unitSystem = getUnitSystem(nextAlt.unit, language);
+        }
       }
-      if ((alt.quantity === 0 || alt.quantity === null) && primaryQty) {
-        alt.quantity = primaryQty;
-        alt.minQty = primaryMin;
-        alt.maxQty = primaryMax;
+
+      if (nextAlt.ingredient !== null && nextAlt.ingredient !== undefined) {
+        const trimmedIng = String(nextAlt.ingredient).trim();
+        nextAlt.ingredient = trimmedIng.length > 0 ? trimmedIng : null;
       }
-      if (includeUnitSystems && !alt.unitSystem) {
-        alt.unitSystem = getUnitSystem(alt.unit || primaryUnit, language);
+      if (
+        nextAlt.ingredient &&
+        result.ingredient &&
+        nextAlt.ingredient.toLowerCase() === result.ingredient.toLowerCase()
+      ) {
+        nextAlt.ingredient = null;
       }
+      const altIngLower = (nextAlt.ingredient || '').toLowerCase();
+      if (
+        altIngLower &&
+        (altIngLower === (nextAlt.unit || '').toLowerCase() ||
+          altIngLower === (nextAlt.unitPlural || '').toLowerCase() ||
+          altIngLower === (nextAlt.symbol || '').toLowerCase())
+      ) {
+        nextAlt.ingredient = null;
+      }
+
+      return nextAlt;
     });
-    result.alternatives = alternatives;
+    result.alternatives = cleanedAlternatives;
   }
   // Fallback alternative extraction when "or" was consumed during range parsing.
   if (
@@ -910,13 +935,13 @@ export function parse(ingredientString, language, options = {}) {
         ) {
           result.alternatives = [
             {
-              quantity: altParsed.quantity || result.quantity,
-              unit: altParsed.unit || result.unit,
-              unitPlural: altParsed.unitPlural || result.unitPlural,
-              symbol: altParsed.symbol || result.symbol,
+              quantity: altParsed.quantity ?? null,
+              unit: altParsed.unit ?? null,
+              unitPlural: altParsed.unitPlural ?? null,
+              symbol: altParsed.symbol ?? null,
               ingredient: altParsed.ingredient,
-              minQty: altParsed.minQty || result.minQty,
-              maxQty: altParsed.maxQty || result.maxQty,
+              minQty: altParsed.minQty ?? null,
+              maxQty: altParsed.maxQty ?? null,
               originalString: altPart,
               ...(includeUnitSystems && {
                 unitSystem: getUnitSystem(altParsed.unit, language),
@@ -1116,6 +1141,9 @@ export function parse(ingredientString, language, options = {}) {
 
   return result;
 }
+
+// Alias to avoid confusion with JSON.parse/HTML parsers.
+export const ingredientParse = parse;
 
 export const combine = combineIngredients;
 export {getSymbol} from './utils/parser-helpers';
