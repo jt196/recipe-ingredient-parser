@@ -64,6 +64,9 @@ export function parse(ingredientString, language, options = {}) {
   const toTasteAdditionalWords = langMap.toTasteAdditional || [];
   const instructionWords = langMap.instructions || [];
   const adverbWords = langMap.adverbs || [];
+  const additionalStopwords = (langMap.additionalStopwords || []).map(word =>
+    (word || '').trim().toLowerCase(),
+  );
   let forceUnitNull = false;
   // Working copies
   let originalString = ingredientString.trim();
@@ -856,6 +859,13 @@ export function parse(ingredientString, language, options = {}) {
       const finalAdditional = cleanedExtra.replace(/^[,\s]+|[,\s]+$/g, '').trim();
       result.additional = finalAdditional || null;
     }
+  }
+  if (result.additional && additionalStopwords.length > 0) {
+    const filtered = result.additional
+      .split(',')
+      .map(part => part.trim())
+      .filter(part => part && !additionalStopwords.includes(part.toLowerCase()));
+    result.additional = filtered.length ? filtered.join(', ') : null;
   }
   if (includeAlternatives && alternatives.length > 0) {
     const primaryQty = result.quantity;

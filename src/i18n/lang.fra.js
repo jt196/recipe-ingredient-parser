@@ -143,6 +143,7 @@ const toTasteAdditional = [
   'ou plus',
   'encore un peu',
 ];
+const additionalStopwords = [];
 const approx = [
   'env.',
   'environ',
@@ -331,6 +332,7 @@ export const langFra = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,

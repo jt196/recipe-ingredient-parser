@@ -157,6 +157,7 @@ const toTasteAdditional = [
   'or more',
   'plus more',
 ];
+const additionalStopwords = ['and', 'or'];
 const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
 const optional = ['optional', 'option.', 'if desired'];
 const toServe = [
@@ -291,6 +292,7 @@ const adverbs = [
   'freshly',
   'roughly',
   'firmly',
+  'lightly',
 ];
 const unitSystems = {
   gram: 'metric',
@@ -363,6 +365,7 @@ export const langEng = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,
@@ -372,5 +375,6 @@ export const langEng = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  additionalStopwords,
   isCommaDelimited: false,
 };

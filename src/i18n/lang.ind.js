@@ -129,6 +129,7 @@ const toTasteAdditional = [
   'atau lebih',
   'tambah lagi',
 ];
+const additionalStopwords = [];
 const approx = ['sekitar', 'kira-kira', 'kurang lebih', '±', '~'];
 const optional = ['opsional', 'jika diinginkan'];
 const toServe = [
@@ -309,6 +310,7 @@ export const langInd = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,

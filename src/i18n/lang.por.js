@@ -136,6 +136,7 @@ const toTasteAdditional = [
   'ou mais',
   'um pouco mais',
 ];
+const additionalStopwords = [];
 const approx = [
   'aprox',
   'aprox.',
@@ -325,6 +326,7 @@ export const langPor = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,

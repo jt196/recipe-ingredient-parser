@@ -126,6 +126,7 @@ const toTasteAdditional = [
   'или больше',
   'еще немного',
 ];
+const additionalStopwords = [];
 const approx = ['примерно', 'прибл', 'прибл.', 'приблизительно', 'около', '~'];
 const optional = ['по желанию', 'опционально', 'если нужно'];
 const toServe = ['для подачи', 'для украшения', 'украсить', 'украшать'];
@@ -297,6 +298,7 @@ export const langRus = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,

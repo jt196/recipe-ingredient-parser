@@ -165,6 +165,7 @@ const toTasteAdditional = [
   'o più',
   'ancora',
 ];
+const additionalStopwords = [];
 const approx = ['circa', 'circa.', 'cir.', 'approssimativamente', 'quasi', '~'];
 const optional = ['opzionale', 'facoltativo', 'se desiderato'];
 const toServe = [
@@ -377,6 +378,7 @@ export const langIta = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,

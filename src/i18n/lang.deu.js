@@ -118,6 +118,7 @@ const toTasteAdditional = [
   'oder mehr',
   'noch mehr',
 ];
+const additionalStopwords = [];
 const approx = ['ca', 'ca.', 'circa', 'ungefähr', 'etwa', '~'];
 const optional = ['optional', 'falls gewünscht', 'wenn gewünscht'];
 const instructions = [
@@ -308,5 +309,6 @@ export const langDeu = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  additionalStopwords,
   isCommaDelimited: true,
 };

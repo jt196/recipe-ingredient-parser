@@ -126,6 +126,7 @@ const toTasteAdditional = [
   'या अधिक',
   'थोड़ा और',
 ];
+const additionalStopwords = [];
 const approx = ['लगभग', 'करीब', 'तक़रीबन', 'आसपास', '~'];
 const optional = ['वैकल्पिक', 'ऑप्शनल', 'यदि चाहें'];
 const toServe = [
@@ -306,6 +307,7 @@ export const langHin = {
   joiners,
   toTaste,
   toTasteAdditional,
+  additionalStopwords,
   approx,
   optional,
   toServe,
