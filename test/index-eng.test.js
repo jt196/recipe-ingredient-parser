@@ -1289,6 +1289,15 @@ describe('recipe parser eng', () => {
       expect(res.instructions).to.include('lukewarm');
     });
 
+    it('omits instruction-only additional fragments', () => {
+      const res = parse('3/4 cup water, lukewarm', 'eng', opts);
+      expect(res.quantity).to.equal(0.75);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('water');
+      expect(res.instructions).to.include('lukewarm');
+      expect(res.additional).to.equal(null);
+    });
+
     it('parses garlic cloves with or instructions', () => {
       const res = parse(
         '6 large cloves of garlic, diced or grated',

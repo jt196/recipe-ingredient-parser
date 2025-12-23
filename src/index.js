@@ -469,6 +469,27 @@ export function parse(ingredientString, language, options = {}) {
     );
   }
 
+  // Strip instruction words that remain in additional parts to avoid leftovers like "luke" from "lukewarm".
+  if (Array.isArray(instructionsFound) && instructionsFound.length) {
+    const escape = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const instrRegex = new RegExp(`\\b(?:${instructionsFound.map(escape).join('|')})\\b`, 'gi');
+    additionalParts = additionalParts
+      .map(part =>
+        typeof part === 'string'
+          ? part
+              // Remove the whole instruction tokens.
+              .replace(instrRegex, ' ')
+              // Remove partial truncations like "luke" from "lukewarm".
+              .replace(/\bluke\b/gi, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+          : part,
+      )
+      .filter(part =>
+        part && (typeof part !== 'string' || (part || '').trim().length > 0),
+      );
+  }
+
   if (
     Array.isArray(instructionsFound) &&
     instructionsFound.includes('salted') &&
