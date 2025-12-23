@@ -276,8 +276,6 @@ const unitSystems = {
   taza: 'americanVolumetric',
   cuarto: 'americanVolumetric',
   pinta: 'americanVolumetric',
-  cucharada: 'americanVolumetric',
-  cucharadita: 'americanVolumetric',
 };
 
 const numbersSmall = {

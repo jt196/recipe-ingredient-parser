@@ -225,8 +225,6 @@ const unitSystems = {
   بنت: 'imperial',
   فنجان: 'americanVolumetric',
   ربع: 'americanVolumetric',
-  ملعقة_طعام: 'americanVolumetric',
-  ملعقة_شاي: 'americanVolumetric',
 };
 
 const numbersSmall = {

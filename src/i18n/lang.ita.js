@@ -304,8 +304,6 @@ const unitSystems = {
   tazza: 'americanVolumetric',
   quarto: 'americanVolumetric',
   pinta: 'americanVolumetric',
-  cucchiaio: 'americanVolumetric',
-  cucchiaino: 'americanVolumetric',
 };
 
 export const numbersSmall = {

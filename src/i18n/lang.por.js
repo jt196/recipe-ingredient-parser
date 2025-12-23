@@ -268,8 +268,6 @@ const unitSystems = {
   xícara: 'americanVolumetric',
   quarto: 'americanVolumetric',
   pinta: 'americanVolumetric',
-  'colher de sopa': 'americanVolumetric',
-  'colher de chá': 'americanVolumetric',
 };
 
 const numbersSmall = {

@@ -255,8 +255,6 @@ const unitSystems = {
   pinta: 'imperial',
   cangkir: 'americanVolumetric',
   kuart: 'americanVolumetric',
-  'sendok makan': 'americanVolumetric',
-  'sendok teh': 'americanVolumetric',
 };
 
 const numbersSmall = {

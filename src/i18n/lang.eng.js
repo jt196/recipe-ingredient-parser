@@ -311,8 +311,6 @@ const unitSystems = {
   cup: 'americanVolumetric',
   quart: 'americanVolumetric',
   pint: 'americanVolumetric',
-  tablespoon: 'americanVolumetric',
-  teaspoon: 'americanVolumetric',
 };
 
 const numbersSmall = {

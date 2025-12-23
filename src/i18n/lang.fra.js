@@ -275,8 +275,6 @@ const unitSystems = {
   pinte: 'imperial',
   tasse: 'americanVolumetric',
   quart: 'americanVolumetric',
-  'cuillère à soupe': 'americanVolumetric',
-  'cuillère à café': 'americanVolumetric',
 };
 
 const numbersSmall = {
