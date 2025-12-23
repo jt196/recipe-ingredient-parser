@@ -18,26 +18,24 @@ describe('recipe parser eng', () => {
   });
 
   describe('translates the quantity', () => {
-    it('of "to taste of water"', () => {
-      expect(parse('to taste of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "To taste of water"', () => {
-      expect(parse('To taste of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "t.t. of water"', () => {
-      expect(parse('t.t. of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "t.t. of water"', () => {
-      expect(parse('t.t. of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "TT of water"', () => {
-      expect(parse('TT of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "TT. of water"', () => {
-      expect(parse('TT. of water', 'eng').unit).to.equal('t.t.');
-    });
-    it('of "T.t of water"', () => {
-      expect(parse('T.t of water', 'eng').unit).to.equal('t.t.');
+    it('flags "to taste" variants and strips them from ingredient', () => {
+      const variants = [
+        'to taste of salt',
+        'To taste of salt',
+        't.t. of salt',
+        'TT of salt',
+        'TT. of salt',
+        'T.t of salt',
+        'salt, to taste',
+        'salt to taste',
+      ];
+      variants.forEach(v => {
+        const res = parse(v, 'eng');
+        expect(res.toTaste).to.equal(true);
+        expect(res.unit).to.equal(null);
+        expect(res.quantity).to.equal(0);
+        expect(res.ingredient).to.equal('salt');
+      });
     });
     it('of "1 teaspoon water"', () => {
       expect(parse('1 teaspoon water', 'eng').quantity).to.equal(1);
@@ -87,9 +85,11 @@ describe('recipe parser eng', () => {
     });
 
     describe('to taste detector', () => {
-      it('does not detect words containing the same characters', () => {
-        expect(parse('100g of butter', 'eng').unit).to.equal('gram');
-        expect(parse('100g of butter', 'eng').ingredient).to.equal('butter');
+      it('does not set toTaste for normal ingredients', () => {
+        const res = parse('100g of butter', 'eng');
+        expect(res.unit).to.equal('gram');
+        expect(res.ingredient).to.equal('butter');
+        expect(res.toTaste).to.equal(undefined);
       });
     });
 
@@ -241,21 +241,13 @@ describe('recipe parser eng', () => {
     });
 
     describe('translates teaspoons correctly', () => {
-      const teaspoon = {
-        ingredient: 'salt',
-        maxQty: 1,
-        minQty: 1,
-        quantity: 1,
-        additional: 'more to taste',
-        originalString: '1 teaspoon salt, more to taste',
-        symbol: 'tsp',
-        unit: 'teaspoon',
-        unitPlural: 'teaspoons',
-      };
       it('of "1 teaspoon salt, more to taste"', () => {
-        expect(parse('1 teaspoon salt, more to taste', 'eng')).to.deep.equal(
-          teaspoon,
-        );
+        const res = parse('1 teaspoon salt, more to taste', 'eng');
+        expect(res.quantity).to.equal(1);
+        expect(res.unit).to.equal('teaspoon');
+        expect(res.ingredient).to.equal('salt');
+        expect(res.toTaste).to.equal(true);
+        expect(res.additional).to.equal(null);
       });
     });
 
@@ -445,9 +437,7 @@ describe('recipe parser eng', () => {
       expect(parse('1 milliliter water', 'eng').unit).to.equal('milliliter');
     });
     it('of "500 millilitres water"', () => {
-      expect(parse('500 millilitres water', 'eng').unit).to.equal(
-        'milliliter',
-      );
+      expect(parse('500 millilitres water', 'eng').unit).to.equal('milliliter');
     });
     it('of "1 large onion"', () => {
       const result = parse('1 large onion', 'eng');
@@ -775,7 +765,10 @@ describe('recipe parser eng', () => {
     });
 
     it('captures multiple instructions and keeps other flags', () => {
-      const result = parse('about 1 cup ripe tomatoes, peeled and diced', 'eng');
+      const result = parse(
+        'about 1 cup ripe tomatoes, peeled and diced',
+        'eng',
+      );
       expect(result.approx).to.equal(true);
       expect(result.ingredient).to.equal('tomatoes');
       expect(result.instructions).to.deep.equal(['ripe', 'peeled', 'diced']);
@@ -800,11 +793,7 @@ describe('recipe parser eng', () => {
     const opts = {includeAlternatives: true, includeUnitSystems: true};
 
     it('captures bracketed alternative unit with system tagging', () => {
-      const result = parse(
-        '450g (1 lb) of tinned tomatoes',
-        'eng',
-        opts,
-      );
+      const result = parse('450g (1 lb) of tinned tomatoes', 'eng', opts);
       expect(result.unit).to.equal('gram');
       expect(result.unitSystem).to.equal('metric');
       expect(result.ingredient).to.equal('tinned tomatoes');
@@ -928,12 +917,18 @@ describe('recipe parser eng', () => {
       );
       expect(result.quantity).to.equal(0.5);
       expect(result.unit).to.equal('pack');
-      expect(result.ingredient).to.equal('3.5-ounce prepared achiote seasoning');
+      expect(result.ingredient).to.equal(
+        '3.5-ounce prepared achiote seasoning',
+      );
       expect(result.additional).to.equal(null);
     });
 
     it('promotes leftover text to ingredient after instruction stripping', () => {
-      const res = parse('120 grams chopped, roasted nuts (optional)', 'eng', opts);
+      const res = parse(
+        '120 grams chopped, roasted nuts (optional)',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(120);
       expect(res.unit).to.equal('gram');
       expect(res.ingredient).to.equal('nuts');
@@ -966,7 +961,11 @@ describe('recipe parser eng', () => {
     });
 
     it('keeps primary fraction and adds alt from parentheses', () => {
-      const result = parse('1/3 cup warm water (95 to 105 degrees F)', 'eng', opts);
+      const result = parse(
+        '1/3 cup warm water (95 to 105 degrees F)',
+        'eng',
+        opts,
+      );
       expect(result.quantity).to.equal(0.333);
       expect(result.unit).to.equal('cup');
       expect(result.ingredient).to.equal('water');
@@ -1066,7 +1065,11 @@ describe('recipe parser eng', () => {
     const opts = {includeAlternatives: true, includeUnitSystems: true};
 
     it('parses sized ginger piece with instructions', () => {
-      const res = parse('1 2½-inch piece ginger, peeled, finely grated', 'eng', opts);
+      const res = parse(
+        '1 2½-inch piece ginger, peeled, finely grated',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(1);
       expect(res.unit).to.equal('piece');
       expect(res.ingredient).to.equal('ginger');
@@ -1078,11 +1081,16 @@ describe('recipe parser eng', () => {
       const res = parse('fish sauce optional, to taste', 'eng', opts);
       expect(res.optional).to.equal(true);
       expect(res.ingredient).to.equal('fish sauce');
-      expect(res.additional).to.contain('to taste');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional).to.equal(null);
     });
 
     it('keeps brussels sprouts instructions', () => {
-      const res = parse('1 pound Brussels sprouts trimmed and halved', 'eng', opts);
+      const res = parse(
+        '1 pound Brussels sprouts trimmed and halved',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(1);
       expect(res.unit).to.equal('pound');
       expect(res.ingredient).to.equal('Brussels sprouts');
@@ -1090,7 +1098,11 @@ describe('recipe parser eng', () => {
     });
 
     it('stones cherries and keeps stalk note', () => {
-      const res = parse('450 g cherries - stalks removed and stoned', 'eng', opts);
+      const res = parse(
+        '450 g cherries - stalks removed and stoned',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(450);
       expect(res.unit).to.equal('gram');
       expect(res.ingredient).to.equal('cherries');
@@ -1109,7 +1121,8 @@ describe('recipe parser eng', () => {
       expect(res.unit).to.equal('cup');
       expect(res.ingredient).to.equal('Chili powder');
       expect(res.additional).to.contain('Gebhardt');
-      expect(res.additional).to.contain('to taste');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional || '').to.not.contain('to taste');
     });
 
     it('handles garnish sticks without quantity', () => {
@@ -1133,7 +1146,11 @@ describe('recipe parser eng', () => {
     });
 
     it('handles ml with generous cup note', () => {
-      const res = parse('60ml cup (generous) superfine granulated sugar', 'eng', opts);
+      const res = parse(
+        '60ml cup (generous) superfine granulated sugar',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(60);
       expect(res.unit).to.equal('milliliter');
       expect(res.ingredient).to.equal('superfine granulated sugar');
@@ -1177,7 +1194,8 @@ describe('recipe parser eng', () => {
       const res = parse('1 tbs pepper adjust to taste', 'eng', opts);
       expect(res.unit).to.equal('tablespoon');
       expect(res.ingredient).to.equal('pepper');
-      expect(res.additional).to.contain('to taste');
+      expect(res.toTaste).to.equal(true);
+      expect(res.additional).to.equal(null);
     });
 
     it('cleans healthy pinch each', () => {
@@ -1203,7 +1221,11 @@ describe('recipe parser eng', () => {
     });
 
     it('parses garlic cloves with or instructions', () => {
-      const res = parse('6 large cloves of garlic, diced or grated', 'eng', opts);
+      const res = parse(
+        '6 large cloves of garlic, diced or grated',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(6);
       expect(res.unit).to.equal('clove');
       expect(res.ingredient).to.equal('garlic');
@@ -1236,7 +1258,11 @@ describe('recipe parser eng', () => {
     });
 
     it('parses another sized ginger piece with instructions', () => {
-      const res = parse('One 1-inch piece ginger, peeled and thinly sliced', 'eng', opts);
+      const res = parse(
+        'One 1-inch piece ginger, peeled and thinly sliced',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(1);
       expect(res.unit).to.equal('piece');
       expect(res.ingredient).to.equal('ginger');
@@ -1262,7 +1288,11 @@ describe('recipe parser eng', () => {
     });
 
     it('keeps peppercorn instructions', () => {
-      const res = parse('2 tsp freshly ground or whole black peppercorns', 'eng', opts);
+      const res = parse(
+        '2 tsp freshly ground or whole black peppercorns',
+        'eng',
+        opts,
+      );
       expect(res.unit).to.equal('teaspoon');
       expect(res.ingredient).to.equal('black peppercorns');
       expect(res.instructions).to.include.members(['freshly ground', 'whole']);
@@ -1277,7 +1307,11 @@ describe('recipe parser eng', () => {
     });
 
     it('parses scant tablespoon scallion', () => {
-      const res = parse('1 scant tablespoon thinly sliced scallion (green and white)', 'eng', opts);
+      const res = parse(
+        '1 scant tablespoon thinly sliced scallion (green and white)',
+        'eng',
+        opts,
+      );
       expect(res.unit).to.equal('tablespoon');
       expect(res.ingredient).to.equal('scallion');
       expect(res.instructions).to.include('thinly sliced');
@@ -1312,7 +1346,11 @@ describe('recipe parser eng', () => {
     });
 
     it('keeps spicy bean paste intact', () => {
-      const res = parse('2 tablespoons spicy bean paste douban jiang', 'eng', opts);
+      const res = parse(
+        '2 tablespoons spicy bean paste douban jiang',
+        'eng',
+        opts,
+      );
       expect(res.unit).to.equal('tablespoon');
       expect(res.ingredient).to.equal('spicy bean paste douban jiang');
     });
@@ -1325,7 +1363,11 @@ describe('recipe parser eng', () => {
     });
 
     it('parses dairy alternatives as alternatives', () => {
-      const res = parse('1/2 cup yogurt / vegan yogurt / coconut milk', 'eng', opts);
+      const res = parse(
+        '1/2 cup yogurt / vegan yogurt / coconut milk',
+        'eng',
+        opts,
+      );
       expect(res.quantity).to.equal(0.5);
       expect(res.unit).to.equal('cup');
       expect(res.ingredient).to.equal('yogurt');

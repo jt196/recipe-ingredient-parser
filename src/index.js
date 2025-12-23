@@ -60,6 +60,8 @@ export function parse(ingredientString, language, options = {}) {
   const approxWords = langMap.approx || [];
   const optionalWords = langMap.optional || [];
   const toServeWords = langMap.toServe || [];
+  const toTasteWords = langMap.toTaste || [];
+  const toTasteAdditionalWords = langMap.toTasteAdditional || [];
   const instructionWords = langMap.instructions || [];
   const adverbWords = langMap.adverbs || [];
   let forceUnitNull = false;
@@ -130,10 +132,19 @@ export function parse(ingredientString, language, options = {}) {
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
   let approx = false;
-  const {approxRegex, optionalRegex, toServeRegex} = buildFlagRegexes({
+  let toTaste = false;
+  const {
+    approxRegex,
+    optionalRegex,
+    toServeRegex,
+    toTasteRegex,
+    toTasteAdditionalRegex,
+  } = buildFlagRegexes({
     approxWords,
     optionalWords,
     toServeWords,
+    toTasteWords,
+    toTasteAdditionalWords,
   });
 
   if (approxRegex) {
@@ -172,6 +183,15 @@ export function parse(ingredientString, language, options = {}) {
     ingredientLine = safeReplace(ingredientLine, toServeRegex).trim();
   }
 
+  if (safeTest(toTasteRegex, originalString)) {
+    toTaste = true;
+  }
+  if (safeTest(toTasteRegex, ingredientLine)) {
+    toTaste = true;
+    ingredientLine = safeReplace(ingredientLine, toTasteRegex).trim();
+  }
+  ingredientLine = ingredientLine.replace(/\badjust\s+to\s+taste\b/gi, '').trim();
+
   const {multiplier, line: lineWithoutMultiplier} = extractMultiplier(
     ingredientLine,
     language,
@@ -209,6 +229,17 @@ export function parse(ingredientString, language, options = {}) {
   if (safeTest(toServeRegex, restOfIngredient)) {
     toServe = true;
     restOfIngredient = safeReplace(restOfIngredient, toServeRegex).trim();
+  }
+  if (safeTest(toTasteRegex, restOfIngredient)) {
+    toTaste = true;
+    restOfIngredient = safeReplace(restOfIngredient, toTasteRegex).trim();
+  }
+  restOfIngredient = restOfIngredient
+    .replace(/\badjust\s+to\s+taste\b/gi, '')
+    .trim();
+
+  if (toTaste && !resultQuantityCaptured(quantity)) {
+    forceUnitNull = true;
   }
 
   // Detect primary/alternative units expressed with a slash (e.g., "cup/150 grams sugar").
@@ -452,16 +483,6 @@ export function parse(ingredientString, language, options = {}) {
     // Strip lingering optional markers.
     ingredient = safeReplace(ingredient, optionalRegex).trim();
 
-    // Move "to taste"/"adjust to taste" into additional parts.
-    if (/\badjust to taste\b/i.test(ingredient)) {
-      additionalParts.push('to taste');
-      ingredient = ingredient.replace(/\badjust to taste\b/gi, '').trim();
-    }
-    if (/\bto taste\b/i.test(ingredient)) {
-      additionalParts.push('to taste');
-      ingredient = ingredient.replace(/\bto taste\b/gi, '').trim();
-    }
-
     // Fix missing spaces after common size adjectives that get glued when units are stripped.
     const spacerWords = ['small', 'large', 'medium', 'healthy', 'scant'];
     spacerWords.forEach(word => {
@@ -549,6 +570,21 @@ export function parse(ingredientString, language, options = {}) {
 
     // Clean residual lukewarm truncations.
     ingredient = ingredient.replace(/\bluke\b/gi, '').trim();
+
+    if (toTaste) {
+      ingredient = ingredient.replace(/\badjust\b/gi, '').trim();
+      additionalParts = additionalParts
+        .map(part =>
+          typeof part === 'string'
+            ? part.replace(/\badjust\b/gi, '').trim()
+            : part,
+        )
+        .filter(
+          part =>
+            part &&
+            (typeof part !== 'string' || (part || '').trim().length > 0),
+        );
+    }
 
     // Strip leading numeric tokens if quantity already captured.
     if (resultQuantityCaptured(quantity) && /^[\d.]/.test(ingredient)) {
@@ -791,6 +827,14 @@ export function parse(ingredientString, language, options = {}) {
   if (approx) {
     result.approx = true;
   }
+  if (toTaste && forceUnitNull) {
+    result.unit = null;
+    result.unitPlural = null;
+    result.symbol = null;
+    if (includeUnitSystems) {
+      result.unitSystem = null;
+    }
+  }
   if (optional) {
     result.optional = true;
     if (result.additional && optionalRegex) {
@@ -808,6 +852,19 @@ export function parse(ingredientString, language, options = {}) {
         .replace(/^[,\s]+|[,\s]+$/g, '')
         .trim();
       result.additional = cleanedAdditional || null;
+    }
+  }
+  if (toTaste) {
+    result.toTaste = true;
+    if (result.additional) {
+      const cleanedAdditional = safeReplace(result.additional, toTasteRegex)
+        .replace(/^[,\s]+|[,\s]+$/g, '')
+        .trim();
+      const cleanedExtra = toTasteAdditionalRegex
+        ? safeReplace(cleanedAdditional, toTasteAdditionalRegex)
+        : cleanedAdditional;
+      const finalAdditional = cleanedExtra.replace(/^[,\s]+|[,\s]+$/g, '').trim();
+      result.additional = finalAdditional || null;
     }
   }
   if (includeAlternatives && alternatives.length > 0) {

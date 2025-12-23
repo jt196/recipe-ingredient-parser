@@ -6,6 +6,8 @@ export function buildFlagRegexes({
   approxWords = [],
   optionalWords = [],
   toServeWords = [],
+  toTasteWords = [],
+  toTasteAdditionalWords = [],
 }) {
   const approxRegex =
     approxWords.length > 0
@@ -37,7 +39,41 @@ export function buildFlagRegexes({
         )
       : null;
 
-  return {approxRegex, optionalRegex, toServeRegex};
+  const toTasteRegex =
+    toTasteWords.length > 0
+      ? (() => {
+          const escapedWords = toTasteWords.map(w =>
+            w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'),
+          );
+          const abbrevParts = toTasteWords
+            .map(w => (w.match(/\b(\w)/g) || []).join(''))
+            .filter(Boolean)
+            .map(letters => `${letters.split('').join('\\.?')}\\.?`);
+          const parts = [...escapedWords, ...abbrevParts];
+          const body = parts.length ? `(?:${parts.join('|')})` : '';
+          return body
+            ? new RegExp(`\\b(?:adjust\\s+to\\s+)?${body}\\b`, 'gi')
+            : null;
+        })()
+      : null;
+
+  const toTasteAdditionalRegex =
+    toTasteAdditionalWords.length > 0
+      ? new RegExp(
+          `\\b(${toTasteAdditionalWords
+            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
+            .join('|')})\\b`,
+          'gi',
+        )
+      : null;
+
+  return {
+    approxRegex,
+    optionalRegex,
+    toServeRegex,
+    toTasteRegex,
+    toTasteAdditionalRegex,
+  };
 }
 
 /**

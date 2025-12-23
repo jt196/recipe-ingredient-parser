@@ -1,39 +1,6 @@
 import * as convert from './convert';
 import {i18nMap} from '../i18n';
 
-export function toTasteRecognize(input, language) {
-  if (typeof input !== 'string') return ['', '', false];
-  const langMap = i18nMap[language];
-  if (!langMap || !langMap.toTaste) return ['', '', false];
-  const {toTaste} = langMap;
-
-  for (const toTasteItem of toTaste) {
-    const firstLetter = toTasteItem.match(/\b(\w)/g);
-
-    if (firstLetter) {
-      let regEx = new RegExp(toTasteItem, 'gi');
-      if (input.match(regEx)) {
-        return [
-          (firstLetter.join('.') + '.').toLocaleLowerCase(),
-          convert.getFirstMatch(input, regEx),
-          true,
-        ];
-      }
-      const regExString = firstLetter.join('[.]?') + '[.]?';
-      regEx = new RegExp('(\\b' + regExString + '\\b)', 'gi');
-      if (input.match(regEx)) {
-        return [
-          (firstLetter.join('.') + '.').toLocaleLowerCase(),
-          convert.getFirstMatch(input, regEx),
-          false,
-        ];
-      }
-    }
-  }
-
-  return ['', '', false];
-}
-
 function getEarliestMatch(allMatches, input) {
   let bestMatch = null;
   for (const match of allMatches) {
@@ -55,7 +22,6 @@ export function getUnit(input, language) {
   const langMap = i18nMap[language];
   if (!langMap) return [];
   const {units, pluralUnits, symbolUnits, problematicUnits} = langMap;
-  const [toTaste, toTasteMatch] = toTasteRecognize(input, language);
 
   let allMatches = [];
 
@@ -63,10 +29,6 @@ export function getUnit(input, language) {
     const symbol = symbolUnits[unit];
     allMatches.push([unit, pluralUnit, symbol, match]);
   };
-
-  if (toTaste) {
-    addMatch(toTaste, toTaste, toTasteMatch);
-  }
 
   for (const unit of Object.keys(units)) {
     for (const shorthand of units[unit]) {

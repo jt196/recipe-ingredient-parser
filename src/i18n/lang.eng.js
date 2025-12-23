@@ -147,7 +147,9 @@ const prepositions = ['of'];
 
 const joiners = ['to', 'or'];
 
-const toTaste = ['to taste'];
+const toTaste = ['to taste', 't.t.', 't.t', 'tt'];
+// Terms that may trail to-taste and should be stripped from additional.
+const toTasteAdditional = ['more', 'adjust'];
 const approx = ['about', 'approx', 'approx.', 'approximately', 'roughly', '~'];
 const optional = ['optional', 'option.', 'if desired'];
 const toServe = [
@@ -353,6 +355,7 @@ export const langEng = {
   prepositions,
   joiners,
   toTaste,
+  toTasteAdditional,
   approx,
   optional,
   toServe,
