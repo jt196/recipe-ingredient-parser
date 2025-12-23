@@ -15,6 +15,8 @@ import {
   resolveRangeQuantities,
 } from './utils/quantity';
 import {combine as combineIngredients} from './utils/combine';
+import {processAlternatives} from './utils/alternatives';
+import {buildFlagRegexes, safeReplace, safeTest} from './utils/flags';
 
 /**
  * Parses a ingredient string to extract ingredient details.
@@ -61,10 +63,9 @@ export function parse(ingredientString, language, options = {}) {
   const instructionWords = langMap.instructions || [];
   const adverbWords = langMap.adverbs || [];
   let forceUnitNull = false;
-
-  // Initialize variables
-  let originalString = ingredientString.trim(); // Save the original string
-  let ingredientLine = originalString; // Initialize working copy
+  // Working copies
+  let originalString = ingredientString.trim();
+  let ingredientLine = originalString;
 
   const hadOptionalLabel = /^optional:/i.test(ingredientLine);
   // Normalize leading "Optional:" label that sometimes precedes the line.
@@ -96,6 +97,7 @@ export function parse(ingredientString, language, options = {}) {
     }
   }
 
+  // 1) Remove parenthetical segments (stored in additional parts)
   const {cleaned, segments} = extractParentheticalSegments(ingredientLine);
   if (segments.length) additionalParts.push(...segments);
   ingredientLine = cleaned;
@@ -108,167 +110,31 @@ export function parse(ingredientString, language, options = {}) {
   }
   ingredientLine = ingredientLine.replace(commaAdditionalRegex, '').trim();
 
-  const alternatives = [];
-  const tryAddAlternative = fragment => {
-    if (!includeAlternatives || !fragment || !fragment.trim()) return false;
-    if (!/\d/.test(fragment)) return false;
-    if (/\bpage\s+\d+/i.test(fragment)) return false;
-    if (/\bsee note\b/i.test(fragment)) return false;
-    if (/\bif frozen\b/i.test(fragment)) return false;
-    if (/\bcut\b/i.test(fragment) || /\bchunk/i.test(fragment)) return false;
-    if (
-      Array.isArray(instructionWords) &&
-      instructionWords.some(word => {
-        const escaped = word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-        return new RegExp(`^\\s*${escaped}\\b`, 'i').test(fragment);
-      })
-    ) {
-      return false;
-    }
-    const alt = parse(fragment, language, {
-      includeUnitSystems,
-      includeAlternatives: false,
-    });
-    const meaningful =
-      alt &&
-      (alt.unit ||
-        alt.quantity ||
-        (alt.ingredient && alt.ingredient.trim() !== ''));
-    if (meaningful) {
-      const altEntry = {
-        quantity: alt.quantity,
-        unit: alt.unit,
-        unitPlural: alt.unitPlural,
-        symbol: alt.symbol,
-        ingredient: alt.ingredient,
-        additional: alt.additional,
-        instructions: alt.instructions,
-        minQty: alt.minQty,
-        maxQty: alt.maxQty,
-        originalString: alt.originalString,
-      };
-      if (includeUnitSystems) {
-        altEntry.unitSystem = getUnitSystem(alt.unit, language);
-      }
-      alternatives.push(altEntry);
-      return altEntry;
-    }
-    return false;
-  };
-
-  if (includeAlternatives && additionalParts.length) {
-    const kept = [];
-    additionalParts.forEach(part => {
-      if (!tryAddAlternative(part)) {
-        kept.push(part);
-      }
-    });
-    additionalParts.length = 0;
-    additionalParts.push(...kept);
-  }
-
-  // Detect alternative separated by slash (units on both sides or spaced slash)
-  if (includeAlternatives && originalString.includes('/')) {
-    const slashParts = originalString.split('/');
-    if (slashParts.length >= 2) {
-      const lastPart = slashParts[slashParts.length - 1];
-      const firstPart = slashParts[0];
-      const hasUnitish = part => /\d[^\s]*[A-Za-z]/.test(part);
-      const spacedSlash = /\s\/\s/.test(originalString);
-      if (spacedSlash || (hasUnitish(firstPart) && hasUnitish(lastPart))) {
-        if (/\d/.test(lastPart)) {
-          const altEntry = tryAddAlternative(lastPart);
-          if (altEntry) {
-            alternatives.push(altEntry);
-            const primarySegment = ingredientLine.split('/')[0].trim();
-            ingredientLine = `${primarySegment} ${
-              altEntry.ingredient || ''
-            }`.trim();
-          }
-        }
-      }
-    }
-  }
-  // Fallback: if slash-present alt was filtered out, at least keep the primary side.
-  if (
-    includeAlternatives &&
-    originalString.includes('/') &&
-    alternatives.length === 0
-  ) {
-    const slashParts = originalString.split('/');
-    if (slashParts.length >= 2) {
-      const lastPart = slashParts[slashParts.length - 1];
-      const firstPart = slashParts[0];
-      const hasUnitish = part => /\d[^\s]*[A-Za-z]/.test(part);
-      const spacedSlash = /\s\/\s/.test(originalString);
-      if (spacedSlash || (hasUnitish(firstPart) && hasUnitish(lastPart))) {
-        const primarySegment = ingredientLine.split('/')[0].trim();
-        const altEntry = tryAddAlternative(lastPart.trim());
-        if (altEntry && primarySegment) {
-          alternatives.push(altEntry);
-          ingredientLine = `${primarySegment} ${
-            altEntry.ingredient || ''
-          }`.trim();
-          if (altEntry.additional) {
-            additionalParts.push(altEntry.additional);
-          }
-          if (
-            Array.isArray(altEntry.instructions) &&
-            altEntry.instructions.length
-          ) {
-            additionalParts.push(...altEntry.instructions);
-          }
-        } else if (primarySegment) {
-          ingredientLine = primarySegment;
-        }
-      }
-    }
-  }
+  const {
+    ingredientLine: altIngredientLine,
+    additionalParts: altAdditionalParts,
+    alternatives,
+  } = processAlternatives({
+    ingredientLine,
+    additionalParts,
+    includeAlternatives,
+    instructionWords,
+    language,
+    includeUnitSystems,
+    parseFn: parse,
+    originalString,
+  });
+  ingredientLine = altIngredientLine;
+  additionalParts = altAdditionalParts;
 
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
   let approx = false;
-  const approxRegex =
-    approxWords.length > 0
-      ? new RegExp(
-          `^(${approxWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'i',
-        )
-      : null;
-
-  const optionalRegex =
-    optionalWords.length > 0
-      ? new RegExp(
-          `(?:^|[\\s,(])\\s*(${optionalWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'gi',
-        )
-      : null;
-
-  const toServeRegex =
-    toServeWords.length > 0
-      ? new RegExp(
-          `\\b(${toServeWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'gi',
-        )
-      : null;
-
-  const safeTest = (regex, text) => {
-    if (!regex || typeof text !== 'string') return false;
-    regex.lastIndex = 0;
-    return regex.test(text);
-  };
-
-  const safeReplace = (text, regex) => {
-    if (!regex || typeof text !== 'string') return text;
-    regex.lastIndex = 0;
-    return text.replace(regex, '');
-  };
+  const {approxRegex, optionalRegex, toServeRegex} = buildFlagRegexes({
+    approxWords,
+    optionalWords,
+    toServeWords,
+  });
 
   if (approxRegex) {
     const matchApprox = ingredientLine.match(approxRegex);
@@ -849,7 +715,7 @@ export function parse(ingredientString, language, options = {}) {
     }
   }
 
-  // if quantity is non-nil and is a range, for ex: "1-2", we want to get minQty and maxQty
+  // 7) if quantity is non-nil and is a range, for ex: "1-2", we want to get minQty and maxQty
   if (quantity && (quantity.includes('-') || quantity.includes('–'))) {
     [minQty, maxQty] = quantity.split(/-|–/);
     quantity = minQty;
@@ -959,6 +825,9 @@ export function parse(ingredientString, language, options = {}) {
         alt.quantity = primaryQty;
         alt.minQty = primaryMin;
         alt.maxQty = primaryMax;
+      }
+      if (includeUnitSystems && !alt.unitSystem) {
+        alt.unitSystem = getUnitSystem(alt.unit || primaryUnit, language);
       }
     });
     result.alternatives = alternatives;
