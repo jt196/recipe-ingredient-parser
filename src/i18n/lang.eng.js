@@ -167,6 +167,8 @@ const toServe = [
   'for serving',
   'for garnish',
   'to garnish',
+  'garnish',
+  'garnish with',
   'to decorate',
 ];
 const instructions = [
