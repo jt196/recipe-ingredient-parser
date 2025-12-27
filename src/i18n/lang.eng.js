@@ -288,6 +288,7 @@ const instructions = [
   'unwaxed',
   'firm',
   'soft',
+  'uncooked',
 ];
 const adverbs = [
   'finely',
