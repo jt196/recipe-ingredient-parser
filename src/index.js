@@ -68,10 +68,19 @@ export function parse(ingredientString, language, options = {}) {
     (word || '').trim().toLowerCase(),
   );
   let forceUnitNull = false;
-  // Working copies
+
+  // ==========================================================================
+  // SECTION 1: INITIALIZATION
+  // ==========================================================================
+  // Working copies of the input string that will be progressively transformed
   let originalString = ingredientString.trim();
   let ingredientLine = originalString;
 
+  // ==========================================================================
+  // SECTION 2: TEXT NORMALIZATION - Remove markers, extract parentheticals
+  // ==========================================================================
+  // Remove leading optional markers, list markers, written numbers with cans,
+  // parenthetical segments, comma-separated extras, and process alternatives
   const hadOptionalLabel = /^optional:/i.test(ingredientLine);
   // Normalize leading "Optional:" label that sometimes precedes the line.
   ingredientLine = ingredientLine.replace(/^optional:\s*/i, '').trim();
@@ -132,6 +141,11 @@ export function parse(ingredientString, language, options = {}) {
   ingredientLine = altIngredientLine;
   additionalParts = altAdditionalParts;
 
+  // ==========================================================================
+  // SECTION 3: FLAG DETECTION & QUANTITY EXTRACTION
+  // ==========================================================================
+  // Detect flags (approx, optional, to serve, to taste) and extract quantity
+  // and multiplier from the ingredient line
   /* restOfIngredient represents rest of ingredient line.
   For example: "1 pinch salt" --> quantity: 1, restOfIngredient: pinch salt */
   let approx = false;
@@ -241,6 +255,11 @@ export function parse(ingredientString, language, options = {}) {
     forceUnitNull = true;
   }
 
+  // ==========================================================================
+  // SECTION 4: UNIT DETECTION & SIZE DESCRIPTORS
+  // ==========================================================================
+  // Handle slash-separated units, normalize dashes, extract size descriptors
+  // (inch, container sizes), and detect the primary unit
   // Detect primary/alternative units expressed with a slash (e.g., "cup/150 grams sugar").
   if (
     includeAlternatives &&
@@ -365,6 +384,11 @@ export function parse(ingredientString, language, options = {}) {
     ingredient = ingredient.replace(regex, '').trim();
   }
 
+  // ==========================================================================
+  // SECTION 5: UNIT RESOLUTION & PREPOSITION HANDLING
+  // ==========================================================================
+  // Prefer container units over weight/volume when appropriate, remove
+  // prepositions, handle inch+piece special case
   // Treat leading inch-based size descriptors as additional context when followed by pieces.
   if (unit === 'inch' && /\bpiece\b/i.test(restBeforeUnit)) {
     const sizeText = (restBeforeUnit.match(
@@ -389,6 +413,11 @@ export function parse(ingredientString, language, options = {}) {
   // Drop leading articles like "a" / "an" that can survive after preposition stripping.
   ingredient = ingredient.replace(/^(?:a|an)\s+/i, '').trim();
 
+  // ==========================================================================
+  // SECTION 6: INGREDIENT TEXT CLEANUP & INSTRUCTION EXTRACTION
+  // ==========================================================================
+  // Split glued instruction words, extract instruction phrases, remove adverbs,
+  // clean up size descriptors and filler qualifiers
   // If an instruction/state word (or other known markers) is glued to the previous token, insert a space so it can be detected.
   const glueTargets = [
     ...(Array.isArray(instructionWords)
@@ -400,13 +429,29 @@ export function parse(ingredientString, language, options = {}) {
     const escapedInstr = glueTargets.map(w =>
       w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
     );
+    // Only add space if the combined word isn't itself a known instruction
     const instrGlueRegex = new RegExp(
-      `([A-Za-z])(${escapedInstr.join('|')})\\b`,
+      `([A-Za-z]+)(${escapedInstr.join('|')})\\b`,
       'gi',
     );
-    ingredient = ingredient.replace(instrGlueRegex, '$1 $2');
+    const allInstructionWords = Array.isArray(instructionWords) ? instructionWords : [];
+
+    const smartReplace = (text) => {
+      return text.replace(instrGlueRegex, (match, prefix, instrWord) => {
+        // Check if the full match (prefix + instrWord) is itself an instruction word
+        const fullWord = prefix + instrWord;
+        if (allInstructionWords.some(w => w.toLowerCase() === fullWord.toLowerCase())) {
+          // Don't split - the full word is a known instruction
+          return match;
+        }
+        // Split it
+        return prefix + ' ' + instrWord;
+      });
+    };
+
+    ingredient = smartReplace(ingredient);
     additionalParts = additionalParts.map(part =>
-      typeof part === 'string' ? part.replace(instrGlueRegex, '$1 $2') : part,
+      typeof part === 'string' ? smartReplace(part) : part,
     );
   }
 
@@ -469,26 +514,6 @@ export function parse(ingredientString, language, options = {}) {
     );
   }
 
-  // Strip instruction words that remain in additional parts to avoid leftovers like "luke" from "lukewarm".
-  if (Array.isArray(instructionsFound) && instructionsFound.length) {
-    const escape = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-    const instrRegex = new RegExp(`\\b(?:${instructionsFound.map(escape).join('|')})\\b`, 'gi');
-    additionalParts = additionalParts
-      .map(part =>
-        typeof part === 'string'
-          ? part
-              // Remove the whole instruction tokens.
-              .replace(instrRegex, ' ')
-              // Remove partial truncations like "luke" from "lukewarm".
-              .replace(/\bluke\b/gi, ' ')
-              .replace(/\s+/g, ' ')
-              .trim()
-          : part,
-      )
-      .filter(part =>
-        part && (typeof part !== 'string' || (part || '').trim().length > 0),
-      );
-  }
 
   if (
     Array.isArray(instructionsFound) &&
@@ -652,6 +677,11 @@ export function parse(ingredientString, language, options = {}) {
     ingredient = ingredient.replace(/\b(?:and|or)\s*$/i, '').trim();
   }
 
+  // ==========================================================================
+  // SECTION 7: INGREDIENT PROMOTION & LEADING FRACTION HANDLING
+  // ==========================================================================
+  // Promote additional parts to ingredient if empty, handle leading fractions,
+  // final cleanups on ingredient text
   // If instructions stripped the ingredient text but we still have leftover parts, promote the first leftover to ingredient.
   if ((!ingredient || ingredient.trim() === '') && additionalParts.length > 0) {
     const idx = additionalParts.findIndex(part => {
@@ -698,6 +728,11 @@ export function parse(ingredientString, language, options = {}) {
     .trim();
   ingredient = ingredient.replace(/^[^\p{L}\p{N}]+/u, '').trim();
 
+  // ==========================================================================
+  // SECTION 8: RANGE QUANTITY RESOLUTION & ALTERNATIVE PROCESSING
+  // ==========================================================================
+  // Resolve quantity ranges (min/max), process "or" alternatives (both
+  // fully-specified and simple ingredient swaps)
   // Initialize range bounds up-front so downstream alternative handling can reuse them.
   let {
     quantity: rangeQuantity,
@@ -771,6 +806,11 @@ export function parse(ingredientString, language, options = {}) {
     quantity = minQty;
   }
 
+  // ==========================================================================
+  // SECTION 9: RESULT OBJECT ASSEMBLY
+  // ==========================================================================
+  // Build the main result object, apply multipliers, set unit systems, handle
+  // flags (approx, optional, toServe, toTaste)
   const result = {
     quantity: convertToNumber(quantity, language),
     unit: unit ? unit : null,
@@ -813,6 +853,11 @@ export function parse(ingredientString, language, options = {}) {
     result.unitSystem = getUnitSystem(result.unit, language);
   }
 
+  // ==========================================================================
+  // SECTION 10: POST-PROCESSING & EDGE CASES
+  // ==========================================================================
+  // Handle special patterns: weight ranges with counts, stopword filtering,
+  // approx/optional/toServe/toTaste flag cleanup, alternatives cleanup
   // Handle leading weight/size ranges after an initial count, e.g., "1 3-4 lb whole chicken".
   // In these cases treat the range + unit as additional info and keep unit null to avoid "1 lb 3-4 chicken".
   if (result.quantity === 1 && result.unit && originalUnit && restBeforeUnit) {
@@ -842,7 +887,9 @@ export function parse(ingredientString, language, options = {}) {
     const filtered = result.additional
       .split(',')
       .map(part => part.trim())
-      .filter(part => part && !additionalStopwords.includes(part.toLowerCase()));
+      .filter(
+        part => part && !additionalStopwords.includes(part.toLowerCase()),
+      );
     result.additional = filtered.length ? filtered.join(', ') : null;
   }
   if (!approx && approxWords.length > 0) {
@@ -907,7 +954,9 @@ export function parse(ingredientString, language, options = {}) {
       const cleanedExtra = toTasteAdditionalRegex
         ? safeReplace(cleanedAdditional, toTasteAdditionalRegex)
         : cleanedAdditional;
-      const finalAdditional = cleanedExtra.replace(/^[,\s]+|[,\s]+$/g, '').trim();
+      const finalAdditional = cleanedExtra
+        .replace(/^[,\s]+|[,\s]+$/g, '')
+        .trim();
       result.additional = finalAdditional || null;
     }
   }
@@ -915,9 +964,16 @@ export function parse(ingredientString, language, options = {}) {
     const filtered = result.additional
       .split(',')
       .map(part => part.trim())
-      .filter(part => part && !additionalStopwords.includes(part.toLowerCase()));
+      .filter(
+        part => part && !additionalStopwords.includes(part.toLowerCase()),
+      );
     result.additional = filtered.length ? filtered.join(', ') : null;
   }
+  // ==========================================================================
+  // SECTION 11: ALTERNATIVES CLEANUP & NORMALIZATION
+  // ==========================================================================
+  // Clean up alternative entries: convert quantities, remove duplicates,
+  // handle fallback extraction from "or" and slash separators
   if (includeAlternatives && alternatives.length > 0) {
     const cleanedAlternatives = alternatives.map(alt => {
       const hasQty = resultQuantityCaptured(alt.quantity);
@@ -1036,6 +1092,12 @@ export function parse(ingredientString, language, options = {}) {
       }));
     }
   }
+  // ==========================================================================
+  // SECTION 12: FINAL CLEANUPS & EDGE CASE HANDLING
+  // ==========================================================================
+  // Add instructions to result, clean up alternative quantity prefixes,
+  // handle inch+piece special cases, weight ranges, unit fallback, ingredient
+  // fallback from alternatives or slash-separated lists
   if (instructionsFound && instructionsFound.length > 0) {
     result.instructions = instructionsFound;
   }

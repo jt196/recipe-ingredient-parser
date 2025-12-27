@@ -905,7 +905,11 @@ describe('recipe parser eng', () => {
     });
 
     it('keeps alt quantity/unit when explicitly provided', () => {
-      const res = parse('1/2 teaspoon black or 1 tsp white pepper', 'eng', opts);
+      const res = parse(
+        '1/2 teaspoon black or 1 tsp white pepper',
+        'eng',
+        opts,
+      );
       expect(res.alternatives?.[0].quantity).to.equal(1);
       expect(res.alternatives?.[0].unit).to.equal('teaspoon');
       expect(res.alternatives?.[0].ingredient).to.equal('white pepper');
@@ -975,7 +979,7 @@ describe('recipe parser eng', () => {
       expect(res.unit).to.equal('ounce');
       expect(res.ingredient).to.equal('butter');
       expect(res.instructions).to.include('cold');
-      expect(res.instructions).to.include('salted');
+      expect(res.instructions).to.include('unsalted');
       expect(res.additional).to.equal('cut into 1-inch chunks');
       expect(res.alternatives?.[0].unit).to.equal('tablespoon');
     });
@@ -1287,6 +1291,15 @@ describe('recipe parser eng', () => {
       expect(res.unit).to.equal('gram');
       expect(res.ingredient).to.equal('water');
       expect(res.instructions).to.include('lukewarm');
+    });
+
+    it('parses uncooked semolina without partial leftovers', () => {
+      const res = parse('1 cup uncooked semolina', 'eng', opts);
+      expect(res.quantity).to.equal(1);
+      expect(res.unit).to.equal('cup');
+      expect(res.ingredient).to.equal('semolina');
+      expect(res.additional).to.equal(null);
+      expect(res.instructions).to.deep.equal(['uncooked']);
     });
 
     it('omits instruction-only additional fragments', () => {

@@ -241,8 +241,9 @@ export function extractInstructions(
 
   const adverbPart =
     escapedAdverbs.length > 0 ? `(?:${escapedAdverbs.join('|')})\\s+` : '';
+  // Use word boundaries but exclude hyphenated words
   const regex = new RegExp(
-    `(?<!-)\\b(?:${adverbPart})?(?:${escaped.join('|')})\\b(?!-)`,
+    `(?<![a-zA-Z-])(?:${adverbPart})?(?:${escaped.join('|')})(?![a-zA-Z-])`,
     'gi',
   );
 

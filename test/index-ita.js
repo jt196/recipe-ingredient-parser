@@ -32,23 +32,32 @@ describe('recipe parser ita', () => {
 
   describe('translates the unit', () => {
     it('of "qb  di acqua"', () => {
-      expect(parse('qb di acqua', 'ita').unit).to.equal('q.b.');
-      expect(parse('qb di acqua', 'ita').quantity).to.equal(0);
+      const res = parse('qb di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "quanto basta  acqua"', () => {
-      expect(parse('quanto basta di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('quanto basta di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "Quanto basta  acqua"', () => {
-      expect(parse('Quanto basta di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('Quanto basta di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "Quanto Basta  acqua"', () => {
-      expect(parse('Quanto Basta di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('Quanto Basta di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "q.b.   di farina"', () => {
       expect(parse('q.b. di farina', 'ita').ingredient).to.equal('farina');
     });
     it('of "q.b.  di farina"', () => {
-      expect(parse('q.b. di farina', 'ita').unit).to.equal('q.b.');
+      const res = parse('q.b. di farina', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "q.b. farina"', () => {
       expect(parse('q.b. farina', 'ita').ingredient).to.equal('farina');
@@ -60,20 +69,30 @@ describe('recipe parser ita', () => {
       expect(parse('grammi  farina', 'ita').ingredient).to.equal('farina');
     });
     it('of "Q.B. di acqua"', () => {
-      expect(parse('Q.B. di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('Q.B. di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "acqua quanto basta"', () => {
-      expect(parse('acqua quanto basta', 'ita').unit).to.equal('q.b.');
+      const res = parse('acqua quanto basta', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
 
     it('of "QB di acqua"', () => {
-      expect(parse('QB di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('QB di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "QB. di acqua"', () => {
-      expect(parse('QB. di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('QB. di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "Q.B di acqua"', () => {
-      expect(parse('Q.b di acqua', 'ita').unit).to.equal('q.b.');
+      const res = parse('Q.b di acqua', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
     });
     it('of "1 cucchiao acqua"', () => {
       expect(parse('1 cucchiao acqua', 'ita').quantity).to.equal(1);
@@ -553,62 +572,42 @@ describe('recipe parser ita', () => {
           minQty: 100,
           maxQty: 100,
         });
-      });
-      it('"quanto basta  di latte"', () => {
-        expectParsed('quanto basta  di latte', {
-          unit: 'q.b.',
-          unitPlural: 'q.b.',
-          quantity: 0,
-          symbol: null,
-          ingredient: 'latte',
-          minQty: 0,
-          maxQty: 0,
-        });
-      });
-      it('"Quanto Basta  di latte"', () => {
-        expectParsed('quanto basta  di latte', {
-          unit: 'q.b.',
-          unitPlural: 'q.b.',
-          quantity: 0,
-          symbol: null,
-          ingredient: 'latte',
-          minQty: 0,
-          maxQty: 0,
-        });
-      });
-      it('"qb  di latte"', () => {
-        expectParsed('quanto basta  di latte', {
-          unit: 'q.b.',
-          unitPlural: 'q.b.',
-          quantity: 0,
-          symbol: null,
-          ingredient: 'latte',
-          minQty: 0,
-          maxQty: 0,
-        });
-      });
-      it('"q.b. di latte"', () => {
-        expectParsed('q.b.  di latte', {
-          unit: 'q.b.',
-          unitPlural: 'q.b.',
-          quantity: 0,
-          symbol: null,
-          ingredient: 'latte',
-          minQty: 0,
-          maxQty: 0,
-        });
-      });
-      it('"q.b. latte"', () => {
-        expectParsed('q.b.  latte', {
-          unit: 'q.b.',
-          unitPlural: 'q.b.',
-          quantity: 0,
-          symbol: null,
-          ingredient: 'latte',
-          minQty: 0,
-          maxQty: 0,
-        });
-      });
+    });
+    it('"quanto basta  di latte"', () => {
+      const res = parse('quanto basta  di latte', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
+      expect(res.unitPlural).to.equal(null);
+      expect(res.ingredient).to.equal('latte');
+    });
+    it('"Quanto Basta  di latte"', () => {
+      const res = parse('quanto basta  di latte', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
+      expect(res.unitPlural).to.equal(null);
+      expect(res.ingredient).to.equal('latte');
+    });
+    it('"qb  di latte"', () => {
+      const res = parse('quanto basta  di latte', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
+      expect(res.unitPlural).to.equal(null);
+      expect(res.ingredient).to.equal('latte');
+    });
+    it('"q.b. di latte"', () => {
+      const res = parse('q.b.  di latte', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
+      expect(res.unitPlural).to.equal(null);
+      expect(res.ingredient).to.equal('latte');
+    });
+    it('"q.b. latte"', () => {
+      const res = parse('q.b.  latte', 'ita');
+      expect(res.toTaste).to.equal(true);
+      expect(res.unit).to.equal(null);
+      expect(res.unitPlural).to.equal(null);
+      expect(res.ingredient).to.equal('latte');
+    });
     });
   });
 
@@ -670,8 +669,8 @@ it('test order and case sensitive', () => {
       maxQty: 100,
     });
   expectParsed('q.b. di sale', {
-    unit: 'q.b.',
-    unitPlural: 'q.b.',
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'sale',
       quantity: 0,
@@ -697,8 +696,8 @@ it('test order and case sensitive', () => {
       maxQty: 100,
     });
   expectParsed('basilico quanto basta', {
-    unit: 'q.b.',
-    unitPlural: 'q.b.',
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
@@ -706,8 +705,8 @@ it('test order and case sensitive', () => {
       maxQty: 0,
     });
   expectParsed('basilico q.b.', {
-    unit: 'q.b.',
-    unitPlural: 'q.b.',
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
@@ -715,8 +714,8 @@ it('test order and case sensitive', () => {
       maxQty: 0,
     });
   expectParsed('basilico QB', {
-    unit: 'q.b.',
-    unitPlural: 'q.b.',
+    unit: null,
+    unitPlural: null,
       symbol: null,
       ingredient: 'basilico',
       quantity: 0,
