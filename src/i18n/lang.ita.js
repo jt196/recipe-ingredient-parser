@@ -1,155 +1,204 @@
-const units = {
-  barattolo: ['barattolo', 'barattoli'],
-  bicchiere: ['bicchiere'],
-  bottiglia: ['bottiglie', 'bottiglia'],
-  bustina: ['bustina', 'bustine'],
-  cubetto: ['cubetto', 'cubetti'],
-  cucchiaio: ['cucchiai', 'cucchiaio'],
-  cucchiaino: ['cucchiaini', 'cucchiaino'],
-  confezione: ['confezioni', 'confezione'],
-  grammo: ['g', 'g.', 'gr', 'gr.', 'grammi', 'grammo'],
+/**
+ * Italian (Italiano) language data for recipe ingredient parser
+ *
+ * Structure:
+ * - unitTranslations: Italian names/plurals for units defined in English
+ * - All other data: Italian-specific linguistic data (prepositions, instructions, etc.)
+ *
+ * Unit metadata (system, unitType, conversionFactor, etc.) comes from English.
+ * This file only provides Italian translations (names, plural, symbol).
+ */
 
-  chilogrammo: [
-    'kg.',
-    'kg',
-    'kilogrammo',
-    'chilogrammi',
-    'kilogrammo',
-    'chilogrammo',
-  ],
-
-  fetta: ['fetta', 'fette'],
-  fettina: ['fettina', 'fettine'],
-  fogliolina: ['fogliolina', 'foglioline'],
-  foglia: ['foglie', 'foglia'],
-  foglio: ['fogli', 'foglio'],
-  litro: ['l.', 'l', 'lt', 'litro'],
-  gambo: ['gambo', 'gambi'],
-  mazzo: ['mazzo', 'mazzi'],
-  mazzetto: ['Mazzetto', 'mazzetti', 'mazzetto'],
-  lattina: ['Lattina', 'lattina'],
-  milligrammo: ['mg.', 'mg', 'milligrammo'],
-  millilitro: ['ml', 'ml.', 'millilitro'],
-  panetto: ['Panetto', 'panetti', 'panetto'],
-  pacco: ['pkg', 'pkgs', 'pacchetto', 'pacco'],
-  pezzo: ['pezzo', 'pcs', 'pcs.', 'pezzi'],
-  pizzico: ['pizzico', 'pizzichi'],
-  goccia: ['goccia', 'gocce'],
-  spruzzo: ['spruzzo', 'spruzzi'],
-  tazza: ['tazza', 'tazzina', 'tazzine'],
-  sacco: ['sacco', 'sacchi'],
-  spicchio: ['spicchio', 'spicchi'],
-  scatola: ['scatola', 'scatole'],
-  vasetto: ['vasetto', 'vasetti'],
-  filo: ['filo'],
-  ciuffo: ['ciuffo'],
-  scatoletta: ['scatoletta'],
-  manciata: ['manciata'],
-  porzione: ['porzione', 'porzioni'],
-  rametto: ['rametto', 'rametti'],
-  rotolo: ['rotolo'],
-  pugno: ['pugno', 'pugni'],
-  pioviggine: ['pioviggine'],
-  centimetro: ['centimetro', 'centimetri', 'cm', 'cm.'],
-  orecchio: ['orecchio', 'orecchie'],
-  pochi: ['pochi'],
-  manopola: ['manopola'],
-  pollice: ['pollice', 'pollici'],
-  pacchetto: ['pacchetto', 'pacchetti'],
-
-  // noce: ['noce'],
-  bicchierino: ['bicchierino'],
-};
-
-const pluralUnits = {
-  barattolo: 'barattoli',
-  bicchiere: 'bicchieri',
-  bustina: 'bustine',
-  bottiglia: 'bottiglie',
-  cubetto: 'cubetti',
-  gambo: 'gambi',
-  tazza: 'tazze',
-  quarto: 'quarti',
-  cucchiaio: 'cucchiai',
-  cucchiaino: 'cucchiaini',
-  confezione: 'confezioni',
-  grammo: 'grammi',
-  chilogrammo: 'chilogrammi',
-  litro: 'litri',
-  milligrammo: 'milligrammi',
-  millilitro: 'millilitri',
-  spicchio: 'spicchi',
-  scatola: 'scatole',
-  pizzico: 'pizzichi',
-  goccia: 'gocce',
-  spruzzo: 'spruzzi',
-  lattina: 'lattine',
-  fetta: 'fette',
-  fettina: 'fettine',
-  pezzo: 'pezzi',
-  panetto: 'panetti',
-  foglio: 'fogli',
-  fogliolina: 'foglioline',
-  foglia: 'foglie',
-  mazzo: 'mazzi',
-  mazzetto: 'mazzetti',
-  vasetto: 'vasetti',
-  filo: 'fili',
-  ciuffo: 'ciuffi',
-  sacco: 'sacchi',
-  scatoletta: 'scatolette',
-  manciata: 'manciate',
-  porzione: 'porzioni',
-  rametto: 'rametti',
-  rotolo: 'rotoli',
-  bicchierino: 'bicchierini',
-
-  //noce: 'noci'
-  pugno: 'pugni',
-  pioviggine: 'pioviggine',
-  centimetro: 'centimetri',
-  orecchio: 'orecchie',
-  pochi: 'pochi',
-  manopola: 'manopole',
-  pollice: 'pollici',
-  pacchetto: 'pacchetti',
-};
-
-const symbolUnits = {
-  bicchiere: '',
-  bustina: '',
-  cubetto: '',
-  gambo: '',
-  tazza: '',
-  quarto: '',
-  cucchiaio: '',
-  spicchio: '',
-  scatola: '',
-  pizzico: '',
-  lattina: '',
-  fetta: '',
-  pezzo: '',
-  panetto: '',
-  foglia: '',
-  mazzetto: '',
-  manciata: '',
-  porzione: '',
-  vasetto: '',
-  goccia: '',
-  spruzzo: '',
-  pioviggine: '',
-  centimetro: 'cm',
-  orecchio: '',
-  pochi: '',
-  manopola: '',
-  pollice: '',
-  pacchetto: '',
-  grammo: 'g',
-  cucchiaino: 'cc',
-  chilogrammo: 'kg',
-  litro: 'lt',
-  milligrammo: 'mg',
-  millilitro: 'ml',
+/**
+ * Italian translations for units defined in English base (lang.eng.js).
+ *
+ * Keys are English canonical unit names.
+ * Values contain Italian-specific data:
+ * - names: Array of Italian unit name variants
+ * - plural: Italian plural form
+ * - symbol: Italian symbol (if different from English)
+ */
+export const unitTranslations = {
+  gram: {
+    names: ['g', 'g.', 'gr', 'gr.', 'grammi', 'grammo'],
+    singular: 'grammo',
+    plural: 'grammi',
+    symbol: 'g',
+  },
+  milligram: {
+    names: ['mg.', 'mg', 'milligrammo'],
+    singular: 'milligrammo',
+    plural: 'milligrammi',
+    symbol: 'mg',
+  },
+  kilogram: {
+    names: ['kg.', 'kg', 'kilogrammo', 'chilogrammi', 'kilogrammo', 'chilogrammo'],
+    singular: 'chilogrammo',
+    plural: 'chilogrammi',
+    symbol: 'kg',
+  },
+  milliliter: {
+    names: ['ml', 'ml.', 'millilitro'],
+    singular: 'millilitro',
+    plural: 'millilitri',
+    symbol: 'ml',
+  },
+  liter: {
+    names: ['l.', 'l', 'lt', 'litro'],
+    singular: 'litro',
+    plural: 'litri',
+    symbol: 'lt',
+  },
+  teaspoon: {
+    names: ['cucchiaini', 'cucchiaino'],
+    singular: 'cucchiaino',
+    plural: 'cucchiaini',
+    symbol: 'cc',
+  },
+  tablespoon: {
+    names: ['cucchiai', 'cucchiaio'],
+    singular: 'cucchiaio',
+    plural: 'cucchiai',
+    symbol: '',
+  },
+  cup: {
+    names: ['tazza', 'tazzina', 'tazzine'],
+    singular: 'tazza',
+    plural: 'tazze',
+    symbol: '',
+  },
+  dozen: {
+    names: ['dozzina'],
+    singular: 'dozzina',
+    plural: 'dozzine',
+    symbol: '',
+  },
+  piece: {
+    names: ['pezzo', 'pcs', 'pcs.', 'pezzi'],
+    singular: 'pezzo',
+    plural: 'pezzi',
+    symbol: '',
+  },
+  pinch: {
+    names: ['pizzico', 'pizzichi'],
+    singular: 'pizzico',
+    plural: 'pizzichi',
+    symbol: '',
+  },
+  drop: {
+    names: ['goccia', 'gocce'],
+    singular: 'goccia',
+    plural: 'gocce',
+    symbol: '',
+  },
+  drizzle: {
+    names: ['spruzzo', 'spruzzi'],
+    singular: 'spruzzo',
+    plural: 'spruzzi',
+    symbol: '',
+  },
+  slice: {
+    names: ['fetta', 'fette', 'fettina', 'fettine'],
+    singular: 'fetta',
+    plural: 'fette',
+    symbol: '',
+  },
+  clove: {
+    names: ['spicchio', 'spicchi'],
+    singular: 'spicchio',
+    plural: 'spicchi',
+    symbol: '',
+  },
+  handful: {
+    names: ['manciata'],
+    singular: 'manciata',
+    plural: 'manciate',
+    symbol: '',
+  },
+  bunch: {
+    names: ['mazzo', 'mazzi', 'mazzetto', 'mazzetti'],
+    singular: 'mazzo',
+    plural: 'mazzi',
+    symbol: '',
+  },
+  serving: {
+    names: ['porzione', 'porzioni'],
+    singular: 'porzione',
+    plural: 'porzioni',
+    symbol: '',
+  },
+  can: {
+    names: ['barattolo', 'barattoli', 'lattina', 'scatoletta', 'scatola', 'scatole'],
+    singular: 'barattolo',
+    plural: 'barattoli',
+    symbol: '',
+  },
+  bottle: {
+    names: ['bottiglia', 'bottiglie'],
+    singular: 'bottiglia',
+    plural: 'bottiglie',
+    symbol: '',
+  },
+  pack: {
+    names: ['pkg', 'pkgs', 'pacchetto', 'pacco', 'pacchetti', 'confezione', 'confezioni', 'bustina', 'bustine'],
+    singular: 'pacchetto',
+    plural: 'pacchetti',
+    symbol: '',
+  },
+  bag: {
+    names: ['sacco', 'sacchi'],
+    singular: 'sacco',
+    plural: 'sacchi',
+    symbol: '',
+  },
+  box: {
+    names: ['cubetto', 'cubetti'],
+    singular: 'cubetto',
+    plural: 'cubetti',
+    symbol: '',
+  },
+  container: {
+    names: ['vasetto', 'vasetti'],
+    singular: 'vasetto',
+    plural: 'vasetti',
+    symbol: '',
+  },
+  stick: {
+    names: ['panetto', 'panetti', 'filo', 'gambo', 'gambi'],
+    singular: 'panetto',
+    plural: 'panetti',
+    symbol: '',
+  },
+  centimetre: {
+    names: ['centimetro', 'centimetri', 'cm', 'cm.'],
+    singular: 'centimetro',
+    plural: 'centimetri',
+    symbol: 'cm',
+  },
+  ear: {
+    names: ['orecchio', 'orecchie'],
+    singular: 'orecchio',
+    plural: 'orecchie',
+    symbol: '',
+  },
+  few: {
+    names: ['pochi'],
+    singular: 'poco',
+    plural: 'pochi',
+    symbol: '',
+  },
+  knob: {
+    names: ['ciuffo'],
+    singular: 'ciuffo',
+    plural: 'ciuffi',
+    symbol: '',
+  },
+  thumb: {
+    names: ['pugno'],
+    singular: 'pugno',
+    plural: 'pugni',
+    symbol: '',
+  },
 };
 
 const prepositions = ['di', "d'"];
@@ -293,18 +342,6 @@ const adverbs = [
   'fresco',
   'fermamente',
 ];
-const unitSystems = {
-  grammo: 'metric',
-  chilogrammo: 'metric',
-  milligrammo: 'metric',
-  litro: 'metric',
-  millilitro: 'metric',
-  oncia: 'imperial',
-  libbra: 'imperial',
-  tazza: 'americanVolumetric',
-  quarto: 'americanVolumetric',
-  pinta: 'americanVolumetric',
-};
 
 export const numbersSmall = {
   zero: 0,
@@ -369,9 +406,7 @@ export const problematicUnits = {
 };
 
 export const langIta = {
-  units,
-  pluralUnits,
-  symbolUnits,
+  unitTranslations,
   prepositions,
   joiners,
   toTaste,
@@ -382,7 +417,6 @@ export const langIta = {
   toServe,
   instructions,
   adverbs,
-  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

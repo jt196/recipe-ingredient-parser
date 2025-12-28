@@ -82,7 +82,10 @@ export function getUnit(input, language) {
   let allMatches = [];
 
   const addMatch = (unitKey, unitData, match) => {
-    allMatches.push([unitKey, unitData.plural, unitData.symbol, match]);
+    // For backwards compatibility: first element is singular, second is plural
+    // Fall back to plural if singular not provided
+    const singular = unitData.singular || unitData.plural;
+    allMatches.push([singular, unitData.plural, unitData.symbol, match]);
   };
 
   // Search through all unit names

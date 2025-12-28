@@ -1,135 +1,237 @@
-const units = {
-  // Ingredients/food portions
-  diente: ['diente', 'diente de ajo'],
-  galón: ['galón', 'gal'],
-  onza: ['onza', 'oz', 'oz.'],
-  floz: [
-    'onza fluida',
-    'onz. fluida',
-    'fl oz',
-    'fl. oz',
-    'fluid ounce',
-    'fluid ounces',
-  ],
-  pinta: ['pinta', 'pt', 'pt.'],
-  libra: ['libra', 'lb', 'lb.', 'libras'],
-  cuarto: ['cuarto', 'qt', 'qt.'],
-  cucharada: ['cucharada', 'cda', 'cda.'],
-  cucharadita: ['cucharadita', 'cdta', 'cdta.'],
-  gramo: ['gramo', 'g', 'g.'],
-  kilogramo: ['kilogramo', 'kg', 'kg.'],
-  litro: ['litro', 'l', 'l.', 'lt'],
-  miligramo: ['miligramo', 'mg', 'mg.'],
-  mililitro: ['mililitro', 'ml', 'ml.'],
-  paquete: ['paquete', 'pqt', 'pqt.'],
-  bolsa: ['bolsa', 'blsa'],
-  caja: ['caja'],
-  botella: ['botella', 'btl', 'btl.'],
-  envase: ['envase', 'envases'],
-  lata: ['lata', 'latas'],
-  taza: ['taza', 'tz', 'tz.'],
-  barra: ['barra'], // e.g. stick of butter => "barra de mantequilla"
-  docena: ['docena'],
-  pieza: ['pieza', 'pz', 'pz.'],
-  pizca: ['pizca', 'pizcas'],
-  gota: ['gota', 'gotas'],
-  chorrito: ['chorrito', 'chorritos'],
-  rebanada: ['rebanada', 'rebanadas'],
-  puñado: ['puñado', 'puñados'],
-  manojo: ['manojo', 'manojos', 'ramo', 'ramos'],
-  porción: ['porción', 'porciones', 'porcion', 'porciones'],
-  pulgada: ['pulgada', 'pulg.', 'pulgadas'],
-  llovizna: ['llovizna'],
-  centímetro: ['centímetro', 'centimetro', 'cm', 'cm.'],
-  oreja: ['oreja', 'orejas'],
-  pocos: ['pocos'],
-  perilla: ['perilla'],
-  pulgar: ['pulgar'],
-  paquetes: ['paquetes'],
-};
+/**
+ * Spanish (Español) language data for recipe ingredient parser
+ *
+ * Structure:
+ * - unitTranslations: Spanish names/plurals for units defined in English
+ * - All other data: Spanish-specific linguistic data (prepositions, instructions, etc.)
+ *
+ * Unit metadata (system, unitType, conversionFactor, etc.) comes from English.
+ * This file only provides Spanish translations (names, plural, symbol).
+ */
 
-const pluralUnits = {
-  diente: 'dientes',
-  galón: 'galones',
-  onza: 'onzas',
-  floz: 'onzas fluidas',
-  pinta: 'pintas',
-  libra: 'libras',
-  cuarto: 'cuartos',
-  cucharada: 'cucharadas',
-  cucharadita: 'cucharaditas',
-  gramo: 'gramos',
-  kilogramo: 'kilogramos',
-  litro: 'litros',
-  miligramo: 'miligramos',
-  mililitro: 'mililitros',
-  paquete: 'paquetes',
-  bolsa: 'bolsas',
-  caja: 'cajas',
-  botella: 'botellas',
-  envase: 'envases',
-  lata: 'latas',
-  taza: 'tazas',
-  barra: 'barras',
-  docena: 'docenas',
-  pieza: 'piezas',
-  pizca: 'pizcas',
-  gota: 'gotas',
-  chorrito: 'chorritos',
-  rebanada: 'rebanadas',
-  puñado: 'puñados',
-  manojo: 'manojos',
-  porción: 'porciones',
-  pulgada: 'pulgadas',
-  llovizna: 'lloviznas',
-  centímetro: 'centímetros',
-  oreja: 'orejas',
-  pocos: 'pocos',
-  perilla: 'perillas',
-  pulgar: 'pulgares',
-  paquetes: 'paquetes',
-};
-
-const symbolUnits = {
-  diente: '',
-  galón: 'gal',
-  onza: 'oz',
-  floz: 'fl oz',
-  pinta: 'pt',
-  libra: 'lb',
-  cuarto: 'qt',
-  cucharada: 'cda',
-  cucharadita: 'cdta',
-  gramo: 'g',
-  kilogramo: 'kg',
-  litro: 'l',
-  miligramo: 'mg',
-  mililitro: 'ml',
-  paquete: 'pqt',
-  bolsa: '',
-  caja: '',
-  botella: 'bt',
-  envase: '',
-  lata: '',
-  taza: 'tz',
-  barra: '',
-  docena: 'doc',
-  pieza: 'pz',
-  pizca: '',
-  gota: '',
-  chorrito: '',
-  rebanada: '',
-  puñado: '',
-  manojo: '',
-  porción: '',
-  pulgada: 'pulg.',
-  llovizna: '',
-  centímetro: 'cm',
-  oreja: '',
-  pocos: '',
-  perilla: '',
-  pulgar: '',
-  paquetes: '',
+export const unitTranslations = {
+  clove: {
+    names: ['diente', 'diente de ajo'],
+    singular: 'diente',
+    plural: 'dientes',
+    symbol: '',
+  },
+  gallon: {
+    names: ['galón', 'gal'],
+    singular: 'galón',
+    plural: 'galones',
+    symbol: 'gal',
+  },
+  ounce: {
+    names: ['onza', 'oz', 'oz.'],
+    singular: 'onza',
+    plural: 'onzas',
+    symbol: 'oz',
+  },
+  floz: {
+    names: ['onza fluida', 'onz. fluida', 'fl oz', 'fl. oz', 'fluid ounce', 'fluid ounces'],
+    singular: 'onza fluida',
+    plural: 'onzas fluidas',
+    symbol: 'fl oz',
+  },
+  pint: {
+    names: ['pinta', 'pt', 'pt.'],
+    singular: 'pinta',
+    plural: 'pintas',
+    symbol: 'pt',
+  },
+  pound: {
+    names: ['libra', 'lb', 'lb.', 'libras'],
+    singular: 'libra',
+    plural: 'libras',
+    symbol: 'lb',
+  },
+  quart: {
+    names: ['cuarto', 'qt', 'qt.'],
+    singular: 'cuarto',
+    plural: 'cuartos',
+    symbol: 'qt',
+  },
+  tablespoon: {
+    names: ['cucharada', 'cda', 'cda.'],
+    singular: 'cucharada',
+    plural: 'cucharadas',
+    symbol: 'cda',
+  },
+  teaspoon: {
+    names: ['cucharadita', 'cdta', 'cdta.'],
+    singular: 'cucharadita',
+    plural: 'cucharaditas',
+    symbol: 'cdta',
+  },
+  gram: {
+    names: ['gramo', 'g', 'g.'],
+    singular: 'gramo',
+    plural: 'gramos',
+    symbol: 'g',
+  },
+  kilogram: {
+    names: ['kilogramo', 'kg', 'kg.'],
+    singular: 'kilogramo',
+    plural: 'kilogramos',
+    symbol: 'kg',
+  },
+  liter: {
+    names: ['litro', 'l', 'l.', 'lt'],
+    singular: 'litro',
+    plural: 'litros',
+    symbol: 'l',
+  },
+  milligram: {
+    names: ['miligramo', 'mg', 'mg.'],
+    singular: 'miligramo',
+    plural: 'miligramos',
+    symbol: 'mg',
+  },
+  milliliter: {
+    names: ['mililitro', 'ml', 'ml.'],
+    singular: 'mililitro',
+    plural: 'mililitros',
+    symbol: 'ml',
+  },
+  pack: {
+    names: ['paquete', 'pqt', 'pqt.', 'paquetes'],
+    singular: 'paquete',
+    plural: 'paquetes',
+    symbol: 'pqt',
+  },
+  bag: {
+    names: ['bolsa', 'blsa'],
+    singular: 'bolsa',
+    plural: 'bolsas',
+    symbol: '',
+  },
+  box: {
+    names: ['caja'],
+    singular: 'caja',
+    plural: 'cajas',
+    symbol: '',
+  },
+  bottle: {
+    names: ['botella', 'btl', 'btl.'],
+    singular: 'botella',
+    plural: 'botellas',
+    symbol: 'bt',
+  },
+  container: {
+    names: ['envase', 'envases'],
+    singular: 'envase',
+    plural: 'envases',
+    symbol: '',
+  },
+  can: {
+    names: ['lata', 'latas'],
+    singular: 'lata',
+    plural: 'latas',
+    symbol: '',
+  },
+  cup: {
+    names: ['taza', 'tz', 'tz.'],
+    singular: 'taza',
+    plural: 'tazas',
+    symbol: 'tz',
+  },
+  stick: {
+    names: ['barra'],
+    singular: 'barra',
+    plural: 'barras',
+    symbol: '',
+  },
+  dozen: {
+    names: ['docena'],
+    singular: 'docena',
+    plural: 'docenas',
+    symbol: 'doc',
+  },
+  piece: {
+    names: ['pieza', 'pz', 'pz.'],
+    singular: 'pieza',
+    plural: 'piezas',
+    symbol: 'pz',
+  },
+  pinch: {
+    names: ['pizca', 'pizcas'],
+    singular: 'pizca',
+    plural: 'pizcas',
+    symbol: '',
+  },
+  drop: {
+    names: ['gota', 'gotas'],
+    singular: 'gota',
+    plural: 'gotas',
+    symbol: '',
+  },
+  drizzle: {
+    names: ['chorrito', 'chorritos', 'llovizna'],
+    singular: 'chorrito',
+    plural: 'chorritos',
+    symbol: '',
+  },
+  slice: {
+    names: ['rebanada', 'rebanadas'],
+    singular: 'rebanada',
+    plural: 'rebanadas',
+    symbol: '',
+  },
+  handful: {
+    names: ['puñado', 'puñados'],
+    singular: 'puñado',
+    plural: 'puñados',
+    symbol: '',
+  },
+  bunch: {
+    names: ['manojo', 'manojos', 'ramo', 'ramos'],
+    singular: 'manojo',
+    plural: 'manojos',
+    symbol: '',
+  },
+  serving: {
+    names: ['porción', 'porciones', 'porcion'],
+    singular: 'porción',
+    plural: 'porciones',
+    symbol: '',
+  },
+  inch: {
+    names: ['pulgada', 'pulg.', 'pulgadas'],
+    singular: 'pulgada',
+    plural: 'pulgadas',
+    symbol: 'pulg.',
+  },
+  centimetre: {
+    names: ['centímetro', 'centimetro', 'cm', 'cm.'],
+    singular: 'centímetro',
+    plural: 'centímetros',
+    symbol: 'cm',
+  },
+  ear: {
+    names: ['oreja', 'orejas'],
+    singular: 'oreja',
+    plural: 'orejas',
+    symbol: '',
+  },
+  few: {
+    names: ['pocos'],
+    singular: 'poco',
+    plural: 'pocos',
+    symbol: '',
+  },
+  knob: {
+    names: ['perilla'],
+    singular: 'perilla',
+    plural: 'perillas',
+    symbol: '',
+  },
+  thumb: {
+    names: ['pulgar'],
+    singular: 'pulgar',
+    plural: 'pulgares',
+    symbol: '',
+  },
 };
 
 const prepositions = ['de'];
@@ -137,10 +239,15 @@ const prepositions = ['de'];
 const joiners = ['a'];
 
 const toTaste = ['al gusto'];
+
 const toTasteAdditional = ['más', 'ajustar', 'sazonar', 'o', 'o más', 'un poco más'];
+
 const additionalStopwords = [];
+
 const optional = ['opcional', 'si se desea', 'a elección'];
+
 const toServe = ['para servir', 'para decorar', 'para adornar', 'decorar'];
+
 const approx = [
   'aprox',
   'aprox.',
@@ -150,6 +257,7 @@ const approx = [
   'sobre',
   '~',
 ];
+
 const instructions = [
   'picado',
   'cortado en cubos',
@@ -212,7 +320,6 @@ const instructions = [
   'zesteado',
   'seco',
   'nivelado',
-  'nivelado',
   'comprado en la tienda',
   'a temperatura ambiente',
   'para engrasar',
@@ -222,8 +329,6 @@ const instructions = [
   'cocido',
   'se desmoronó',
   'crujiente',
-  'crujiente',
-  'seco',
   'curado en seco',
   'lleno',
   'fresco',
@@ -231,8 +336,6 @@ const instructions = [
   'casero',
   'amontonado',
   'abundante',
-  'helado',
-  'helado',
   'jugo de',
   'para freír',
   'reservado',
@@ -256,27 +359,8 @@ const instructions = [
   'cubicado',
   'rasgado',
 ];
-const adverbs = [
-  'finamente',
-  'gruesamente',
-  'delgadamente',
-  'recién',
-  'firmemente',
-];
-const unitSystems = {
-  gramo: 'metric',
-  kilogramo: 'metric',
-  miligramo: 'metric',
-  litro: 'metric',
-  mililitro: 'metric',
-  onza: 'imperial',
-  floz: 'imperial',
-  galón: 'imperial',
-  libra: 'imperial',
-  taza: 'americanVolumetric',
-  cuarto: 'americanVolumetric',
-  pinta: 'americanVolumetric',
-};
+
+const adverbs = ['finamente', 'gruesamente', 'delgadamente', 'recién', 'firmemente'];
 
 const numbersSmall = {
   cero: 0,
@@ -323,14 +407,12 @@ const numbersMagnitude = {
 };
 
 export const problematicUnits = {
-  diente: ['ajo'],
+  clove: ['ajo'],
   // Add more problematic units here as needed
 };
 
 export const langEsp = {
-  units,
-  pluralUnits,
-  symbolUnits,
+  unitTranslations,
   prepositions,
   joiners,
   toTaste,
@@ -340,7 +422,6 @@ export const langEsp = {
   toServe,
   instructions,
   adverbs,
-  unitSystems,
   approx,
   numbersSmall,
   numbersMagnitude,

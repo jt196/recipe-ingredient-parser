@@ -1,128 +1,246 @@
-const units = {
-  dente: ['dente', 'dente de alho'],
-  galão: ['galão', 'gal', 'gal.'],
-  onça: ['onça', 'oz', 'oz.'],
-  // "floz" stands for fluid ounce
-  floz: ['onça fluida', 'fl oz', 'fl. oz', 'onças fluidas'],
-  pinta: ['pinta', 'pt', 'pt.'],
-  libra: ['libra', 'lb', 'lb.', 'libras'],
-  quarto: ['quarto', 'qt', 'qt.'],
-  'colher de sopa': ['colher de sopa', 'c.s.', 'cs'],
-  'colher de chá': ['colher de chá', 'c.c.', 'cc'],
-  grama: ['grama', 'g', 'g.'],
-  quilo: ['quilo', 'kg', 'kg.'],
-  litro: ['litro', 'l', 'l.', 'lt'],
-  miligrama: ['miligrama', 'mg', 'mg.'],
-  mililitro: ['mililitro', 'ml', 'ml.'],
-  pacote: ['pacote', 'pct', 'pac.'],
-  saco: ['saco'],
-  caixa: ['caixa'],
-  garrafa: ['garrafa', 'grf'],
-  recipiente: ['recipiente', 'recip.'],
-  lata: ['lata', 'latas'],
-  xícara: ['xícara', 'xicara'],
-  barra: ['barra'],
-  dúzia: ['dúzia', 'duzia'],
-  pedaço: ['pedaço', 'pç', 'pç.'],
-  pitada: ['pitada'],
-  gota: ['gota', 'gotas'],
-  borrifo: ['borrifo', 'borrifos'],
-  fatia: ['fatia', 'fatias'],
-  punhado: ['punhado', 'punhados'],
-  maço: ['maço', 'maços', 'ramo', 'ramos'],
-  porção: ['porção', 'porções', 'porcao', 'porcoes'],
-  polegada: ['polegada', 'pol', 'pol.'],
-  chuvisco: ['chuvisco'],
-  centímetro: ['centímetro', 'centimetro', 'cm', 'cm.'],
-  orelha: ['orelha', 'orelhas'],
-  alguns: ['alguns'],
-  botão: ['botão'],
-  dedão: ['dedão'],
-  pacotes: ['pacote', 'pacotes'],
-};
+/**
+ * Portuguese (Português) language data for recipe ingredient parser
+ *
+ * Structure:
+ * - unitTranslations: Portuguese names/plurals for units defined in English
+ * - All other data: Portuguese-specific linguistic data (prepositions, instructions, etc.)
+ *
+ * Unit metadata (system, unitType, conversionFactor, etc.) comes from English.
+ * This file only provides Portuguese translations (names, plural, symbol).
+ */
 
-const pluralUnits = {
-  dente: 'dentes',
-  galão: 'galões',
-  onça: 'onças',
-  floz: 'onças fluidas',
-  pinta: 'pintas',
-  libra: 'libras',
-  quarto: 'quartos',
-  'colher de sopa': 'colheres de sopa',
-  'colher de chá': 'colheres de chá',
-  grama: 'gramas',
-  quilo: 'quilos',
-  litro: 'litros',
-  miligrama: 'miligramas',
-  mililitro: 'mililitros',
-  pacote: 'pacotes',
-  saco: 'sacos',
-  caixa: 'caixas',
-  garrafa: 'garrafas',
-  recipiente: 'recipientes',
-  lata: 'latas',
-  xícara: 'xícaras',
-  barra: 'barras',
-  dúzia: 'dúzias',
-  pedaço: 'pedaços',
-  pitada: 'pitadas',
-  gota: 'gotas',
-  borrifo: 'borrifos',
-  fatia: 'fatias',
-  punhado: 'punhados',
-  maço: 'maços',
-  porção: 'porções',
-  polegada: 'polegadas',
-  chuvisco: 'chuviscos',
-  centímetro: 'centímetros',
-  orelha: 'orelhas',
-  alguns: 'alguns',
-  botão: 'botões',
-  dedão: 'dedões',
-  pacotes: 'pacotes',
-};
-
-const symbolUnits = {
-  dente: '',
-  galão: 'gal',
-  onça: 'oz',
-  floz: 'fl oz',
-  pinta: 'pt',
-  libra: 'lb',
-  quarto: 'qt',
-  'colher de sopa': 'c.s.',
-  'colher de chá': 'c.c.',
-  grama: 'g',
-  quilo: 'kg',
-  litro: 'l',
-  miligrama: 'mg',
-  mililitro: 'ml',
-  pacote: 'pct',
-  saco: '',
-  caixa: '',
-  garrafa: 'grf',
-  recipiente: '',
-  lata: '',
-  xícara: 'xic',
-  barra: '',
-  dúzia: 'dz',
-  pedaço: 'pç',
-  pitada: '',
-  gota: '',
-  borrifo: '',
-  fatia: '',
-  punhado: '',
-  maço: '',
-  porção: '',
-  polegada: 'pol',
-  chuvisco: '',
-  centímetro: 'cm',
-  orelha: '',
-  alguns: '',
-  botão: '',
-  dedão: '',
-  pacotes: '',
+/**
+ * Portuguese translations for units defined in English base (lang.eng.js).
+ *
+ * Keys are English canonical unit names.
+ * Values contain Portuguese-specific data:
+ * - names: Array of Portuguese unit name variants
+ * - plural: Portuguese plural form
+ * - symbol: Portuguese symbol (if different from English)
+ */
+export const unitTranslations = {
+  gram: {
+    names: ['grama', 'g', 'g.'],
+    singular: 'grama',
+    plural: 'gramas',
+    symbol: 'g',
+  },
+  milligram: {
+    names: ['miligrama', 'mg', 'mg.'],
+    singular: 'miligrama',
+    plural: 'miligramas',
+    symbol: 'mg',
+  },
+  kilogram: {
+    names: ['quilo', 'kg', 'kg.'],
+    singular: 'quilo',
+    plural: 'quilos',
+    symbol: 'kg',
+  },
+  milliliter: {
+    names: ['mililitro', 'ml', 'ml.'],
+    singular: 'mililitro',
+    plural: 'mililitros',
+    symbol: 'ml',
+  },
+  liter: {
+    names: ['litro', 'l', 'l.', 'lt'],
+    singular: 'litro',
+    plural: 'litros',
+    symbol: 'l',
+  },
+  teaspoon: {
+    names: ['colher de chá', 'c.c.', 'cc'],
+    singular: 'colher de chá',
+    plural: 'colheres de chá',
+    symbol: 'c.c.',
+  },
+  tablespoon: {
+    names: ['colher de sopa', 'c.s.', 'cs'],
+    singular: 'colher de sopa',
+    plural: 'colheres de sopa',
+    symbol: 'c.s.',
+  },
+  cup: {
+    names: ['xícara', 'xicara'],
+    singular: 'xícara',
+    plural: 'xícaras',
+    symbol: 'xic',
+  },
+  gallon: {
+    names: ['galão', 'gal', 'gal.'],
+    singular: 'galão',
+    plural: 'galões',
+    symbol: 'gal',
+  },
+  ounce: {
+    names: ['onça', 'oz', 'oz.'],
+    singular: 'onça',
+    plural: 'onças',
+    symbol: 'oz',
+  },
+  floz: {
+    names: ['onça fluida', 'fl oz', 'fl. oz', 'onças fluidas'],
+    singular: 'onça fluida',
+    plural: 'onças fluidas',
+    symbol: 'fl oz',
+  },
+  pint: {
+    names: ['pinta', 'pt', 'pt.'],
+    singular: 'pinta',
+    plural: 'pintas',
+    symbol: 'pt',
+  },
+  pound: {
+    names: ['libra', 'lb', 'lb.', 'libras'],
+    singular: 'libra',
+    plural: 'libras',
+    symbol: 'lb',
+  },
+  quart: {
+    names: ['quarto', 'qt', 'qt.'],
+    singular: 'quarto',
+    plural: 'quartos',
+    symbol: 'qt',
+  },
+  dozen: {
+    names: ['dúzia', 'duzia'],
+    singular: 'dúzia',
+    plural: 'dúzias',
+    symbol: 'dz',
+  },
+  piece: {
+    names: ['pedaço', 'pç', 'pç.'],
+    singular: 'pedaço',
+    plural: 'pedaços',
+    symbol: 'pç',
+  },
+  pinch: {
+    names: ['pitada'],
+    singular: 'pitada',
+    plural: 'pitadas',
+    symbol: '',
+  },
+  drop: {
+    names: ['gota', 'gotas'],
+    singular: 'gota',
+    plural: 'gotas',
+    symbol: '',
+  },
+  drizzle: {
+    names: ['borrifo', 'borrifos'],
+    singular: 'borrifo',
+    plural: 'borrifos',
+    symbol: '',
+  },
+  slice: {
+    names: ['fatia', 'fatias'],
+    singular: 'fatia',
+    plural: 'fatias',
+    symbol: '',
+  },
+  clove: {
+    names: ['dente', 'dente de alho'],
+    singular: 'dente',
+    plural: 'dentes',
+    symbol: '',
+  },
+  handful: {
+    names: ['punhado', 'punhados'],
+    singular: 'punhado',
+    plural: 'punhados',
+    symbol: '',
+  },
+  bunch: {
+    names: ['maço', 'maços', 'ramo', 'ramos'],
+    singular: 'maço',
+    plural: 'maços',
+    symbol: '',
+  },
+  serving: {
+    names: ['porção', 'porções', 'porcao', 'porcoes'],
+    singular: 'porção',
+    plural: 'porções',
+    symbol: '',
+  },
+  can: {
+    names: ['lata', 'latas'],
+    singular: 'lata',
+    plural: 'latas',
+    symbol: '',
+  },
+  bottle: {
+    names: ['garrafa', 'grf'],
+    singular: 'garrafa',
+    plural: 'garrafas',
+    symbol: 'grf',
+  },
+  pack: {
+    names: ['pacote', 'pct', 'pac.', 'pacotes'],
+    singular: 'pacote',
+    plural: 'pacotes',
+    symbol: 'pct',
+  },
+  bag: {
+    names: ['saco'],
+    singular: 'saco',
+    plural: 'sacos',
+    symbol: '',
+  },
+  box: {
+    names: ['caixa'],
+    singular: 'caixa',
+    plural: 'caixas',
+    symbol: '',
+  },
+  container: {
+    names: ['recipiente', 'recip.'],
+    singular: 'recipiente',
+    plural: 'recipientes',
+    symbol: '',
+  },
+  stick: {
+    names: ['barra'],
+    singular: 'barra',
+    plural: 'barras',
+    symbol: '',
+  },
+  inch: {
+    names: ['polegada', 'pol', 'pol.'],
+    singular: 'polegada',
+    plural: 'polegadas',
+    symbol: 'pol',
+  },
+  centimetre: {
+    names: ['centímetro', 'centimetro', 'cm', 'cm.'],
+    singular: 'centímetro',
+    plural: 'centímetros',
+    symbol: 'cm',
+  },
+  ear: {
+    names: ['orelha', 'orelhas'],
+    singular: 'orelha',
+    plural: 'orelhas',
+    symbol: '',
+  },
+  few: {
+    names: ['alguns'],
+    singular: 'algum',
+    plural: 'alguns',
+    symbol: '',
+  },
+  knob: {
+    names: ['botão'],
+    singular: 'botão',
+    plural: 'botões',
+    symbol: '',
+  },
+  thumb: {
+    names: ['dedão'],
+    singular: 'dedão',
+    plural: 'dedões',
+    symbol: '',
+  },
 };
 
 const prepositions = ['de'];
@@ -255,20 +373,6 @@ const instructions = [
   'rasgado',
 ];
 const adverbs = ['finamente', 'grosseiramente', 'delicadamente', 'recém', 'firmemente'];
-const unitSystems = {
-  grama: 'metric',
-  quilo: 'metric',
-  miligrama: 'metric',
-  litro: 'metric',
-  mililitro: 'metric',
-  onça: 'imperial',
-  floz: 'imperial',
-  galão: 'imperial',
-  libra: 'imperial',
-  xícara: 'americanVolumetric',
-  quarto: 'americanVolumetric',
-  pinta: 'americanVolumetric',
-};
 
 const numbersSmall = {
   zero: 0,
@@ -312,14 +416,12 @@ const numbersMagnitude = {
 };
 
 export const problematicUnits = {
-  dente: ['alho'],
+  clove: ['alho'],
   // Add more problematic units here if needed
 };
 
 export const langPor = {
-  units,
-  pluralUnits,
-  symbolUnits,
+  unitTranslations,
   prepositions,
   joiners,
   toTaste,
@@ -330,7 +432,6 @@ export const langPor = {
   toServe,
   instructions,
   adverbs,
-  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

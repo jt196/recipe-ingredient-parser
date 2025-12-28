@@ -38,6 +38,45 @@ const units = {
   paketBaru: ['paket', 'paket'],
 };
 
+const singularUnits = {
+  siung: 'siung',
+  galon: 'galon',
+  ons: 'ons',
+  onsCair: 'ons cair',
+  pinta: 'pinta',
+  pon: 'pon',
+  kuart: 'kuart',
+  sendokMakan: 'sendok makan',
+  sendokTeh: 'sendok teh',
+  gram: 'gram',
+  kilogram: 'kilogram',
+  liter: 'liter',
+  miligram: 'miligram',
+  mililiter: 'mililiter',
+  pak: 'pak',
+  kantong: 'kantong',
+  kotak: 'kotak',
+  botol: 'botol',
+  wadah: 'wadah',
+  kaleng: 'kaleng',
+  cangkir: 'cangkir',
+  batang: 'batang',
+  lusin: 'lusin',
+  potong: 'potong',
+  sejumput: 'sejumput',
+  irisan: 'irisan',
+  tetes: 'tetes',
+  porsi: 'porsi',
+  genggam: 'genggam',
+  ikat: 'ikat',
+  semprotan: 'semprotan',
+  sentimeter: 'sentimeter',
+  telinga: 'telinga',
+  sedikit: 'sedikit',
+  tombol: 'tombol',
+  ibuJari: 'ibu jari',
+};
+
 const pluralUnits = {
   siung: 'siung',
   galon: 'galon',
@@ -302,6 +341,7 @@ export const problematicUnits = {
 
 export const langInd = {
   units,
+  singularUnits,
   pluralUnits,
   symbolUnits,
   prepositions,

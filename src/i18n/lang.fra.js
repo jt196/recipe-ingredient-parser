@@ -1,135 +1,246 @@
-const units = {
-  gousse: ['gousse', "gousse d'ail"],
-  gallon: ['gallon', 'gal'],
-  once: ['once', 'oz', 'oz.'],
-  // "floz" stands for fluid ounce
-  floz: ['once liquide', 'fl oz', 'fl. oz', 'once liquides'],
-  pinte: ['pinte', 'pt', 'pt.'],
-  livre: ['livre', 'lb', 'lb.', 'livres'],
-  quart: ['quart', 'qt', 'qt.'],
-  'cuillère à soupe': ['cuillère à soupe', 'càs', 'cuillère-s', 'cs'],
-  'cuillère à café': ['cuillère à café', 'càc', 'cuillère-c', 'cc'],
-  gramme: ['gramme', 'g', 'g.'],
-  kilogramme: ['kilogramme', 'kg', 'kg.'],
-  litre: ['litre', 'l', 'l.', 'lt'],
-  milligramme: ['milligramme', 'mg', 'mg.'],
-  millilitre: ['millilitre', 'ml', 'ml.'],
-  paquet: ['paquet', 'pkt'],
-  sac: ['sac'],
-  boîte: ['boîte', 'boites'],
-  bouteille: ['bouteille', 'bt', 'bt.'],
-  récipient: ['récipient', 'récipients'],
-  // "can" in English recipes may be translated as "boîte de conserve"
-  conserve: ['conserve', 'boîte de conserve'],
-  tasse: ['tasse', 't'],
-  barre: ['barre'],
-  douzaine: ['douzaine'],
-  pièce: ['pièce', 'pz', 'pz.'],
-  pincée: ['pincée', 'pincées'],
-  goutte: ['goutte', 'gouttes'],
-  trait: ['trait', 'traits'],
-  tranche: ['tranche', 'tranches'],
-  petit: ['petit'],
-  moyen: ['moyen'],
-  grand: ['grand'],
-  poignée: ['poignée', 'poignées'],
-  botte: ['botte', 'bottes'],
-  portion: ['portion', 'portions'],
-  pouce: ['pouce', 'po', 'pouces'],
-  bruine: ['bruine'],
-  centimètre: ['centimètre', 'cm', 'cm.'],
-  oreille: ['oreille', 'oreilles'],
-  peu: ['peu'],
-  bouton: ['bouton'],
-  pouceSuppl: ['pouce'],
-  paquets: ['paquets'],
-};
+/**
+ * French (Français) language data for recipe ingredient parser
+ *
+ * Structure:
+ * - unitTranslations: French names/plurals for units defined in English
+ * - All other data: French-specific linguistic data (prepositions, instructions, etc.)
+ *
+ * Unit metadata (system, unitType, conversionFactor, etc.) comes from English.
+ * This file only provides French translations (names, plural, symbol).
+ */
 
-const pluralUnits = {
-  gousse: 'gousses',
-  gallon: 'gallons',
-  once: 'onces',
-  floz: 'onces liquides',
-  pinte: 'pintes',
-  livre: 'livres',
-  quart: 'quarts',
-  'cuillère à soupe': 'cuillères à soupe',
-  'cuillère à café': 'cuillères à café',
-  gramme: 'grammes',
-  kilogramme: 'kilogrammes',
-  litre: 'litres',
-  milligramme: 'milligrammes',
-  millilitre: 'millilitres',
-  paquet: 'paquets',
-  sac: 'sacs',
-  boîte: 'boîtes',
-  bouteille: 'bouteilles',
-  récipient: 'récipients',
-  conserve: 'conserves',
-  tasse: 'tasses',
-  barre: 'barres',
-  douzaine: 'douzaines',
-  pièce: 'pièces',
-  pincée: 'pincées',
-  goutte: 'gouttes',
-  trait: 'traits',
-  tranche: 'tranches',
-  petit: 'petits',
-  moyen: 'moyens',
-  grand: 'grands',
-  poignée: 'poignées',
-  botte: 'bottes',
-  portion: 'portions',
-  pouce: 'pouces',
-  bruine: 'bruines',
-  centimètre: 'centimètres',
-  oreille: 'oreilles',
-  peu: 'peu',
-  bouton: 'boutons',
-  pouceSuppl: 'pouces',
-  paquets: 'paquets',
-};
-
-const symbolUnits = {
-  gousse: '',
-  gallon: 'gal',
-  once: 'oz',
-  floz: 'fl oz',
-  pinte: 'pt',
-  livre: 'lb',
-  quart: 'qt',
-  'cuillère à soupe': 'càs',
-  'cuillère à café': 'càc',
-  gramme: 'g',
-  kilogramme: 'kg',
-  litre: 'l',
-  milligramme: 'mg',
-  millilitre: 'ml',
-  paquet: 'pkt',
-  sac: '',
-  boîte: '',
-  bouteille: 'bt',
-  récipient: '',
-  conserve: '',
-  tasse: 't',
-  barre: '',
-  douzaine: 'dz',
-  pièce: 'pz',
-  pincée: '',
-  goutte: '',
-  trait: '',
-  tranche: '',
-  poignée: '',
-  botte: '',
-  portion: '',
-  pouce: 'po',
-  bruine: '',
-  centimètre: 'cm',
-  oreille: '',
-  peu: '',
-  bouton: '',
-  pouceSuppl: '',
-  paquets: '',
+/**
+ * French translations for units defined in English base (lang.eng.js).
+ *
+ * Keys are English canonical unit names.
+ * Values contain French-specific data:
+ * - names: Array of French unit name variants
+ * - plural: French plural form
+ * - symbol: French symbol (if different from English)
+ */
+export const unitTranslations = {
+  gram: {
+    names: ['gramme', 'g', 'g.'],
+    singular: 'gramme',
+    plural: 'grammes',
+    symbol: 'g',
+  },
+  milligram: {
+    names: ['milligramme', 'mg', 'mg.'],
+    singular: 'milligramme',
+    plural: 'milligrammes',
+    symbol: 'mg',
+  },
+  kilogram: {
+    names: ['kilogramme', 'kg', 'kg.'],
+    singular: 'kilogramme',
+    plural: 'kilogrammes',
+    symbol: 'kg',
+  },
+  milliliter: {
+    names: ['millilitre', 'ml', 'ml.'],
+    singular: 'millilitre',
+    plural: 'millilitres',
+    symbol: 'ml',
+  },
+  liter: {
+    names: ['litre', 'l', 'l.', 'lt'],
+    singular: 'litre',
+    plural: 'litres',
+    symbol: 'l',
+  },
+  teaspoon: {
+    names: ['cuillère à café', 'càc', 'cuillère-c', 'cc'],
+    singular: 'cuillère à café',
+    plural: 'cuillères à café',
+    symbol: 'càc',
+  },
+  tablespoon: {
+    names: ['cuillère à soupe', 'càs', 'cuillère-s', 'cs'],
+    singular: 'cuillère à soupe',
+    plural: 'cuillères à soupe',
+    symbol: 'càs',
+  },
+  cup: {
+    names: ['tasse', 't'],
+    singular: 'tasse',
+    plural: 'tasses',
+    symbol: 't',
+  },
+  gallon: {
+    names: ['gallon', 'gal'],
+    singular: 'gallon',
+    plural: 'gallons',
+    symbol: 'gal',
+  },
+  ounce: {
+    names: ['once', 'oz', 'oz.'],
+    singular: 'once',
+    plural: 'onces',
+    symbol: 'oz',
+  },
+  floz: {
+    names: ['once liquide', 'fl oz', 'fl. oz', 'once liquides'],
+    singular: 'once liquide',
+    plural: 'onces liquides',
+    symbol: 'fl oz',
+  },
+  pint: {
+    names: ['pinte', 'pt', 'pt.'],
+    singular: 'pinte',
+    plural: 'pintes',
+    symbol: 'pt',
+  },
+  pound: {
+    names: ['livre', 'lb', 'lb.', 'livres'],
+    singular: 'livre',
+    plural: 'livres',
+    symbol: 'lb',
+  },
+  quart: {
+    names: ['quart', 'qt', 'qt.'],
+    singular: 'quart',
+    plural: 'quarts',
+    symbol: 'qt',
+  },
+  dozen: {
+    names: ['douzaine'],
+    singular: 'douzaine',
+    plural: 'douzaines',
+    symbol: 'dz',
+  },
+  piece: {
+    names: ['pièce', 'pz', 'pz.'],
+    singular: 'pièce',
+    plural: 'pièces',
+    symbol: 'pz',
+  },
+  pinch: {
+    names: ['pincée', 'pincées'],
+    singular: 'pincée',
+    plural: 'pincées',
+    symbol: '',
+  },
+  drop: {
+    names: ['goutte', 'gouttes'],
+    singular: 'goutte',
+    plural: 'gouttes',
+    symbol: '',
+  },
+  drizzle: {
+    names: ['trait', 'traits'],
+    singular: 'trait',
+    plural: 'traits',
+    symbol: '',
+  },
+  slice: {
+    names: ['tranche', 'tranches'],
+    singular: 'tranche',
+    plural: 'tranches',
+    symbol: '',
+  },
+  clove: {
+    names: ['gousse', "gousse d'ail"],
+    singular: 'gousse',
+    plural: 'gousses',
+    symbol: '',
+  },
+  handful: {
+    names: ['poignée', 'poignées'],
+    singular: 'poignée',
+    plural: 'poignées',
+    symbol: '',
+  },
+  bunch: {
+    names: ['botte', 'bottes'],
+    singular: 'botte',
+    plural: 'bottes',
+    symbol: '',
+  },
+  serving: {
+    names: ['portion', 'portions'],
+    singular: 'portion',
+    plural: 'portions',
+    symbol: '',
+  },
+  can: {
+    names: ['conserve', 'boîte de conserve'],
+    singular: 'conserve',
+    plural: 'conserves',
+    symbol: '',
+  },
+  bottle: {
+    names: ['bouteille', 'bt', 'bt.'],
+    singular: 'bouteille',
+    plural: 'bouteilles',
+    symbol: 'bt',
+  },
+  pack: {
+    names: ['paquet', 'pkt', 'paquets'],
+    singular: 'paquet',
+    plural: 'paquets',
+    symbol: 'pkt',
+  },
+  bag: {
+    names: ['sac'],
+    singular: 'sac',
+    plural: 'sacs',
+    symbol: '',
+  },
+  box: {
+    names: ['boîte', 'boites'],
+    singular: 'boîte',
+    plural: 'boîtes',
+    symbol: '',
+  },
+  container: {
+    names: ['récipient', 'récipients'],
+    singular: 'récipient',
+    plural: 'récipients',
+    symbol: '',
+  },
+  stick: {
+    names: ['barre'],
+    singular: 'barre',
+    plural: 'barres',
+    symbol: '',
+  },
+  inch: {
+    names: ['pouce', 'po', 'pouces'],
+    singular: 'pouce',
+    plural: 'pouces',
+    symbol: 'po',
+  },
+  centimetre: {
+    names: ['centimètre', 'cm', 'cm.'],
+    singular: 'centimètre',
+    plural: 'centimètres',
+    symbol: 'cm',
+  },
+  ear: {
+    names: ['oreille', 'oreilles'],
+    singular: 'oreille',
+    plural: 'oreilles',
+    symbol: '',
+  },
+  few: {
+    names: ['peu'],
+    singular: 'peu',
+    plural: 'peu',
+    symbol: '',
+  },
+  knob: {
+    names: ['bouton'],
+    singular: 'bouton',
+    plural: 'boutons',
+    symbol: '',
+  },
+  thumb: {
+    names: ['pouce'],
+    singular: 'pouce',
+    plural: 'pouces',
+    symbol: '',
+  },
 };
 
 const prepositions = ['de'];
@@ -263,19 +374,6 @@ const adverbs = [
   'fraîchement',
   'fermement',
 ];
-const unitSystems = {
-  gramme: 'metric',
-  kilogramme: 'metric',
-  milligramme: 'metric',
-  litre: 'metric',
-  millilitre: 'metric',
-  once: 'imperial',
-  floz: 'imperial',
-  gallon: 'imperial',
-  pinte: 'imperial',
-  tasse: 'americanVolumetric',
-  quart: 'americanVolumetric',
-};
 
 const numbersSmall = {
   zéro: 0,
@@ -318,14 +416,12 @@ const numbersMagnitude = {
 };
 
 export const problematicUnits = {
-  gousse: ['ail'],
+  clove: ['ail'],
   // Add more problematic units here if needed
 };
 
 export const langFra = {
-  units,
-  pluralUnits,
-  symbolUnits,
+  unitTranslations,
   prepositions,
   joiners,
   toTaste,
@@ -336,7 +432,6 @@ export const langFra = {
   toServe,
   instructions,
   adverbs,
-  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,

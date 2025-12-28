@@ -1,4 +1,5 @@
-const { langEng } = require('../src/i18n/lang.eng.js');
+const { i18nMap } = require('../src/i18n/index.js');
+const langEng = i18nMap.eng;
 
 describe('unitsData structure', () => {
   it('should have unitsData defined', () => {
