@@ -1,7 +1,6 @@
 import * as convert from './utils/convert';
 import {i18nMap} from './i18n';
 import {
-  getUnit,
   getPreposition,
   getUnitSystem,
   convertToNumber,
@@ -31,7 +30,11 @@ import {
   resolveRangeQuantities,
 } from './utils/quantity';
 import {combine as combineIngredients} from './utils/combine';
-import {processAlternatives, processOrAlternatives, cleanupAlternatives} from './utils/alternatives';
+import {
+  processAlternatives,
+  processOrAlternatives,
+  cleanupAlternatives,
+} from './utils/alternatives';
 import {
   buildFlagRegexes,
   safeReplace,
@@ -138,7 +141,8 @@ export function parse(ingredientString, language, options = {}) {
   // parenthetical segments, comma-separated extras, and process alternatives
 
   // 1) Remove optional label
-  const {line: lineAfterOptional, hadOptionalLabel} = removeOptionalLabel(ingredientLine);
+  const {line: lineAfterOptional, hadOptionalLabel} =
+    removeOptionalLabel(ingredientLine);
   ingredientLine = lineAfterOptional;
   originalString = ingredientLine;
 
@@ -151,8 +155,11 @@ export function parse(ingredientString, language, options = {}) {
   let containerSizeText = null;
 
   // 4) Normalize word number + cans (e.g., "Three 15-ounce cans")
-  const {line: lineAfterCans, additionalParts: canParts, hadWordNumberCan} =
-    normalizeWordNumberCans(ingredientLine, language);
+  const {
+    line: lineAfterCans,
+    additionalParts: canParts,
+    hadWordNumberCan,
+  } = normalizeWordNumberCans(ingredientLine, language);
   ingredientLine = lineAfterCans;
   if (canParts.length) additionalParts.push(...canParts);
   if (hadWordNumberCan) originalString = ingredientLine;
@@ -163,7 +170,8 @@ export function parse(ingredientString, language, options = {}) {
   ingredientLine = cleaned;
 
   // 6) Extract comma-separated additional content
-  const {line: lineAfterCommas, additionalParts: commaParts} = extractCommaAdditional(ingredientLine);
+  const {line: lineAfterCommas, additionalParts: commaParts} =
+    extractCommaAdditional(ingredientLine);
   ingredientLine = lineAfterCommas;
   if (commaParts.length) additionalParts.push(...commaParts);
 
@@ -221,7 +229,11 @@ export function parse(ingredientString, language, options = {}) {
   if (safeTest(optionalRegex, originalString)) {
     optional = true;
   }
-  const optionalResult1 = detectOptionalFlag(ingredientLine, optional, optionalRegex);
+  const optionalResult1 = detectOptionalFlag(
+    ingredientLine,
+    optional,
+    optionalRegex,
+  );
   optional = optionalResult1.optional;
   ingredientLine = optionalResult1.line;
 
@@ -230,7 +242,11 @@ export function parse(ingredientString, language, options = {}) {
   if (safeTest(toServeRegex, originalString)) {
     toServe = true;
   }
-  const toServeResult1 = detectToServeFlag(ingredientLine, toServe, toServeRegex);
+  const toServeResult1 = detectToServeFlag(
+    ingredientLine,
+    toServe,
+    toServeRegex,
+  );
   toServe = toServeResult1.toServe;
   ingredientLine = toServeResult1.line;
 
@@ -238,7 +254,11 @@ export function parse(ingredientString, language, options = {}) {
   if (safeTest(toTasteRegex, originalString)) {
     toTaste = true;
   }
-  const toTasteResult1 = detectToTasteFlag(ingredientLine, toTaste, toTasteRegex);
+  const toTasteResult1 = detectToTasteFlag(
+    ingredientLine,
+    toTaste,
+    toTasteRegex,
+  );
   toTaste = toTasteResult1.toTaste;
   ingredientLine = toTasteResult1.line;
 
@@ -270,15 +290,27 @@ export function parse(ingredientString, language, options = {}) {
   approx = approxResult2.approx;
   restOfIngredient = approxResult2.line;
 
-  const optionalResult2 = detectOptionalFlag(restOfIngredient, optional, optionalRegex);
+  const optionalResult2 = detectOptionalFlag(
+    restOfIngredient,
+    optional,
+    optionalRegex,
+  );
   optional = optionalResult2.optional;
   restOfIngredient = optionalResult2.line;
 
-  const toServeResult2 = detectToServeFlag(restOfIngredient, toServe, toServeRegex);
+  const toServeResult2 = detectToServeFlag(
+    restOfIngredient,
+    toServe,
+    toServeRegex,
+  );
   toServe = toServeResult2.toServe;
   restOfIngredient = toServeResult2.line;
 
-  const toTasteResult2 = detectToTasteFlag(restOfIngredient, toTaste, toTasteRegex);
+  const toTasteResult2 = detectToTasteFlag(
+    restOfIngredient,
+    toTaste,
+    toTasteRegex,
+  );
   toTaste = toTasteResult2.toTaste;
   restOfIngredient = toTasteResult2.line;
 
@@ -306,12 +338,18 @@ export function parse(ingredientString, language, options = {}) {
   restOfIngredient = removeLeadingDashes(restOfIngredient);
 
   // 3) Extract leading size descriptors like "3-inch" (e.g., "1 3-inch stick")
-  const inchResult = extractInchSizeDescriptor(restOfIngredient, additionalParts);
+  const inchResult = extractInchSizeDescriptor(
+    restOfIngredient,
+    additionalParts,
+  );
   restOfIngredient = inchResult.text;
   additionalParts = inchResult.additionalParts;
 
   // 4) Handle implicit inch descriptors (e.g., "inch piece ginger")
-  const implicitInchResult = handleImplicitInchDescriptor(restOfIngredient, additionalParts);
+  const implicitInchResult = handleImplicitInchDescriptor(
+    restOfIngredient,
+    additionalParts,
+  );
   restOfIngredient = implicitInchResult.text;
   additionalParts = implicitInchResult.additionalParts;
 
@@ -386,12 +424,20 @@ export function parse(ingredientString, language, options = {}) {
   // Split glued instruction words, extract instruction phrases, remove adverbs,
   // clean up size descriptors and filler qualifiers
   // Split glued instruction words (e.g., "tomatoeschopped" → "tomatoes chopped")
-  const glueResult = splitGluedInstructions(ingredient, additionalParts, instructionWords);
+  const glueResult = splitGluedInstructions(
+    ingredient,
+    additionalParts,
+    instructionWords,
+  );
   ingredient = glueResult.ingredient;
   additionalParts = glueResult.additionalParts;
 
   // Fallback to ingredient from alternatives if main ingredient is empty
-  ingredient = fallbackIngredientFromAlternatives(ingredient, includeAlternatives, alternatives);
+  ingredient = fallbackIngredientFromAlternatives(
+    ingredient,
+    includeAlternatives,
+    alternatives,
+  );
 
   // Move trailing dash-separated notes into additional (e.g., "cherries - stalks removed")
   const dashResult = extractDashSeparatedNotes(ingredient, additionalParts);
@@ -410,7 +456,12 @@ export function parse(ingredientString, language, options = {}) {
   const instructionsFound = instructionExtraction.instructions;
 
   // Remove standalone adverbs and add them to instructions
-  const adverbResult = removeStandaloneAdverbs(ingredient, additionalParts, adverbWords, instructionsFound);
+  const adverbResult = removeStandaloneAdverbs(
+    ingredient,
+    additionalParts,
+    adverbWords,
+    instructionsFound,
+  );
   ingredient = adverbResult.ingredient;
   additionalParts = adverbResult.additionalParts;
 
@@ -426,7 +477,10 @@ export function parse(ingredientString, language, options = {}) {
     ingredient = removeFillerQualifiers(ingredient);
 
     // Move leading size descriptors like "1-inch" into additional.
-    const sizeResult = extractLeadingSizeDescriptor(ingredient, additionalParts);
+    const sizeResult = extractLeadingSizeDescriptor(
+      ingredient,
+      additionalParts,
+    );
     ingredient = sizeResult.ingredient;
     additionalParts = sizeResult.additionalParts;
 
@@ -437,7 +491,12 @@ export function parse(ingredientString, language, options = {}) {
     ingredient = processLeadingSizeAdjectives(ingredient, instructionsFound);
 
     // Demote leading leftover unit tokens to additional notes
-    const demoteResult = demoteLeftoverUnits(ingredient, unit, additionalParts, language);
+    const demoteResult = demoteLeftoverUnits(
+      ingredient,
+      unit,
+      additionalParts,
+      language,
+    );
     ingredient = demoteResult.ingredient;
     additionalParts = demoteResult.additionalParts;
 
@@ -445,15 +504,31 @@ export function parse(ingredientString, language, options = {}) {
     ingredient = removeLeadingAdverbs(ingredient, adverbWords);
 
     // Clean toTaste-related text
-    const toTasteResult = cleanToTasteText(ingredient, additionalParts, toTaste, toTasteAdditionalRegex, safeReplace);
+    const toTasteResult = cleanToTasteText(
+      ingredient,
+      additionalParts,
+      toTaste,
+      toTasteAdditionalRegex,
+      safeReplace,
+    );
     ingredient = toTasteResult.ingredient;
     additionalParts = toTasteResult.additionalParts;
 
     // Strip leading numeric tokens if quantity already captured
-    ingredient = stripLeadingNumericTokens(ingredient, quantity, language, resultQuantityCaptured);
+    ingredient = stripLeadingNumericTokens(
+      ingredient,
+      quantity,
+      language,
+      resultQuantityCaptured,
+    );
 
     // Prepend container size for pack-style units
-    ingredient = prependPackSize(ingredient, unit, containerSizeText, originalString);
+    ingredient = prependPackSize(
+      ingredient,
+      unit,
+      containerSizeText,
+      originalString,
+    );
 
     // Remove can/tin prefixes
     ingredient = removeCanPrefix(ingredient, unit);
@@ -597,7 +672,12 @@ export function parse(ingredientString, language, options = {}) {
   // approx/optional/toServe/toTaste flag cleanup, alternatives cleanup
 
   // Handle leading weight/size range after initial count (e.g., "1 3-4 lb whole chicken")
-  handleLeadingWeightSizeRange(result, originalUnit, restBeforeUnit, includeUnitSystems);
+  handleLeadingWeightSizeRange(
+    result,
+    originalUnit,
+    restBeforeUnit,
+    includeUnitSystems,
+  );
 
   // Filter additional parts by stopwords
   filterAdditionalStopwords(result, additionalStopwords);
@@ -607,7 +687,13 @@ export function parse(ingredientString, language, options = {}) {
   approx = approxResult.approx;
 
   // Apply post-processing flags (approx, toTaste unit nulling)
-  applyPostProcessingFlags(result, approx, toTaste, forceUnitNull, includeUnitSystems);
+  applyPostProcessingFlags(
+    result,
+    approx,
+    toTaste,
+    forceUnitNull,
+    includeUnitSystems,
+  );
 
   // Process optional, toServe, toTaste flags and clean additional
   processOptionalFlag(result, optional, optionalRegex);
@@ -675,14 +761,25 @@ export function parse(ingredientString, language, options = {}) {
   handlePieceInchSize(result, unit, originalString);
 
   // Handle weight range patterns (e.g., "3-4 lb chicken")
-  const weightRangeResult = handleWeightRange(result, originalString, restBeforeUnit, includeUnitSystems);
+  const weightRangeResult = handleWeightRange(
+    result,
+    originalString,
+    restBeforeUnit,
+    includeUnitSystems,
+  );
   forceUnitNull = forceUnitNull || weightRangeResult.forceUnitNull;
 
   // Handle count + range patterns (e.g., "1 3-4 lb chicken")
   handleCountPlusRange(result, originalString, includeUnitSystems);
 
   // Fallback: guess unit from original string if not detected
-  fallbackUnitGuess(result, forceUnitNull, originalString, language, includeUnitSystems);
+  fallbackUnitGuess(
+    result,
+    forceUnitNull,
+    originalString,
+    language,
+    includeUnitSystems,
+  );
 
   // Fallback: guess ingredient from original string if not found
   fallbackIngredientGuess(result, originalString);

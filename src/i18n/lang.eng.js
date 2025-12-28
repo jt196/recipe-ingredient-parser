@@ -176,6 +176,7 @@ const instructions = [
   'diced',
   'sliced',
   'minced',
+  'mince',
   'crushed',
   'grated',
   'thinly sliced',
@@ -301,6 +302,7 @@ const adverbs = [
   'firmly',
   'lightly',
 ];
+
 const unitSystems = {
   gram: 'metric',
   kilogram: 'metric',
@@ -380,6 +382,5 @@ export const langEng = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
-  additionalStopwords,
   isCommaDelimited: false,
 };
