@@ -270,3 +270,410 @@ export function extractInstructions(
     instructions: found,
   };
 }
+
+/**
+ * Fixes missing spaces after size adjectives that get glued when units are stripped.
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @returns {string} - Ingredient with fixed spacing
+ */
+export function fixSizeAdjectiveSpacing(ingredient) {
+  const spacerWords = ['small', 'large', 'medium', 'healthy', 'scant'];
+  let result = ingredient;
+  spacerWords.forEach(word => {
+    const re = new RegExp(`${word}(?=[A-Za-z])`, 'gi');
+    result = result.replace(re, `${word} `);
+  });
+  return result;
+}
+
+/**
+ * Removes filler qualifiers that pollute the ingredient text.
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @returns {string} - Ingredient with fillers removed
+ */
+export function removeFillerQualifiers(ingredient) {
+  return ingredient
+    .replace(/\bhealthy\b/gi, '')
+    .replace(/\beach\b/gi, '')
+    .replace(/\bscant\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Extracts leading size descriptors like "1-inch" into additional parts.
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} additionalParts - Array to store extracted size descriptors
+ * @returns {{ingredient: string, additionalParts: string[]}} - Updated ingredient and parts
+ */
+export function extractLeadingSizeDescriptor(ingredient, additionalParts) {
+  const sizeInchMatch = ingredient.match(
+    /^(\d+(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?\s*-?inch)\s+(.*)$/i,
+  );
+  if (sizeInchMatch) {
+    additionalParts.push(sizeInchMatch[1]);
+    return {ingredient: sizeInchMatch[2].trim(), additionalParts};
+  }
+  return {ingredient, additionalParts};
+}
+
+/**
+ * Strips leading instruction/state terms that were already captured.
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} instructionsFound - Array of already found instructions
+ * @returns {string} - Ingredient with leading instructions removed
+ */
+export function stripLeadingInstructions(ingredient, instructionsFound) {
+  if (!instructionsFound || !instructionsFound.length) {
+    return ingredient;
+  }
+  const escape = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const leadingInstrRegex = new RegExp(
+    `^(?:${instructionsFound.map(escape).join('|')})\\s+`,
+    'i',
+  );
+  return ingredient.replace(leadingInstrRegex, '').trim();
+}
+
+/**
+ * Processes leading size adjectives, treating them as instructions unless hyphenated.
+ * Mutates the instructionsFound array in place.
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} instructionsFound - Array to store size adjectives as instructions (mutated in place)
+ * @returns {string} - Updated ingredient text
+ */
+export function processLeadingSizeAdjectives(ingredient, instructionsFound) {
+  const sizeWords = ['small', 'large', 'medium', 'scant', 'healthy'];
+  const sizeRegex = new RegExp(`^(?:${sizeWords.join('|')})\\b`, 'i');
+  const sizeMatch = ingredient.match(sizeRegex);
+  const nextChar = ingredient.slice(
+    sizeMatch ? sizeMatch[0].length : 0,
+    sizeMatch ? sizeMatch[0].length + 1 : 0,
+  );
+  if (sizeMatch && nextChar !== '-') {
+    const sizeWord = sizeMatch[0].trim();
+    if (!instructionsFound.includes(sizeWord)) {
+      instructionsFound.push(sizeWord);
+    }
+    return ingredient.replace(sizeRegex, '').trim();
+  }
+  return ingredient;
+}
+
+/**
+ * Splits glued instruction words by inserting spaces between prefix and instruction.
+ * Example: "tomatoeschopped" → "tomatoes chopped"
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} additionalParts - Array of additional parts to process
+ * @param {string[]} instructionWords - Array of instruction words
+ * @returns {{ingredient: string, additionalParts: string[]}} - Updated text with split instructions
+ */
+export function splitGluedInstructions(ingredient, additionalParts, instructionWords) {
+  const glueTargets = [
+    ...(Array.isArray(instructionWords)
+      ? instructionWords.filter(word => (word || '').length >= 4)
+      : []),
+    'prepared',
+  ];
+
+  if (glueTargets.length === 0) {
+    return {ingredient, additionalParts};
+  }
+
+  const escapedInstr = glueTargets.map(w =>
+    w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+  );
+
+  // Only add space if the combined word isn't itself a known instruction
+  const instrGlueRegex = new RegExp(
+    `([A-Za-z]+)(${escapedInstr.join('|')})\\b`,
+    'gi',
+  );
+  const allInstructionWords = Array.isArray(instructionWords) ? instructionWords : [];
+
+  const smartReplace = (text) => {
+    return text.replace(instrGlueRegex, (match, prefix, instrWord) => {
+      // Check if the full match (prefix + instrWord) is itself an instruction word
+      const fullWord = prefix + instrWord;
+      if (allInstructionWords.some(w => w.toLowerCase() === fullWord.toLowerCase())) {
+        // Don't split - the full word is a known instruction
+        return match;
+      }
+      // Split it
+      return prefix + ' ' + instrWord;
+    });
+  };
+
+  ingredient = smartReplace(ingredient);
+  additionalParts = additionalParts.map(part =>
+    typeof part === 'string' ? smartReplace(part) : part,
+  );
+
+  return {ingredient, additionalParts};
+}
+
+/**
+ * Falls back to using ingredient from alternatives if main ingredient is empty.
+ *
+ * @param {string} ingredient - The current ingredient text
+ * @param {boolean} includeAlternatives - Whether alternatives are enabled
+ * @param {Array} alternatives - Array of alternative entries
+ * @returns {string} - Updated ingredient (fallback from alternatives if needed)
+ */
+export function fallbackIngredientFromAlternatives(ingredient, includeAlternatives, alternatives) {
+  if (includeAlternatives && !ingredient && alternatives.length > 0) {
+    const altWithIngredient = alternatives.find(
+      alt => alt.ingredient && alt.ingredient.trim() !== '',
+    );
+    if (altWithIngredient) {
+      return altWithIngredient.ingredient;
+    }
+  }
+  return ingredient;
+}
+
+/**
+ * Moves trailing dash-separated notes into additional parts.
+ * Example: "cherries - stalks removed" → ingredient: "cherries", additional: "stalks removed"
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} additionalParts - Array to store extracted notes (mutated)
+ * @returns {{ingredient: string, additionalParts: string[]}} - Updated ingredient and parts
+ */
+export function extractDashSeparatedNotes(ingredient, additionalParts) {
+  const dashSplitMatch = ingredient.match(/^(.*?)[-–—]\s+(.+)$/);
+  if (
+    dashSplitMatch &&
+    dashSplitMatch[1].trim() &&
+    dashSplitMatch[2].trim() &&
+    !/\bor\b/i.test(dashSplitMatch[2])
+  ) {
+    ingredient = dashSplitMatch[1].trim();
+    additionalParts.push(dashSplitMatch[2].trim());
+  }
+  return {ingredient, additionalParts};
+}
+
+/**
+ * Removes standalone adverbs and adds them to instructions.
+ * Example: "finely chopped onions" → removes "finely", adds to instructions
+ *
+ * @param {string} ingredient - The ingredient text to process
+ * @param {string[]} additionalParts - Array of additional parts to process
+ * @param {string[]} adverbWords - Array of adverb words to remove
+ * @param {string[]} instructionsFound - Array to store removed adverbs (mutated)
+ * @returns {{ingredient: string, additionalParts: string[]}} - Updated ingredient and parts
+ */
+export function removeStandaloneAdverbs(ingredient, additionalParts, adverbWords, instructionsFound) {
+  if (!Array.isArray(adverbWords) || adverbWords.length === 0) {
+    return {ingredient, additionalParts};
+  }
+
+  const escapedAdverbs = adverbWords.map(w =>
+    w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+  );
+  const adverbOnlyRegex = new RegExp(
+    `\\b(${escapedAdverbs.join('|')})\\b`,
+    'gi',
+  );
+
+  ingredient = ingredient.replace(adverbOnlyRegex, match => {
+    if (!instructionsFound.includes(match.trim())) {
+      instructionsFound.push(match.trim());
+    }
+    return ' ';
+  });
+
+  additionalParts = additionalParts.map(part =>
+    typeof part === 'string'
+      ? part.replace(adverbOnlyRegex, match => {
+          if (!instructionsFound.includes(match.trim())) {
+            instructionsFound.push(match.trim());
+          }
+          return ' ';
+        })
+      : part,
+  );
+
+  return {ingredient, additionalParts};
+}
+
+/**
+ * Demotes leftover unit tokens to additional parts when they differ from primary unit.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {string|null} unit - The primary unit
+ * @param {Array<string>} additionalParts - Array to store demoted units
+ * @param {string} language - The language key
+ * @returns {{ingredient: string, additionalParts: Array<string>}} - Updated ingredient and parts
+ */
+export function demoteLeftoverUnits(ingredient, unit, additionalParts, language) {
+  const leftoverUnitMatch = getUnit(ingredient, language);
+  if (
+    unit &&
+    leftoverUnitMatch.length &&
+    leftoverUnitMatch[3] &&
+    ingredient.indexOf(leftoverUnitMatch[3]) === 0 &&
+    leftoverUnitMatch[0] !== unit &&
+    ['cup', 'tablespoon', 'teaspoon'].includes(leftoverUnitMatch[0]) &&
+    !/^\d/.test(ingredient)
+  ) {
+    additionalParts.push(leftoverUnitMatch[3].trim());
+    ingredient = ingredient.replace(leftoverUnitMatch[3], '').trim();
+  }
+  return {ingredient, additionalParts};
+}
+
+/**
+ * Removes leading adverbs that survived instruction extraction.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {Array<string>} adverbWords - Array of adverb words
+ * @returns {string} - Ingredient with leading adverbs removed
+ */
+export function removeLeadingAdverbs(ingredient, adverbWords) {
+  if (Array.isArray(adverbWords) && adverbWords.length) {
+    const escapedAdverbs = adverbWords.map(w =>
+      w.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'),
+    );
+    const leadingAdverbRegex = new RegExp(
+      `^(?:${escapedAdverbs.join('|')})\\s+`,
+      'i',
+    );
+    return ingredient.replace(leadingAdverbRegex, '').trim();
+  }
+  return ingredient;
+}
+
+/**
+ * Strips leading numeric tokens when quantity is already captured.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {string|number} quantity - The captured quantity
+ * @param {string} language - The language key
+ * @param {Function} resultQuantityCapturedFn - Function to check if quantity is captured
+ * @returns {string} - Ingredient with numeric tokens stripped
+ */
+export function stripLeadingNumericTokens(
+  ingredient,
+  quantity,
+  language,
+  resultQuantityCapturedFn,
+) {
+  if (resultQuantityCapturedFn(quantity) && /^[\d.]/.test(ingredient)) {
+    return ingredient
+      .replace(/^[\d.¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]+[\s-]*/u, '')
+      .trim();
+  }
+  const firstWord = (ingredient.split(/\s+/)[0] || '').toLowerCase();
+  const wordNum = convert.text2num(firstWord, language);
+  if (resultQuantityCapturedFn(quantity) && wordNum > 0) {
+    return ingredient
+      .replace(new RegExp(`^${firstWord}\\s+`, 'i'), '')
+      .trim();
+  }
+  return ingredient;
+}
+
+/**
+ * Prepends container size for pack-style units.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {string|null} unit - The unit
+ * @param {string|null} containerSizeText - The container size text
+ * @param {string} originalString - The original ingredient string
+ * @returns {string} - Updated ingredient
+ */
+export function prependPackSize(
+  ingredient,
+  unit,
+  containerSizeText,
+  originalString,
+) {
+  if (unit === 'pack') {
+    let sizeForPack = containerSizeText;
+    if (!sizeForPack) {
+      const sizeMatchOrig = originalString.match(
+        /(\d+(?:[.,]\d+)?(?:[¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])?)\s*-?\s*(?:oz|ounce|ounces|pound|lb|g|gram|grams|kg|kilogram)/i,
+      );
+      if (sizeMatchOrig) sizeForPack = sizeMatchOrig[0].trim();
+    }
+    if (sizeForPack) {
+      const cleanedIngredient = ingredient
+        .replace(/^(?:package|pack|packet)s?\s+/i, '')
+        .trim();
+      const sizeAlready = cleanedIngredient
+        .toLowerCase()
+        .startsWith(sizeForPack.toLowerCase());
+      return sizeAlready
+        ? cleanedIngredient
+        : `${sizeForPack} ${cleanedIngredient}`.trim();
+    }
+  }
+  return ingredient;
+}
+
+/**
+ * Removes "can"/"tin" prefixes for can units.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {string|null} unit - The unit
+ * @returns {string} - Updated ingredient
+ */
+export function removeCanPrefix(ingredient, unit) {
+  if (unit === 'can') {
+    return ingredient
+      .replace(/^(?:cans?|tins?)\b\s*(?:of\s+)?/i, '')
+      .trim();
+  }
+  return ingredient;
+}
+
+/**
+ * Removes leading/trailing conjunctions and prepositions.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @returns {string} - Cleaned ingredient
+ */
+export function removeConjunctionsAndPrepositions(ingredient) {
+  ingredient = ingredient.replace(/^(?:of|or|and)\s+/i, '').trim();
+  ingredient = ingredient
+    .replace(/^(?:small|large|medium)\s+of\s+/i, '')
+    .trim();
+  ingredient = ingredient.replace(/\b(?:and|or)\s*$/i, '').trim();
+  return ingredient;
+}
+
+/**
+ * Cleans toTaste-related text from ingredient and additional parts.
+ *
+ * @param {string} ingredient - The ingredient text
+ * @param {Array<string>} additionalParts - Array of additional parts
+ * @param {boolean} toTaste - Whether toTaste flag is set
+ * @param {RegExp} toTasteAdditionalRegex - Regex for additional toTaste cleanup
+ * @param {Function} safeReplaceFn - Safe replace function
+ * @returns {{ingredient: string, additionalParts: Array<string>}} - Cleaned values
+ */
+export function cleanToTasteText(
+  ingredient,
+  additionalParts,
+  toTaste,
+  toTasteAdditionalRegex,
+  safeReplaceFn,
+) {
+  if (toTaste && toTasteAdditionalRegex) {
+    ingredient = safeReplaceFn(ingredient, toTasteAdditionalRegex).trim();
+    additionalParts = additionalParts.map(part =>
+      typeof part === 'string'
+        ? safeReplaceFn(part, toTasteAdditionalRegex).trim()
+        : part,
+    );
+  }
+  return {ingredient, additionalParts};
+}

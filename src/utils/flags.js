@@ -91,3 +91,85 @@ export function safeReplace(text, regex) {
   regex.lastIndex = 0;
   return text.replace(regex, '');
 }
+
+/**
+ * Detects and removes approx flag from ingredient line.
+ * Returns updated flag and cleaned line.
+ *
+ * @param {string} line - The ingredient line to check
+ * @param {boolean} currentFlag - Current approx flag value
+ * @param {RegExp|null} approxRegex - Regex for approx keywords
+ * @returns {{approx: boolean, line: string}} - Updated flag and line
+ */
+export function detectApproxFlag(line, currentFlag, approxRegex) {
+  if (!approxRegex) {
+    return {approx: currentFlag, line};
+  }
+
+  const match = line.match(approxRegex);
+  if (match) {
+    return {
+      approx: true,
+      line: line.replace(match[0], '').trim(),
+    };
+  }
+
+  return {approx: currentFlag, line};
+}
+
+/**
+ * Detects and removes optional flag from ingredient line.
+ * Returns updated flag and cleaned line.
+ *
+ * @param {string} line - The ingredient line to check
+ * @param {boolean} currentFlag - Current optional flag value
+ * @param {RegExp|null} optionalRegex - Regex for optional keywords
+ * @returns {{optional: boolean, line: string}} - Updated flag and line
+ */
+export function detectOptionalFlag(line, currentFlag, optionalRegex) {
+  if (safeTest(optionalRegex, line)) {
+    return {
+      optional: true,
+      line: safeReplace(line, optionalRegex).trim(),
+    };
+  }
+  return {optional: currentFlag, line};
+}
+
+/**
+ * Detects and removes toServe flag from ingredient line.
+ * Returns updated flag and cleaned line.
+ *
+ * @param {string} line - The ingredient line to check
+ * @param {boolean} currentFlag - Current toServe flag value
+ * @param {RegExp|null} toServeRegex - Regex for toServe keywords
+ * @returns {{toServe: boolean, line: string}} - Updated flag and line
+ */
+export function detectToServeFlag(line, currentFlag, toServeRegex) {
+  if (safeTest(toServeRegex, line)) {
+    return {
+      toServe: true,
+      line: safeReplace(line, toServeRegex).trim(),
+    };
+  }
+  return {toServe: currentFlag, line};
+}
+
+/**
+ * Detects and removes toTaste flag from ingredient line.
+ * Returns updated flag and cleaned line.
+ *
+ * @param {string} line - The ingredient line to check
+ * @param {boolean} currentFlag - Current toTaste flag value
+ * @param {RegExp|null} toTasteRegex - Regex for toTaste keywords
+ * @returns {{toTaste: boolean, line: string}} - Updated flag and line
+ */
+export function detectToTasteFlag(line, currentFlag, toTasteRegex) {
+  if (safeTest(toTasteRegex, line)) {
+    return {
+      toTaste: true,
+      line: safeReplace(line, toTasteRegex).trim(),
+    };
+  }
+  return {toTaste: currentFlag, line};
+}
