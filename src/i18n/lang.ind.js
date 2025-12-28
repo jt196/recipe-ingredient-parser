@@ -339,6 +339,9 @@ export const problematicUnits = {
   siung: ['bawang putih'],
 };
 
+// Indonesian unit translations placeholder; add localized unit names when available.
+export const unitTranslations = {};
+
 export const langInd = {
   units,
   singularUnits,
@@ -358,5 +361,6 @@ export const langInd = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  unitTranslations,
   isCommaDelimited: true,
 };

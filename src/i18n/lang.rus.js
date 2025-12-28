@@ -329,6 +329,9 @@ export const problematicUnits = {
   зубчик: ['чеснок'],
 };
 
+// Russian unit translations placeholder; add localized unit names when available.
+export const unitTranslations = {};
+
 export const langRus = {
   units,
   singularUnits,
@@ -348,5 +351,6 @@ export const langRus = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  unitTranslations,
   isCommaDelimited: true,
 };

@@ -309,6 +309,10 @@ export const problematicUnits = {
   فص: ['ثوم'],
 };
 
+// Arabic unit translations (defaults to base English units when missing).
+// Keeping this object present satisfies the i18n contract; add strings here when available.
+export const unitTranslations = {};
+
 export const langAra = {
   units,
   singularUnits,
@@ -328,5 +332,6 @@ export const langAra = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  unitTranslations,
   isCommaDelimited: true,
 };

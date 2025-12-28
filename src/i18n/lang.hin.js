@@ -338,6 +338,9 @@ export const problematicUnits = {
   कलि: ['लहसुन'],
 };
 
+// Hindi unit translations placeholder; fill with localized unit names if needed.
+export const unitTranslations = {};
+
 export const langHin = {
   units,
   singularUnits,
@@ -357,5 +360,6 @@ export const langHin = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  unitTranslations,
   isCommaDelimited: false,
 };
