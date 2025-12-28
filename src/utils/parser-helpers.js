@@ -21,19 +21,75 @@ export function getUnit(input, language) {
   if (typeof input !== 'string') return [];
   const langMap = i18nMap[language];
   if (!langMap) return [];
-  const {units, pluralUnits, symbolUnits, problematicUnits} = langMap;
 
+  // NEW: Use unitsData as primary source
+  const {unitsData, problematicUnits} = langMap;
+
+  // Fallback to old structure if unitsData not available (for other languages not yet migrated)
+  if (!unitsData) {
+    const {units, pluralUnits, symbolUnits} = langMap;
+    let allMatches = [];
+
+    const addMatch = (unit, pluralUnit, match) => {
+      const symbol = symbolUnits[unit];
+      allMatches.push([unit, pluralUnit, symbol, match]);
+    };
+
+    for (const unit of Object.keys(units)) {
+      for (const shorthand of units[unit]) {
+        const regex = new RegExp(
+          `(?:^|[^A-Za-z0-9])${shorthand.replace(
+            /\./g,
+            '\\.',
+          )}(?:$|[^A-Za-z0-9])`,
+          'gi',
+        );
+        const match = input.match(regex);
+        if (match) {
+          addMatch(unit, pluralUnits[unit], match[0]);
+        }
+      }
+    }
+
+    for (const pluralUnit of Object.keys(pluralUnits)) {
+      const regex = new RegExp(
+        `(?:^|[^A-Za-z0-9])${pluralUnits[pluralUnit]}(?:$|[^A-Za-z0-9])`,
+        'gi',
+      );
+      const match = input.match(regex);
+      if (match) {
+        addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
+      }
+    }
+
+    for (const problematicUnit in problematicUnits) {
+      const contextClues = problematicUnits[problematicUnit];
+      if (
+        allMatches.some(match => match[0] === problematicUnit) &&
+        !contextClues.some(clue => input.includes(clue))
+      ) {
+        allMatches = allMatches.filter(match => match[0] !== problematicUnit);
+      }
+    }
+
+    if (allMatches.length === 0) {
+      return [];
+    }
+    return getEarliestMatch(allMatches, input);
+  }
+
+  // NEW: Modern path using unitsData
   let allMatches = [];
 
-  const addMatch = (unit, pluralUnit, match) => {
-    const symbol = symbolUnits[unit];
-    allMatches.push([unit, pluralUnit, symbol, match]);
+  const addMatch = (unitKey, unitData, match) => {
+    allMatches.push([unitKey, unitData.plural, unitData.symbol, match]);
   };
 
-  for (const unit of Object.keys(units)) {
-    for (const shorthand of units[unit]) {
+  // Search through all unit names
+  for (const [unitKey, unitData] of Object.entries(unitsData)) {
+    for (const name of unitData.names) {
       const regex = new RegExp(
-        `(?:^|[^A-Za-z0-9])${shorthand.replace(
+        `(?:^|[^A-Za-z0-9])${name.replace(
           /\./g,
           '\\.',
         )}(?:$|[^A-Za-z0-9])`,
@@ -41,22 +97,12 @@ export function getUnit(input, language) {
       );
       const match = input.match(regex);
       if (match) {
-        addMatch(unit, pluralUnits[unit], match[0]);
+        addMatch(unitKey, unitData, match[0]);
       }
     }
   }
 
-  for (const pluralUnit of Object.keys(pluralUnits)) {
-    const regex = new RegExp(
-      `(?:^|[^A-Za-z0-9])${pluralUnits[pluralUnit]}(?:$|[^A-Za-z0-9])`,
-      'gi',
-    );
-    const match = input.match(regex);
-    if (match) {
-      addMatch(pluralUnit, pluralUnits[pluralUnit], match[0]);
-    }
-  }
-
+  // Filter problematic units
   for (const problematicUnit in problematicUnits) {
     const contextClues = problematicUnits[problematicUnit];
     if (
@@ -88,7 +134,27 @@ export function getPreposition(input, language) {
 
 export const getSymbol = (unit, language) => {
   const langMap = i18nMap[language];
-  if (!unit || !langMap?.units || !langMap?.symbolUnits) return '';
+  if (!unit || !langMap) return '';
+
+  // NEW: Use unitsData if available
+  if (langMap.unitsData) {
+    // Try direct lookup first
+    if (langMap.unitsData[unit]) {
+      return langMap.unitsData[unit].symbol || '';
+    }
+
+    // Search through unit names to find canonical key
+    for (const [canonicalKey, unitData] of Object.entries(langMap.unitsData)) {
+      if (unitData.names.includes(unit)) {
+        return unitData.symbol || '';
+      }
+    }
+
+    return '';
+  }
+
+  // Fallback to old structure for languages not yet migrated
+  if (!langMap.units || !langMap.symbolUnits) return '';
 
   const normalizedKey = Object.keys(langMap.units).find(key =>
     langMap.units[key].includes(unit),
@@ -100,6 +166,26 @@ export const getSymbol = (unit, language) => {
 export const getUnitSystem = (unit, language) => {
   if (!unit) return null;
   const langMap = i18nMap[language];
+  if (!langMap) return null;
+
+  // NEW: Use unitsData if available
+  if (langMap.unitsData) {
+    // Try direct lookup first
+    if (langMap.unitsData[unit]) {
+      return langMap.unitsData[unit].system;
+    }
+
+    // Search through unit names to find canonical key
+    for (const [canonicalKey, unitData] of Object.entries(langMap.unitsData)) {
+      if (unitData.names.includes(unit)) {
+        return unitData.system;
+      }
+    }
+
+    return null;
+  }
+
+  // Fallback to old structure for languages not yet migrated
   const unitSystems = langMap?.unitSystems;
   if (unitSystems && unitSystems[unit]) {
     return unitSystems[unit];

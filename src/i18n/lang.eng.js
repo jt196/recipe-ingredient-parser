@@ -252,7 +252,7 @@ const unitsData = {
 
   // COUNT / CONTAINER UNITS (no conversion)
   clove: {
-    names: ['clove'],
+    names: ['clove', 'cloves'],
     plural: 'cloves',
     symbol: '',
     system: null,
@@ -282,7 +282,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   box: {
-    names: ['box'],
+    names: ['box', 'boxes'],
     plural: 'boxes',
     symbol: '',
     system: null,
@@ -292,7 +292,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   bottle: {
-    names: ['bottle', 'btl', 'btl.'],
+    names: ['bottle', 'bottles', 'btl', 'btl.'],
     plural: 'bottles',
     symbol: '',
     system: null,
@@ -302,7 +302,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   container: {
-    names: ['container', 'cont', 'cont.'],
+    names: ['container', 'containers', 'cont', 'cont.'],
     plural: 'containers',
     symbol: '',
     system: null,
@@ -312,7 +312,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   can: {
-    names: ['can'],
+    names: ['can', 'cans'],
     plural: 'cans',
     symbol: '',
     system: null,
@@ -382,7 +382,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   slice: {
-    names: ['slice'],
+    names: ['slice', 'slices'],
     plural: 'slices',
     symbol: '',
     system: null,
@@ -392,7 +392,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   handful: {
-    names: ['handful'],
+    names: ['handful', 'handfuls'],
     plural: 'handfuls',
     symbol: '',
     system: null,
@@ -402,7 +402,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   drizzle: {
-    names: ['drizzle'],
+    names: ['drizzle', 'drizzles'],
     plural: 'drizzles',
     symbol: '',
     system: null,
@@ -412,7 +412,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   ear: {
-    names: ['ear'],
+    names: ['ear', 'ears'],
     plural: 'ears',
     symbol: '',
     system: null,
@@ -432,7 +432,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   knob: {
-    names: ['knob'],
+    names: ['knob', 'knobs'],
     plural: 'knobs',
     symbol: '',
     system: null,
@@ -442,7 +442,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   thumb: {
-    names: ['thumb'],
+    names: ['thumb', 'thumbs'],
     plural: 'thumbs',
     symbol: '',
     system: null,
@@ -452,7 +452,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   block: {
-    names: ['block'],
+    names: ['block', 'blocks'],
     plural: 'blocks',
     symbol: '',
     system: null,
@@ -464,7 +464,7 @@ const unitsData = {
 
   // LENGTH UNITS
   inch: {
-    names: ['inch'],
+    names: ['inch', 'inches'],
     plural: 'inches',
     symbol: '',
     system: null,
@@ -474,7 +474,7 @@ const unitsData = {
     decimalPlaces: 0
   },
   centimetre: {
-    names: ['centimeter', 'centimetre', 'cm', 'cm.'],
+    names: ['centimeter', 'centimetre', 'centimeters', 'centimetres', 'cm', 'cm.'],
     plural: 'centimetres',
     symbol: 'cm',
     system: 'metric',
