@@ -415,7 +415,7 @@ const numbersMagnitude = {
   billion: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['ail'],
   // Add more problematic units here if needed
 };

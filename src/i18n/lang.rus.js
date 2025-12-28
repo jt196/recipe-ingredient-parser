@@ -373,7 +373,7 @@ const numbersMagnitude = {
   биллион: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['чеснок'],
 };
 

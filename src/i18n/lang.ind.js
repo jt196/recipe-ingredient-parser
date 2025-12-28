@@ -394,7 +394,7 @@ const numbersMagnitude = {
   'satu triliun': 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['bawang putih'],
 };
 

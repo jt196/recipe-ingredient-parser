@@ -237,12 +237,7 @@ const toTasteAdditional = [
 const additionalStopwords = [];
 const approx = ['लगभग', 'करीब', 'तक़रीबन', 'आसपास', '~'];
 const optional = ['वैकल्पिक', 'ऑप्शनल', 'यदि चाहें'];
-const toServe = [
-  'परोसने के लिए',
-  'सजावट के लिए',
-  'सजाने के लिए',
-  'सजा देना',
-];
+const toServe = ['परोसने के लिए', 'सजावट के लिए', 'सजाने के लिए', 'सजा देना'];
 const instructions = [
   'कटा हुआ',
   'टुकड़ों में',
@@ -387,7 +382,7 @@ const numbersMagnitude = {
   करोड़: 10000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['लहसुन'],
 };
 

@@ -372,7 +372,13 @@ const instructions = [
   'em cubos',
   'rasgado',
 ];
-const adverbs = ['finamente', 'grosseiramente', 'delicadamente', 'recém', 'firmemente'];
+const adverbs = [
+  'finamente',
+  'grosseiramente',
+  'delicadamente',
+  'recém',
+  'firmemente',
+];
 
 const numbersSmall = {
   zero: 0,
@@ -415,7 +421,7 @@ const numbersMagnitude = {
   trilhão: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['alho'],
   // Add more problematic units here if needed
 };

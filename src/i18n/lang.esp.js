@@ -29,7 +29,14 @@ export const unitTranslations = {
     symbol: 'oz',
   },
   floz: {
-    names: ['onza fluida', 'onz. fluida', 'fl oz', 'fl. oz', 'fluid ounce', 'fluid ounces'],
+    names: [
+      'onza fluida',
+      'onz. fluida',
+      'fl oz',
+      'fl. oz',
+      'fluid ounce',
+      'fluid ounces',
+    ],
     singular: 'onza fluida',
     plural: 'onzas fluidas',
     symbol: 'fl oz',
@@ -240,7 +247,14 @@ const joiners = ['a'];
 
 const toTaste = ['al gusto'];
 
-const toTasteAdditional = ['más', 'ajustar', 'sazonar', 'o', 'o más', 'un poco más'];
+const toTasteAdditional = [
+  'más',
+  'ajustar',
+  'sazonar',
+  'o',
+  'o más',
+  'un poco más',
+];
 
 const additionalStopwords = [];
 
@@ -360,7 +374,13 @@ const instructions = [
   'rasgado',
 ];
 
-const adverbs = ['finamente', 'gruesamente', 'delgadamente', 'recién', 'firmemente'];
+const adverbs = [
+  'finamente',
+  'gruesamente',
+  'delgadamente',
+  'recién',
+  'firmemente',
+];
 
 const numbersSmall = {
   cero: 0,
@@ -406,7 +426,7 @@ const numbersMagnitude = {
   billon: 1000000000000, // without accent
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['ajo'],
   // Add more problematic units here as needed
 };

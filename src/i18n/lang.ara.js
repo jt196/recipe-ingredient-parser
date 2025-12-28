@@ -226,7 +226,14 @@ export const unitTranslations = {
 const prepositions = ['من'];
 const joiners = ['إلى'];
 const toTaste = ['حسب الذوق'];
-const toTasteAdditional = ['المزيد', 'حسب الرغبة', 'تتبيل', 'أو', 'أو أكثر', 'المزيد قليلاً'];
+const toTasteAdditional = [
+  'المزيد',
+  'حسب الرغبة',
+  'تتبيل',
+  'أو',
+  'أو أكثر',
+  'المزيد قليلاً',
+];
 const additionalStopwords = [];
 const approx = ['حوالي', 'قرابة', 'تقريباً', 'نحو', '~'];
 const optional = ['اختياري', 'إذا رغبت'];
@@ -361,7 +368,7 @@ const numbersMagnitude = {
   بليون: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['ثوم'],
 };
 

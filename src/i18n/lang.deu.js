@@ -363,7 +363,7 @@ const numbersMagnitude = {
   billion: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['knoblauch', 'garlic'],
   // Add more problematic units here as needed
 };

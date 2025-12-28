@@ -32,7 +32,14 @@ export const unitTranslations = {
     symbol: 'mg',
   },
   kilogram: {
-    names: ['kg.', 'kg', 'kilogrammo', 'chilogrammi', 'kilogrammo', 'chilogrammo'],
+    names: [
+      'kg.',
+      'kg',
+      'kilogrammo',
+      'chilogrammi',
+      'kilogrammo',
+      'chilogrammo',
+    ],
     singular: 'chilogrammo',
     plural: 'chilogrammi',
     symbol: 'kg',
@@ -128,7 +135,14 @@ export const unitTranslations = {
     symbol: '',
   },
   can: {
-    names: ['barattolo', 'barattoli', 'lattina', 'scatoletta', 'scatola', 'scatole'],
+    names: [
+      'barattolo',
+      'barattoli',
+      'lattina',
+      'scatoletta',
+      'scatola',
+      'scatole',
+    ],
     singular: 'barattolo',
     plural: 'barattoli',
     symbol: '',
@@ -140,7 +154,17 @@ export const unitTranslations = {
     symbol: '',
   },
   pack: {
-    names: ['pkg', 'pkgs', 'pacchetto', 'pacco', 'pacchetti', 'confezione', 'confezioni', 'bustina', 'bustine'],
+    names: [
+      'pkg',
+      'pkgs',
+      'pacchetto',
+      'pacco',
+      'pacchetti',
+      'confezione',
+      'confezioni',
+      'bustina',
+      'bustine',
+    ],
     singular: 'pacchetto',
     plural: 'pacchetti',
     symbol: '',
@@ -399,7 +423,7 @@ export const numbersMagnitude = {
   trilliardo: 1000000000000,
 };
 
-export const problematicUnits = {
+const problematicUnits = {
   clove: ['garlic'],
   // Add more problematic units here
   // 'unit': ['context clue1', 'context clue2']
