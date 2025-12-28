@@ -1,149 +1,511 @@
-const units = {
-  clove: ['clove'],
-  gallon: ['gallon', 'gal', 'gal.'],
-  ounce: ['ounce', 'oz', 'oz.'],
-  floz: [
-    'fl oz',
-    'fl.oz',
-    'fl oz.',
-    'fl.oz.',
-    'fluid ounce',
-    'fluid ounces',
-    'fl. ounce',
-    'fl. ounces',
-  ],
-  pint: ['pint', 'pt', 'pts', 'pt.', 'pts.'],
-  pound: ['pound', 'lb', 'lb.', 'lbs', 'lbs.', 'Lb', 'Lbs', 'Lb.', 'Lbs.'],
-  quart: ['quart', 'qt', 'qt.', 'qts', 'qts.'],
-  tablespoon: ['tablespoon', 'tbs', 'tbsp', 'tbspn', 'tbs.', 'tbsp.', 'tbspn.'],
-  teaspoon: [
-    'teaspoon',
-    'tsp',
-    'tspn',
-    't',
-    't.',
-    'tsp.',
-    'tspn.',
-    't/s',
-    'ts',
-    'ts.',
-  ],
-  gram: ['gram', 'g', 'g.'],
-  kilogram: ['kilogram', 'kg', 'kg.'],
-  liter: ['liter', 'l', 'l.', 'lt', 'lt.', 'litre', 'litres'],
-  milligram: ['milligram', 'mg', 'mg.'],
-  milliliter: ['milliliter', 'ml', 'ml.', 'millilitre', 'millilitres'],
-  pack: [
-    'package',
-    'pkg',
-    'pkgs',
-    'pkg.',
-    'pkgs.',
-    'pack',
-    'packet',
-    'packets',
-  ],
-  bag: ['bag', 'bg', 'bg.'],
-  box: ['box'],
-  bottle: ['bottle', 'btl', 'btl.'],
-  container: ['container', 'cont', 'cont.'],
-  can: ['can'],
-  cup: ['cup', 'c', 'c.'],
-  stick: ['stick', 'sticks'],
-  dozen: ['dozen'],
-  piece: ['piece', 'pcs', 'pcs.'],
-  pinch: ['pinch'],
-  drop: ['drop', 'drops'],
-  dash: ['dash', 'dashes', 'splash', 'splashes'],
-  squirt: ['squirt', 'squirts'],
-  bunch: ['bunch', 'bunches'],
-  serving: ['serving', 'servings', 'portion', 'portions'],
-  slice: ['slice'],
-  handful: ['handful'],
-  inch: ['inch'],
-  drizzle: ['drizzle'],
-  centimetre: ['centimeter', 'centimetre', 'cm', 'cm.'],
-  ear: ['ear'],
-  few: ['few'],
-  knob: ['knob'],
-  thumb: ['thumb'],
-  block: ['block'],
+// ============================================================================
+// NEW: Unified units data - single source of truth for all unit information
+// ============================================================================
+const unitsData = {
+  // SMALL VOLUME UNITS (skip conversion)
+  drop: {
+    names: ['drop', 'drops', 'dr.', 'dr', 'drs.', 'drs', 'gt.', 'gt', 'gts.', 'gts', 'gtt', 'gtt.', 'gtts', 'gtts.'],
+    plural: 'drops',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 0.05 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  smidgen: {
+    names: ['smidgen', 'smidgens', 'smdg.', 'smdg', 'smdgs.', 'smdgs', 'smi', 'smi.', 'smis.', 'smis'],
+    plural: 'smidgens',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 0.18 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  pinch: {
+    names: ['pinch', 'pinches', 'pinchs', 'pn.', 'pn', 'pns.', 'pns'],
+    plural: 'pinches',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 0.36 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  dash: {
+    names: ['dash', 'dashs', 'dashes', 'splash', 'splashes', 'ds.', 'ds', 'dss.', 'dss'],
+    plural: 'dashes',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 0.72 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  saltspoon: {
+    names: ['saltspoon', 'salt spoon', 'saltspoons', 'salt spoons', 'scruple', 'scruples', 'ssp.', 'ssp', 'ssps.', 'ssps'],
+    plural: 'saltspoons',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 1.23 },
+    skipConversion: true,
+    decimalPlaces: 1
+  },
+  coffeespoon: {
+    names: ['coffeespoon', 'coffee spoon', 'coffeespoons', 'coffee spoons', 'csp.', 'csp', 'csps.', 'csps'],
+    plural: 'coffeespoons',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 2.1 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  fluiddram: {
+    names: ['fluid dram', 'fluiddram', 'fluid drams', 'fluiddrams', 'fl.dr.', 'fldr', 'fl.dr', 'fldr.', 'fl.drs.', 'fldrs', 'fl.drs'],
+    plural: 'fluid drams',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 3.69 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+
+  // STANDARD VOLUME UNITS
+  teaspoon: {
+    names: ['teaspoon', 'tea spoon', 'teaspoons', 'tea spoons', 'tsp.', 'tsp', 'tspn', 'tspn.', 'tsps.', 'tsps', 't.', 't', 'ts.', 'ts', 't/s'],
+    plural: 'teaspoons',
+    symbol: 'tsp',
+    system: 'americanVolumetric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 4.92 },
+    skipConversion: false,
+    decimalPlaces: 1
+  },
+  dessertspoon: {
+    names: ['dessertspoon', 'dessert spoon', 'dessertspoons', 'dessert spoons', 'dsp.', 'dsp', 'dsps.', 'dsps', 'dssp.', 'dssp', 'dssps.', 'dssps', 'dstspn.', 'dstspn', 'dstspns.', 'dstspns'],
+    plural: 'dessertspoons',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 9.85 },
+    skipConversion: true,
+    decimalPlaces: 1
+  },
+  tablespoon: {
+    names: ['tablespoon', 'table spoon', 'tablespoons', 'table spoons', 'tbsp.', 'tbsp', 'tbsps.', 'tbsps', 'tbs', 'tbspn', 'tbs.', 'tbspn.', 'T.', 'T', 'Ts.', 'Ts'],
+    plural: 'tablespoons',
+    symbol: 'tbs',
+    system: 'americanVolumetric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 14.78 },
+    skipConversion: false,
+    decimalPlaces: 1
+  },
+  floz: {
+    names: ['fluid ounce', 'fluidounce', 'fluid ounces', 'fluidounces', 'fl.oz.', 'floz', 'fl.oz', 'floz.', 'fl oz', 'fl oz.', 'fl. ounce', 'fl. ounces', 'fl.ozs.', 'flozs', 'fl.ozs', 'flozs.'],
+    plural: 'fluid ounces',
+    symbol: 'fl oz',
+    system: 'imperial',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 29.5735 },
+    skipConversion: false,
+    decimalPlaces: 1
+  },
+  wineglass: {
+    names: ['wineglass', 'wine glass', 'wineglasses', 'wine glasses', 'wgf.', 'wgf', 'wgfs.', 'wgfs'],
+    plural: 'wineglasses',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 59.14 },
+    skipConversion: true,
+    decimalPlaces: 1
+  },
+  gill: {
+    names: ['gill', 'gills', 'teacup', 'tea cup', 'teacups', 'tea cups', 'tcf.', 'tcf', 'tcfs.', 'tcfs'],
+    plural: 'gills',
+    symbol: '',
+    system: null,
+    unitType: 'volume',
+    conversionFactor: { milliliters: 118.29 },
+    skipConversion: true,
+    decimalPlaces: 2
+  },
+  cup: {
+    names: ['cup', 'cups', 'C.', 'C', 'c.', 'c', 'Cs.', 'Cs'],
+    plural: 'cups',
+    symbol: 'c',
+    system: 'americanVolumetric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 236.588 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  pint: {
+    names: ['pint', 'pints', 'pt.', 'pt', 'pts.', 'pts'],
+    plural: 'pints',
+    symbol: 'pt',
+    system: 'americanVolumetric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 473.176 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  quart: {
+    names: ['quart', 'quarts', 'qt.', 'qt', 'qts.', 'qts'],
+    plural: 'quarts',
+    symbol: 'qt',
+    system: 'americanVolumetric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 946.353 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  gallon: {
+    names: ['gallon', 'gallons', 'gal.', 'gal', 'gals.', 'gals'],
+    plural: 'gallons',
+    symbol: 'gal',
+    system: 'imperial',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 3785.41 },
+    skipConversion: false,
+    decimalPlaces: 3
+  },
+
+  // METRIC VOLUME UNITS
+  milliliter: {
+    names: ['milliliter', 'milliliters', 'millilitre', 'millilitres', 'ml.', 'ml', 'mls.', 'mls'],
+    plural: 'milliliters',
+    symbol: 'ml',
+    system: 'metric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 1 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  liter: {
+    names: ['liter', 'liters', 'litre', 'litres', 'l.', 'l', 'ls.', 'ls', 'lt', 'lt.'],
+    plural: 'liters',
+    symbol: 'lt',
+    system: 'metric',
+    unitType: 'volume',
+    conversionFactor: { milliliters: 1000 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+
+  // WEIGHT UNITS
+  milligram: {
+    names: ['milligram', 'milligrams', 'mg.', 'mg', 'mgs.', 'mgs'],
+    plural: 'milligrams',
+    symbol: 'mg',
+    system: 'metric',
+    unitType: 'weight',
+    conversionFactor: { grams: 0.001 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  gram: {
+    names: ['gram', 'grams', 'g.', 'g', 'gs.', 'gs'],
+    plural: 'grams',
+    symbol: 'g',
+    system: 'metric',
+    unitType: 'weight',
+    conversionFactor: { grams: 1 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  kilogram: {
+    names: ['kilogram', 'kilo gram', 'kilograms', 'kilo grams', 'kg.', 'kg', 'kgs.', 'kgs'],
+    plural: 'kilograms',
+    symbol: 'kg',
+    system: 'metric',
+    unitType: 'weight',
+    conversionFactor: { grams: 1000 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+  ounce: {
+    names: ['ounce', 'ounces', 'oz.', 'oz', 'ozs.', 'ozs'],
+    plural: 'ounces',
+    symbol: 'oz',
+    system: 'imperial',
+    unitType: 'weight',
+    conversionFactor: { grams: 28.3495 },
+    skipConversion: false,
+    decimalPlaces: 1
+  },
+  pound: {
+    names: ['pound', 'pounds', 'lb.', 'lb', 'lbs.', 'lbs', 'Lb', 'Lbs', 'Lb.', 'Lbs.'],
+    plural: 'pounds',
+    symbol: 'lb',
+    system: 'imperial',
+    unitType: 'weight',
+    conversionFactor: { grams: 453.592 },
+    skipConversion: false,
+    decimalPlaces: 2
+  },
+
+  // COUNT / CONTAINER UNITS (no conversion)
+  clove: {
+    names: ['clove'],
+    plural: 'cloves',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  pack: {
+    names: ['package', 'pkg', 'pkgs', 'pkg.', 'pkgs.', 'pack', 'packet', 'packets'],
+    plural: 'packs',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  bag: {
+    names: ['bag', 'bg', 'bg.'],
+    plural: 'bags',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  box: {
+    names: ['box'],
+    plural: 'boxes',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  bottle: {
+    names: ['bottle', 'btl', 'btl.'],
+    plural: 'bottles',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  container: {
+    names: ['container', 'cont', 'cont.'],
+    plural: 'containers',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  can: {
+    names: ['can'],
+    plural: 'cans',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  stick: {
+    names: ['stick', 'sticks'],
+    plural: 'sticks',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  dozen: {
+    names: ['dozen'],
+    plural: 'dozens',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  piece: {
+    names: ['piece', 'pcs', 'pcs.'],
+    plural: 'pieces',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  squirt: {
+    names: ['squirt', 'squirts'],
+    plural: 'squirts',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  bunch: {
+    names: ['bunch', 'bunches'],
+    plural: 'bunches',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  serving: {
+    names: ['serving', 'servings', 'portion', 'portions'],
+    plural: 'servings',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  slice: {
+    names: ['slice'],
+    plural: 'slices',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  handful: {
+    names: ['handful'],
+    plural: 'handfuls',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  drizzle: {
+    names: ['drizzle'],
+    plural: 'drizzles',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  ear: {
+    names: ['ear'],
+    plural: 'ears',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  few: {
+    names: ['few'],
+    plural: 'few',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  knob: {
+    names: ['knob'],
+    plural: 'knobs',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  thumb: {
+    names: ['thumb'],
+    plural: 'thumbs',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  block: {
+    names: ['block'],
+    plural: 'blocks',
+    symbol: '',
+    system: null,
+    unitType: 'count',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+
+  // LENGTH UNITS
+  inch: {
+    names: ['inch'],
+    plural: 'inches',
+    symbol: '',
+    system: null,
+    unitType: 'length',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  centimetre: {
+    names: ['centimeter', 'centimetre', 'cm', 'cm.'],
+    plural: 'centimetres',
+    symbol: 'cm',
+    system: 'metric',
+    unitType: 'length',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 1
+  }
 };
 
-const pluralUnits = {
-  cup: 'cups',
-  gallon: 'gallons',
-  ounce: 'ounces',
-  floz: 'fluid ounces',
-  pint: 'pints',
-  pound: 'pounds',
-  quart: 'quarts',
-  tablespoon: 'tablespoons',
-  teaspoon: 'teaspoons',
-  gram: 'grams',
-  container: 'containers',
-  kilogram: 'kilograms',
-  liter: 'liters',
-  milligram: 'milligrams',
-  milliliter: 'milliliters',
-  clove: 'cloves',
-  bottle: 'bottles',
-  bag: 'bags',
-  box: 'boxes',
-  pinch: 'pinches',
-  drop: 'drops',
-  dash: 'dashes',
-  squirt: 'squirts',
-  bunch: 'bunches',
-  serving: 'servings',
-  can: 'cans',
-  slice: 'slices',
-  piece: 'pieces',
-  stick: 'sticks',
-  handful: 'handfuls',
-  inch: 'inches',
-  pack: 'packs',
-  centimetre: 'centimetres',
-  ear: 'ears',
-  knob: 'knobs',
-  thumb: 'thumbs',
-  block: 'blocks',
-};
+// ============================================================================
+// OLD: Backwards compatibility - auto-generated from unitsData
+// These objects will be removed in Phase 4 after migration is complete
+// ============================================================================
+const units = Object.fromEntries(
+  Object.entries(unitsData).map(([key, data]) => [key, data.names])
+);
 
-const symbolUnits = {
-  cup: 'c',
-  gallon: 'gal',
-  ounce: 'oz',
-  pint: 'pt',
-  pound: 'lb',
-  quart: 'qt',
-  tablespoon: 'tbs',
-  teaspoon: 'tsp',
-  gram: 'g',
-  kilogram: 'kg',
-  liter: 'lt',
-  milligram: 'mg',
-  milliliter: 'ml',
-  container: '',
-  clove: '',
-  bottle: '',
-  bag: '',
-  box: '',
-  pinch: '',
-  drop: '',
-  dash: '',
-  squirt: '',
-  bunch: '',
-  serving: '',
-  can: '',
-  slice: '',
-  piece: '',
-  stick: '',
-  handful: '',
-  inch: '',
-  pack: '',
-  centimetre: 'cm',
-};
+const pluralUnits = Object.fromEntries(
+  Object.entries(unitsData).map(([key, data]) => [key, data.plural])
+);
+
+const symbolUnits = Object.fromEntries(
+  Object.entries(unitsData).map(([key, data]) => [key, data.symbol])
+);
+
+const unitSystems = Object.fromEntries(
+  Object.entries(unitsData)
+    .filter(([_, data]) => data.system !== null)
+    .map(([key, data]) => [key, data.system])
+);
 
 const prepositions = ['of'];
 
@@ -303,21 +665,6 @@ const adverbs = [
   'lightly',
 ];
 
-const unitSystems = {
-  gram: 'metric',
-  kilogram: 'metric',
-  milligram: 'metric',
-  liter: 'metric',
-  milliliter: 'metric',
-  ounce: 'imperial',
-  floz: 'imperial',
-  gallon: 'imperial',
-  pound: 'imperial',
-  cup: 'americanVolumetric',
-  quart: 'americanVolumetric',
-  pint: 'americanVolumetric',
-};
-
 const numbersSmall = {
   zero: 0,
   one: 1,
@@ -365,9 +712,17 @@ export const problematicUnits = {
 };
 
 export const langEng = {
+  // NEW: Unified units data (single source of truth)
+  unitsData,
+
+  // OLD: Backwards compatibility (auto-generated from unitsData)
+  // These will be removed in Phase 4 after migration is complete
   units,
   pluralUnits,
   symbolUnits,
+  unitSystems,
+
+  // Other language data (unchanged)
   prepositions,
   joiners,
   toTaste,
@@ -378,7 +733,6 @@ export const langEng = {
   toServe,
   instructions,
   adverbs,
-  unitSystems,
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
