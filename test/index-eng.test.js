@@ -91,6 +91,13 @@ describe('recipe parser eng', () => {
         expect(res.ingredient).to.equal('butter');
         expect(res.toTaste).to.equal(undefined);
       });
+      it('does not set toTaste for descriptive ingredients', () => {
+        const input =
+          '5 baby artichokes (use canned if you can’t find fresh), halved or quartered depending on size';
+        const res = parse(input, 'eng');
+        expect(res.toTaste).to.equal(undefined);
+        expect(res.ingredient).to.include('baby artichokes');
+      });
     });
 
     describe('unit + descriptor edge cases', () => {

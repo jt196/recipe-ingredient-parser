@@ -9,61 +9,47 @@ export function buildFlagRegexes({
   toTasteWords = [],
   toTasteAdditionalWords = [],
 }) {
+  /**
+   * Escape regex metacharacters in each word so we can safely build a pattern.
+   */
+  const escapeWords = words =>
+    words.map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'));
+
+  /**
+   * Build a word-boundary regex from an array of phrases.
+   * - words: list of literal strings to match
+   * - flags: regex flags (default 'gi' for global + case-insensitive)
+   * - prefix/suffix: lets callers override boundaries (e.g., start-of-string or
+   *   custom separators). Defaults to word boundaries.
+   */
+  const buildWordRegex = (
+    words,
+    {flags = 'gi', prefix = '\\b', suffix = '\\b'} = {},
+  ) => {
+    // No words => no regex
+    if (!words || words.length === 0) return null;
+    // Escape each word to prevent special characters from altering the pattern
+    const escapedWords = escapeWords(words);
+    // Join into a single alternation group
+    const body = escapedWords.join('|');
+    if (!body) return null;
+    // Assemble the final regex
+    return new RegExp(`${prefix}(?:${body})${suffix}`, flags);
+  };
+
   const approxRegex =
-    approxWords.length > 0
-      ? new RegExp(
-          `^(${approxWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'i',
-        )
-      : null;
+    buildWordRegex(approxWords, {flags: 'i', prefix: '^', suffix: '\\b'});
 
-  const optionalRegex =
-    optionalWords.length > 0
-      ? new RegExp(
-          `(?:^|[\\s,(])\\s*(${optionalWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'gi',
-        )
-      : null;
+  const optionalRegex = buildWordRegex(optionalWords, {
+    flags: 'gi',
+    prefix: '(?:^|[\\s,(])\\s*',
+    suffix: '\\b',
+  });
 
-  const toServeRegex =
-    toServeWords.length > 0
-      ? new RegExp(
-          `\\b(${toServeWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'gi',
-        )
-      : null;
+  const toServeRegex = buildWordRegex(toServeWords);
 
-  const toTasteRegex =
-    toTasteWords.length > 0
-      ? (() => {
-          const escapedWords = toTasteWords.map(w =>
-            w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'),
-          );
-          const abbrevParts = toTasteWords
-            .map(w => (w.match(/\b(\w)/g) || []).join(''))
-            .filter(Boolean)
-            .map(letters => `${letters.split('').join('\\.?')}\\.?`);
-          const parts = [...escapedWords, ...abbrevParts];
-          const body = parts.length ? `(?:${parts.join('|')})` : '';
-          return body ? new RegExp(`\\b${body}\\b`, 'gi') : null;
-        })()
-      : null;
-
-  const toTasteAdditionalRegex =
-    toTasteAdditionalWords.length > 0
-      ? new RegExp(
-          `\\b(${toTasteAdditionalWords
-            .map(w => w.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&'))
-            .join('|')})\\b`,
-          'gi',
-        )
-      : null;
+  const toTasteRegex = buildWordRegex(toTasteWords);
+  const toTasteAdditionalRegex = buildWordRegex(toTasteAdditionalWords);
 
   return {
     approxRegex,
