@@ -376,6 +376,7 @@ export const unitTranslations = {
   pack: {
     names: [
       'package',
+      'packages',
       'pkg',
       'pkgs',
       'pkg.',
