@@ -241,6 +241,38 @@ export const unitTranslations = {
     plural: 'dedões',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['segundo', 'segundos', 'seg', 'seg.', 's'],
+    singular: 'segundo',
+    plural: 'segundos',
+    symbol: 's',
+  },
+  minute: {
+    names: ['minuto', 'minutos', 'min', 'min.', 'm'],
+    singular: 'minuto',
+    plural: 'minutos',
+    symbol: 'min',
+  },
+  hour: {
+    names: ['hora', 'horas', 'h'],
+    singular: 'hora',
+    plural: 'horas',
+    symbol: 'h',
+  },
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'centígrados', 'C', '°C', 'ºC', 'graus C', 'graus celsius'],
+    singular: 'celsius',
+    plural: 'celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'graus F', 'graus fahrenheit'],
+    singular: 'fahrenheit',
+    plural: 'fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['de'];

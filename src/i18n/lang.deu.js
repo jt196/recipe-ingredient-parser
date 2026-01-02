@@ -194,6 +194,40 @@ export const unitTranslations = {
     plural: 'Packung',
     symbol: 'Pck',
   },
+
+  // Time units
+  second: {
+    names: ['sekunde', 'sekunden', 'sek', 'sek.', 's'],
+    singular: 'Sekunde',
+    plural: 'Sekunden',
+    symbol: 's',
+  },
+  minute: {
+    names: ['minute', 'minuten', 'min', 'min.', 'm'],
+    singular: 'Minute',
+    plural: 'Minuten',
+    symbol: 'min',
+  },
+  hour: {
+    names: ['stunde', 'stunden', 'std', 'std.', 'h'],
+    singular: 'Stunde',
+    plural: 'Stunden',
+    symbol: 'Std',
+  },
+
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'C', '°C', 'ºC', 'grad C', 'grad celsius'],
+    singular: 'Celsius',
+    plural: 'Celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'grad F', 'grad fahrenheit'],
+    singular: 'Fahrenheit',
+    plural: 'Fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['von'];

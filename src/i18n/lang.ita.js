@@ -223,6 +223,38 @@ export const unitTranslations = {
     plural: 'pugni',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['secondo', 'secondi', 'sec', 'sec.', 's'],
+    singular: 'secondo',
+    plural: 'secondi',
+    symbol: 's',
+  },
+  minute: {
+    names: ['minuto', 'minuti', 'min', 'min.', 'm'],
+    singular: 'minuto',
+    plural: 'minuti',
+    symbol: 'min',
+  },
+  hour: {
+    names: ['ora', 'ore', 'h'],
+    singular: 'ora',
+    plural: 'ore',
+    symbol: 'h',
+  },
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'centigradi', 'C', '°C', 'ºC', 'gradi C', 'gradi celsius'],
+    singular: 'celsius',
+    plural: 'celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'gradi F', 'gradi fahrenheit'],
+    singular: 'fahrenheit',
+    plural: 'fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['di', "d'"];

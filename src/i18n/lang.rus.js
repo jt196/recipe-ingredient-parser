@@ -215,6 +215,38 @@ export const unitTranslations = {
     plural: 'пакеты',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['секунда', 'секунды', 'секунд', 'сек', 'сек.', 'с'],
+    singular: 'секунда',
+    plural: 'секунды',
+    symbol: 'с',
+  },
+  minute: {
+    names: ['минута', 'минуты', 'минут', 'мин', 'мин.', 'м'],
+    singular: 'минута',
+    plural: 'минуты',
+    symbol: 'мин',
+  },
+  hour: {
+    names: ['час', 'часа', 'часов', 'ч', 'ч.'],
+    singular: 'час',
+    plural: 'часа',
+    symbol: 'ч',
+  },
+  // Temperature units
+  celsius: {
+    names: ['цельсий', 'по Цельсию', 'C', '°C', 'ºC', 'градусов C', 'градусов Цельсия'],
+    singular: 'Цельсий',
+    plural: 'Цельсий',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['фаренгейт', 'по Фаренгейту', 'F', '°F', 'ºF', 'градусов F', 'градусов Фаренгейта'],
+    singular: 'Фаренгейт',
+    plural: 'Фаренгейт',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['из'];

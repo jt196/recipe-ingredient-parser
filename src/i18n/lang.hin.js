@@ -221,6 +221,38 @@ export const unitTranslations = {
     plural: 'पैकेट',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['सेकंड', 'सेकंड्स', 'से'],
+    singular: 'सेकंड',
+    plural: 'सेकंड्स',
+    symbol: 'से',
+  },
+  minute: {
+    names: ['मिनट', 'मिनट्स', 'मि'],
+    singular: 'मिनट',
+    plural: 'मिनट्स',
+    symbol: 'मि',
+  },
+  hour: {
+    names: ['घंटा', 'घंटे', 'घं'],
+    singular: 'घंटा',
+    plural: 'घंटे',
+    symbol: 'घं',
+  },
+  // Temperature units
+  celsius: {
+    names: ['सेल्सियस', 'C', '°C', 'ºC', 'डिग्री C', 'डिग्री सेल्सियस'],
+    singular: 'सेल्सियस',
+    plural: 'सेल्सियस',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['फारेनहाइट', 'F', '°F', 'ºF', 'डिग्री F', 'डिग्री फारेनहाइट'],
+    singular: 'फारेनहाइट',
+    plural: 'फारेनहाइट',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['का', 'के'];

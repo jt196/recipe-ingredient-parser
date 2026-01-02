@@ -495,6 +495,60 @@ const baseUnitsData = {
     conversionFactor: null,
     skipConversion: true,
     decimalPlaces: 1
+  },
+
+  // Time units
+  second: {
+    names: [],
+    plural: '',
+    symbol: '',
+    system: null,
+    unitType: 'time',
+    conversionFactor: { seconds: 1 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  minute: {
+    names: [],
+    plural: '',
+    symbol: '',
+    system: null,
+    unitType: 'time',
+    conversionFactor: { seconds: 60 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  hour: {
+    names: [],
+    plural: '',
+    symbol: '',
+    system: null,
+    unitType: 'time',
+    conversionFactor: { seconds: 3600 },
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+
+  // Temperature units
+  celsius: {
+    names: [],
+    plural: '',
+    symbol: '',
+    system: 'metric',
+    unitType: 'temperature',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
+  },
+  fahrenheit: {
+    names: [],
+    plural: '',
+    symbol: '',
+    system: 'imperial',
+    unitType: 'temperature',
+    conversionFactor: null,
+    skipConversion: true,
+    decimalPlaces: 0
   }
 };
 

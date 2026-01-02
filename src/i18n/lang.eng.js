@@ -524,6 +524,40 @@ export const unitTranslations = {
     plural: 'centimetres',
     symbol: 'cm',
   },
+
+  // Time units
+  second: {
+    names: ['second', 'seconds', 'sec', 'secs', 's'],
+    singular: 'second',
+    plural: 'seconds',
+    symbol: 's',
+  },
+  minute: {
+    names: ['minute', 'minutes', 'min', 'mins', 'm'],
+    singular: 'minute',
+    plural: 'minutes',
+    symbol: 'min',
+  },
+  hour: {
+    names: ['hour', 'hours', 'hr', 'hrs', 'h'],
+    singular: 'hour',
+    plural: 'hours',
+    symbol: 'hr',
+  },
+
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'centigrade', 'C', '°C', 'ºC', 'degrees C', 'degrees celsius'],
+    singular: 'celsius',
+    plural: 'celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'degrees F', 'degrees fahrenheit'],
+    singular: 'fahrenheit',
+    plural: 'fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['of'];

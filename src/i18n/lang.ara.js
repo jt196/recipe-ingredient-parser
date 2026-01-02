@@ -221,6 +221,38 @@ export const unitTranslations = {
     plural: 'الحزم',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['ثانية', 'ثواني', 'ث'],
+    singular: 'ثانية',
+    plural: 'ثواني',
+    symbol: 'ث',
+  },
+  minute: {
+    names: ['دقيقة', 'دقائق', 'د'],
+    singular: 'دقيقة',
+    plural: 'دقائق',
+    symbol: 'د',
+  },
+  hour: {
+    names: ['ساعة', 'ساعات', 'س'],
+    singular: 'ساعة',
+    plural: 'ساعات',
+    symbol: 'س',
+  },
+  // Temperature units
+  celsius: {
+    names: ['مئوية', 'درجة مئوية', 'C', '°C', 'ºC', 'درجة C', 'سيلزيوس'],
+    singular: 'مئوية',
+    plural: 'مئوية',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['فهرنهايت', 'F', '°F', 'ºF', 'درجة F', 'درجة فهرنهايت'],
+    singular: 'فهرنهايت',
+    plural: 'فهرنهايت',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['من'];

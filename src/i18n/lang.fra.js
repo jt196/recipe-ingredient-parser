@@ -241,6 +241,38 @@ export const unitTranslations = {
     plural: 'pouces',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['seconde', 'secondes', 'sec', 'sec.', 's'],
+    singular: 'seconde',
+    plural: 'secondes',
+    symbol: 's',
+  },
+  minute: {
+    names: ['minute', 'minutes', 'min', 'min.', 'm'],
+    singular: 'minute',
+    plural: 'minutes',
+    symbol: 'min',
+  },
+  hour: {
+    names: ['heure', 'heures', 'h'],
+    singular: 'heure',
+    plural: 'heures',
+    symbol: 'h',
+  },
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'centigrade', 'C', '°C', 'ºC', 'degrés C', 'degrés celsius'],
+    singular: 'celsius',
+    plural: 'celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'degrés F', 'degrés fahrenheit'],
+    singular: 'fahrenheit',
+    plural: 'fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['de'];

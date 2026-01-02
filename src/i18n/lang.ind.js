@@ -227,6 +227,38 @@ export const unitTranslations = {
     plural: 'paket',
     symbol: '',
   },
+  // Time units
+  second: {
+    names: ['detik', 'det', 'd'],
+    singular: 'detik',
+    plural: 'detik',
+    symbol: 'd',
+  },
+  minute: {
+    names: ['menit', 'men', 'm'],
+    singular: 'menit',
+    plural: 'menit',
+    symbol: 'men',
+  },
+  hour: {
+    names: ['jam', 'j'],
+    singular: 'jam',
+    plural: 'jam',
+    symbol: 'j',
+  },
+  // Temperature units
+  celsius: {
+    names: ['celsius', 'C', '°C', 'ºC', 'derajat C', 'derajat celsius'],
+    singular: 'celsius',
+    plural: 'celsius',
+    symbol: '°C',
+  },
+  fahrenheit: {
+    names: ['fahrenheit', 'F', '°F', 'ºF', 'derajat F', 'derajat fahrenheit'],
+    singular: 'fahrenheit',
+    plural: 'fahrenheit',
+    symbol: '°F',
+  },
 };
 
 const prepositions = ['dari'];
