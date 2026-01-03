@@ -256,7 +256,7 @@ export const unitTranslations = {
     symbol: '',
   },
   cup: {
-    names: ['cup', 'cups', 'C.', 'C', 'c.', 'c', 'Cs.', 'Cs'],
+    names: ['cup', 'cups', 'C.', 'c.', 'c', 'Cs.', 'Cs'],
     singular: 'cup',
     plural: 'cups',
     symbol: 'c',
