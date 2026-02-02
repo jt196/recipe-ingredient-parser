@@ -135,16 +135,18 @@ combine([
 
 | Language   | Code  | Units | Example                          |
 |------------|-------|-------|----------------------------------|
-| English    | `eng` | 47    | `1 cup flour`                    |
-| German     | `deu` | 27    | `1 Tasse Mehl`                   |
-| Spanish    | `esp` | 38    | `1 taza de harina`               |
-| Italian    | `ita` | 31    | `1 tazza di farina`              |
-| French     | `fra` | 33    | `1 tasse de farine`              |
-| Portuguese | `por` | 34    | `1 xícara de farinha`            |
-| Russian    | `rus` | 36    | `1 чашка муки`                   |
-| Hindi      | `hin` | 37    | `1 कप आटा`                      |
-| Indonesian | `ind` | 38    | `1 cangkir tepung`               |
-| Arabic     | `ara` | 37    | `1 فنجان دقيق`                   |
+| English    | `eng` | 52    | `1 cup flour`                    |
+| German     | `deu` | 34    | `1 Tasse Mehl`                   |
+| Spanish    | `esp` | 42    | `1 taza de harina`               |
+| Italian    | `ita` | 35    | `1 tazza di farina`              |
+| French     | `fra` | 42    | `1 tasse de farine`              |
+| Portuguese | `por` | 42    | `1 xícara de farinha`            |
+| Russian    | `rus` | 41    | `1 чашка муки`                   |
+| Hindi      | `hin` | 42    | `1 कप आटा`                      |
+| Indonesian | `ind` | 43    | `1 cangkir tepung`               |
+| Arabic     | `ara` | 42    | `1 فنجان دقيق`                   |
+
+**Want to add a new language?** See [Adding a New Language](#adding-a-new-language) below.
 
 ## Parsing Capabilities
 
@@ -405,7 +407,7 @@ export const i18nMap = {
 
 #### 3. Unit Translations
 
-You don't need to translate all 47 units immediately - start with common ones:
+You don't need to translate all 52 units immediately - start with common ones:
 
 **Essential units** (minimum for basic functionality):
 
@@ -414,6 +416,8 @@ You don't need to translate all 47 units immediately - start with common ones:
 - Count: piece, clove, pinch
 
 **Reference**: Check `src/i18n/lang.eng.js` for the complete list of units.
+
+**Note on pluralization**: Some languages (Czech, Polish, Russian, Arabic) have complex plural rules with more than two forms (e.g., one/few/many). For parsing purposes, simply add all plural variants to the `names` array - the parser will recognize any form. For output display, use the most common plural form in the `plural` field.
 
 #### 4. Test Your Language
 
@@ -455,7 +459,7 @@ All units are defined in `baseUnitsData` (`src/i18n/index.js`) with:
 ### Setup
 
 ```bash
-git clone [repository]
+git clone https://github.com/jt196/recipe-ingredient-parser.git
 cd recipe-ingredient-parser
 npm install
 ```
@@ -488,6 +492,37 @@ npm run test:ci       # Lint + test (pre-publish)
 Checkout [npm publishing docs](https://docs.npmjs.com/getting-started/publishing-npm-packages) for more info.
 
 The `prepublish` hook automatically runs `npm run build` to refresh `lib/` before publishing.
+
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Adding a New Language
+
+This is the most impactful contribution. See [Adding a New Language](#adding-a-new-language) for detailed instructions. In summary:
+
+1. Copy `src/i18n/lang.eng.js` as a template
+2. Translate unit names, adding all variants (abbreviations, plurals) to the `names` array
+3. Translate linguistic data (prepositions, instructions, number words)
+4. Register your language in `src/i18n/index.js`
+5. Add tests and submit a PR
+
+**Tip**: Start with essential units (teaspoon, tablespoon, cup, gram, kilogram) and expand from there.
+
+### Improving Existing Languages
+
+- Add missing unit translations
+- Add more name variants for better recognition
+- Expand instruction/preparation word lists
+- Fix parsing issues for specific ingredient patterns
+
+### Reporting Issues
+
+When reporting parsing issues, please include:
+
+- The exact ingredient string that failed
+- The language code used
+- Expected vs actual output
 
 ## License
 
