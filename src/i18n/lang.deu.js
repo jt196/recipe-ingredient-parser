@@ -402,8 +402,36 @@ const problematicUnits = {
   // Add more problematic units here as needed
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'ca',
+    label: 'ca.',
+    title: 'Ungefähr',
+  },
+  optional: {
+    short: 'opt',
+    label: 'optional',
+    title: 'Optional',
+  },
+  toServe: {
+    short: 'srv',
+    label: 'zum Servieren',
+    title: 'Zum Servieren',
+  },
+  toTaste: {
+    short: 'ges',
+    label: 'nach Geschmack',
+    title: 'Nach Geschmack',
+  },
+};
+
+const languageName = 'Deutsch';
+
 export const langDeu = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

@@ -22,6 +22,9 @@ export function getUnit(input, language) {
   const langMap = i18nMap[language];
   if (!langMap) return [];
 
+  const boundaryPrefix = '(?:^|[^\\p{L}0-9_])';
+  const boundarySuffix = '(?:$|[^\\p{L}0-9_])';
+
   // NEW: Use unitsData as primary source
   const {unitsData, problematicUnits} = langMap;
 
@@ -38,11 +41,8 @@ export function getUnit(input, language) {
     for (const unit of Object.keys(units)) {
       for (const shorthand of units[unit]) {
         const regex = new RegExp(
-          `(?:^|[^A-Za-z0-9])${shorthand.replace(
-            /\./g,
-            '\\.',
-          )}(?:$|[^A-Za-z0-9])`,
-          'gi',
+          `${boundaryPrefix}${shorthand.replace(/\./g, '\\.')}${boundarySuffix}`,
+          'giu',
         );
         const match = input.match(regex);
         if (match) {
@@ -53,8 +53,8 @@ export function getUnit(input, language) {
 
     for (const pluralUnit of Object.keys(pluralUnits)) {
       const regex = new RegExp(
-        `(?:^|[^A-Za-z0-9])${pluralUnits[pluralUnit]}(?:$|[^A-Za-z0-9])`,
-        'gi',
+        `${boundaryPrefix}${pluralUnits[pluralUnit]}${boundarySuffix}`,
+        'giu',
       );
       const match = input.match(regex);
       if (match) {
@@ -92,11 +92,8 @@ export function getUnit(input, language) {
   for (const [unitKey, unitData] of Object.entries(unitsData)) {
     for (const name of unitData.names) {
       const regex = new RegExp(
-        `(?:^|[^A-Za-z0-9])${name.replace(
-          /\./g,
-          '\\.',
-        )}(?:$|[^A-Za-z0-9])`,
-        'gi',
+        `${boundaryPrefix}${name.replace(/\./g, '\\.')}${boundarySuffix}`,
+        'giu',
       );
       const match = input.match(regex);
       if (match) {

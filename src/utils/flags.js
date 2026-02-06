@@ -24,7 +24,7 @@ export function buildFlagRegexes({
    */
   const buildWordRegex = (
     words,
-    {flags = 'gi', prefix = '\\b', suffix = '\\b'} = {},
+    {flags = 'gi', prefix, suffix, unicodeBoundary = true} = {},
   ) => {
     // No words => no regex
     if (!words || words.length === 0) return null;
@@ -33,17 +33,31 @@ export function buildFlagRegexes({
     // Join into a single alternation group
     const body = escapedWords.join('|');
     if (!body) return null;
+    const useUnicodeBoundary = unicodeBoundary && !prefix && !suffix;
+    const finalPrefix =
+      prefix ??
+      (useUnicodeBoundary ? '(?<![\\p{L}0-9_])' : '\\b');
+    const finalSuffix =
+      suffix ??
+      (useUnicodeBoundary ? '(?![\\p{L}0-9_])' : '\\b');
+    const finalFlags =
+      useUnicodeBoundary && !flags.includes('u') ? `${flags}u` : flags;
     // Assemble the final regex
-    return new RegExp(`${prefix}(?:${body})${suffix}`, flags);
+    return new RegExp(`${finalPrefix}(?:${body})${finalSuffix}`, finalFlags);
   };
 
-  const approxRegex =
-    buildWordRegex(approxWords, {flags: 'i', prefix: '^', suffix: '\\b'});
+  const approxRegex = buildWordRegex(approxWords, {
+    flags: 'i',
+    prefix: '^',
+    suffix: '(?![\\p{L}0-9_])',
+    unicodeBoundary: false,
+  });
 
   const optionalRegex = buildWordRegex(optionalWords, {
     flags: 'gi',
     prefix: '(?:^|[\\s,(])\\s*',
-    suffix: '\\b',
+    suffix: '(?![\\p{L}0-9_])',
+    unicodeBoundary: false,
   });
 
   const toServeRegex = buildWordRegex(toServeWords);

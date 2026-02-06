@@ -461,8 +461,36 @@ const problematicUnits = {
   // 'unit': ['context clue1', 'context clue2']
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'cir',
+    label: 'circa',
+    title: 'Circa',
+  },
+  optional: {
+    short: 'opz',
+    label: 'opzionale',
+    title: 'Opzionale',
+  },
+  toServe: {
+    short: 'srv',
+    label: 'per servire',
+    title: 'Per servire',
+  },
+  toTaste: {
+    short: 'q.b.',
+    label: 'quanto basta',
+    title: 'Quanto basta',
+  },
+};
+
+const languageName = 'Italiano';
+
 export const langIta = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

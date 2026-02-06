@@ -34,6 +34,8 @@
     "src/i18n/lang.rus.js",
     "src/i18n/lang.hin.js",
     "src/i18n/lang.ara.js",
+    "src/i18n/lang.hun.js",
+    "src/i18n/lang.ces.js",
     "src/i18n/index.js"
   ],
   "exclude": ["node_modules"]

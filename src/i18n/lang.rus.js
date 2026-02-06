@@ -409,8 +409,36 @@ const problematicUnits = {
   clove: ['чеснок'],
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'пример',
+    label: 'примерно',
+    title: 'Примерно',
+  },
+  optional: {
+    short: 'опц',
+    label: 'по желанию',
+    title: 'По желанию',
+  },
+  toServe: {
+    short: 'пода',
+    label: 'для подачи',
+    title: 'Для подачи',
+  },
+  toTaste: {
+    short: 'вкус',
+    label: 'по вкусу',
+    title: 'По вкусу',
+  },
+};
+
+const languageName = 'Русский';
+
 export const langRus = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

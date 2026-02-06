@@ -418,8 +418,36 @@ const problematicUnits = {
   clove: ['लहसुन'],
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'लग',
+    label: 'लगभग',
+    title: 'लगभग',
+  },
+  optional: {
+    short: 'वि',
+    label: 'वैकल्पिक',
+    title: 'वैकल्पिक',
+  },
+  toServe: {
+    short: 'परो',
+    label: 'परोसने के लिए',
+    title: 'परोसने के लिए',
+  },
+  toTaste: {
+    short: 'स्वा',
+    label: 'स्वादानुसार',
+    title: 'स्वादानुसार',
+  },
+};
+
+const languageName = 'हिन्दी';
+
 export const langHin = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

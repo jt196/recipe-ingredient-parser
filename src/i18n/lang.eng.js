@@ -764,8 +764,35 @@ const problematicUnits = {
   // 'unit': ['context clue1', 'context clue2']
 };
 
+const badgeLabels = {
+  approx: {
+    short: '~',
+    label: 'approx',
+    title: 'Approximate',
+  },
+  optional: {
+    short: 'opt',
+    label: 'optional',
+    title: 'Optional',
+  },
+  toServe: {
+    short: 'srv',
+    label: 'to serve',
+    title: 'To serve',
+  },
+  toTaste: {
+    short: 'tt',
+    label: 'to taste',
+    title: 'To taste',
+  },
+};
+
+const languageName = 'English';
+
 export const langEng = {
   unitTranslations,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,
@@ -779,5 +806,6 @@ export const langEng = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  badgeLabels,
   isCommaDelimited: false,
 };

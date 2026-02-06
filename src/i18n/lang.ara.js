@@ -404,8 +404,36 @@ const problematicUnits = {
   clove: ['ثوم'],
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'تق',
+    label: 'تقريباً',
+    title: 'تقريباً',
+  },
+  optional: {
+    short: 'اخ',
+    label: 'اختياري',
+    title: 'اختياري',
+  },
+  toServe: {
+    short: 'تقد',
+    label: 'للتقديم',
+    title: 'للتقديم',
+  },
+  toTaste: {
+    short: 'ذوق',
+    label: 'حسب الذوق',
+    title: 'حسب الذوق',
+  },
+};
+
+const languageName = 'العربية';
+
 export const langAra = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

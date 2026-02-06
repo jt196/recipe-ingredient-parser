@@ -8,7 +8,7 @@ This project was built on top of code written by [nsafai](https://github.com/nsa
 
 ### Key Features
 
-- **Multi-language support**: 10 languages including English, German, Italian, Spanish, French, Portuguese, Russian, Hindi, Indonesian, and Arabic
+- **Multi-language support**: 12 languages including English, German, Italian, Spanish, French, Portuguese, Russian, Hindi, Indonesian, Arabic, Hungarian, and Czech
 - **No external NLP libraries**: Lightweight and fast
 - **Cross-platform**: Works with Node.js, browser, and React Native
 - **Smart parsing**: Handles fractions (including Unicode), ranges, and numbers written as words
@@ -345,6 +345,13 @@ const additionalStopwords = ['and', 'or'];
 const approx = ['about', 'approximately', '~'];
 const optional = ['optional', 'if desired'];
 const toServe = ['to serve', 'for serving'];
+const badgeLabels = {
+  approx: { short: '~', label: 'approx', title: 'Approximate' },
+  optional: { short: 'opt', label: 'optional', title: 'Optional' },
+  toServe: { short: 'srv', label: 'to serve', title: 'To serve' },
+  toTaste: { short: 'tt', label: 'to taste', title: 'To taste' },
+};
+const languageName = 'English';
 
 const instructions = [
   'chopped', 'diced', 'sliced', 'minced',
@@ -372,6 +379,8 @@ const problematicUnits = {
 
 export const langXXX = {
   unitTranslations,
+  badgeLabels,
+  languageName,
   prepositions,
   joiners,
   toTaste,
@@ -396,12 +405,12 @@ Add your language to `src/i18n/index.js`:
 ```javascript
 import {langXXX} from './lang.XXX.js';
 
-// Add to i18nMap:
-export const i18nMap = {
-  eng: prepareLangExport(langEng),
-  deu: prepareLangExport(langDeu),
+// Add to languages:
+const languages = {
+  eng: langEng,
+  deu: langDeu,
   // ... other languages
-  XXX: prepareLangExport(langXXX),  // Add your language
+  XXX: langXXX,  // Add your language
 };
 ```
 

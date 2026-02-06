@@ -452,8 +452,36 @@ const problematicUnits = {
   // Add more problematic units here if needed
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'approx',
+    label: 'approx.',
+    title: 'Approximatif',
+  },
+  optional: {
+    short: 'opt',
+    label: 'optionnel',
+    title: 'Optionnel',
+  },
+  toServe: {
+    short: 'srv',
+    label: 'pour servir',
+    title: 'Pour servir',
+  },
+  toTaste: {
+    short: 'goût',
+    label: 'selon le goût',
+    title: 'Selon le goût',
+  },
+};
+
+const languageName = 'Français';
+
 export const langFra = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,

@@ -8,6 +8,8 @@ import {langRus} from './lang.rus.js';
 import {langHin} from './lang.hin.js';
 import {langInd} from './lang.ind.js';
 import {langAra} from './lang.ara.js';
+import {langHun} from './lang.hun.js';
+import {langCes} from './lang.ces.js';
 
 /**
  * Base units data - single source of truth for all unit metadata.
@@ -631,11 +633,13 @@ function prepareLangExport(langData) {
   if (langData.unitTranslations) {
     const mergedUnitsData = mergeUnitsData(baseUnitsData, langData.unitTranslations);
     const legacyObjects = generateLegacyObjects(mergedUnitsData);
+    const badgeLabels = langData.badgeLabels || buildBadgeLabels(langData);
 
     return {
       ...langData,
       unitsData: mergedUnitsData,
       ...legacyObjects,  // Generate backwards-compatible objects
+      badgeLabels,
     };
   }
 
@@ -643,15 +647,78 @@ function prepareLangExport(langData) {
   throw new Error('Language data must have unitTranslations');
 }
 
-export const i18nMap = {
-  deu: prepareLangExport(langDeu),
-  eng: prepareLangExport(langEng),
-  ita: prepareLangExport(langIta),
-  esp: prepareLangExport(langEsp),
-  fra: prepareLangExport(langFra),
-  por: prepareLangExport(langPor),
-  rus: prepareLangExport(langRus),
-  hin: prepareLangExport(langHin),
-  ind: prepareLangExport(langInd),
-  ara: prepareLangExport(langAra),
+function buildBadgeLabels(langData) {
+  const defaults = {
+    approx: 'approx',
+    optional: 'optional',
+    toServe: 'to serve',
+    toTaste: 'to taste',
+  };
+
+  const pickLabel = (value, fallback) =>
+    Array.isArray(value) && value.length ? value[0] : fallback;
+
+  const makeShort = (label, fallback) => {
+    if (!label && fallback) return fallback;
+    if (!label) return '';
+    const [firstToken] = `${label}`.trim().split(/\s+/);
+    return firstToken || label || fallback || '';
+  };
+
+  const approxLabel = pickLabel(langData.approx, defaults.approx);
+  const optionalLabel = pickLabel(langData.optional, defaults.optional);
+  const toServeLabel = pickLabel(langData.toServe, defaults.toServe);
+  const toTasteLabel = pickLabel(langData.toTaste, defaults.toTaste);
+
+  return {
+    approx: {
+      short: langData.badgeLabels?.approx?.short ?? makeShort(approxLabel, '~'),
+      label: approxLabel,
+      title: langData.badgeLabels?.approx?.title ?? approxLabel,
+    },
+    optional: {
+      short: langData.badgeLabels?.optional?.short ?? makeShort(optionalLabel, 'opt'),
+      label: optionalLabel,
+      title: langData.badgeLabels?.optional?.title ?? optionalLabel,
+    },
+    toServe: {
+      short: langData.badgeLabels?.toServe?.short ?? makeShort(toServeLabel, 'srv'),
+      label: toServeLabel,
+      title: langData.badgeLabels?.toServe?.title ?? toServeLabel,
+    },
+    toTaste: {
+      short: langData.badgeLabels?.toTaste?.short ?? makeShort(toTasteLabel, 'tt'),
+      label: toTasteLabel,
+      title: langData.badgeLabels?.toTaste?.title ?? toTasteLabel,
+    },
+  };
+}
+
+const languages = {
+  deu: langDeu,
+  eng: langEng,
+  ita: langIta,
+  esp: langEsp,
+  fra: langFra,
+  por: langPor,
+  rus: langRus,
+  hin: langHin,
+  ind: langInd,
+  ara: langAra,
+  hun: langHun,
+  ces: langCes,
 };
+
+export const i18nMap = Object.fromEntries(
+  Object.entries(languages).map(([code, langData]) => [
+    code,
+    prepareLangExport(langData),
+  ]),
+);
+
+export const languageLabels = Object.fromEntries(
+  Object.entries(languages).map(([code, langData]) => [
+    code,
+    langData.languageName || code,
+  ]),
+);

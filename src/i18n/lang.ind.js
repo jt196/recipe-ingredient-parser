@@ -430,8 +430,36 @@ const problematicUnits = {
   clove: ['bawang putih'],
 };
 
+const badgeLabels = {
+  approx: {
+    short: 'kira',
+    label: 'sekitar',
+    title: 'Sekitar',
+  },
+  optional: {
+    short: 'ops',
+    label: 'opsional',
+    title: 'Opsional',
+  },
+  toServe: {
+    short: 'saji',
+    label: 'untuk disajikan',
+    title: 'Untuk disajikan',
+  },
+  toTaste: {
+    short: 'rasa',
+    label: 'secukupnya',
+    title: 'Secukupnya',
+  },
+};
+
+const languageName = 'Bahasa Indonesia';
+
 export const langInd = {
   unitTranslations,
+  badgeLabels,
+
+  languageName,
   prepositions,
   joiners,
   toTaste,
