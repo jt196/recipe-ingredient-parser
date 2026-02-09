@@ -476,12 +476,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Français';
+const languageTag = 'fr';
 
 export const langFra = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

@@ -487,12 +487,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Español';
+const languageTag = 'es';
 
 export const langEsp = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

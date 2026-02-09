@@ -442,12 +442,14 @@ const badgeLabels = {
 };
 
 const languageName = 'हिन्दी';
+const languageTag = 'hi';
 
 export const langHin = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

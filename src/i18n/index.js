@@ -722,3 +722,37 @@ export const languageLabels = Object.fromEntries(
     langData.languageName || code,
   ]),
 );
+
+export const languageTags = Object.fromEntries(
+  Object.entries(languages).map(([code, langData]) => [
+    code,
+    langData.languageTag || code,
+  ]),
+);
+
+const francCodeMap = {
+  spa: 'esp',
+};
+
+export function normalizeLanguageCode(code) {
+  if (!code) return null;
+  return francCodeMap[code] || code;
+}
+
+export function getLanguageDisplayName(code, displayLangCode = 'eng') {
+  if (!code) return null;
+  const normalized = normalizeLanguageCode(code);
+  const displayTag = languageTags[displayLangCode] || 'en';
+  const codeTag = languageTags[normalized] || normalized;
+
+  if (typeof Intl !== 'undefined' && Intl.DisplayNames) {
+    try {
+      const display = new Intl.DisplayNames([displayTag], { type: 'language' });
+      return display.of(codeTag) || normalized;
+    } catch {
+      return normalized;
+    }
+  }
+
+  return normalized;
+}

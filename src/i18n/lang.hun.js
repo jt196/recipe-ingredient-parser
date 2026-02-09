@@ -272,11 +272,13 @@ const badgeLabels = {
 };
 
 const languageName = 'Magyar';
+const languageTag = 'hu';
 
 export const langHun = {
   unitTranslations,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

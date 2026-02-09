@@ -428,12 +428,14 @@ const badgeLabels = {
 };
 
 const languageName = 'العربية';
+const languageTag = 'ar';
 
 export const langAra = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

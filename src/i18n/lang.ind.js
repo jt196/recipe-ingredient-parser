@@ -454,12 +454,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Bahasa Indonesia';
+const languageTag = 'id';
 
 export const langInd = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

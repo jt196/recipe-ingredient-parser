@@ -546,11 +546,13 @@ const badgeLabels = {
 };
 
 const languageName = 'Čeština';
+const languageTag = 'cs';
 
 export const langCes = {
   unitTranslations,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

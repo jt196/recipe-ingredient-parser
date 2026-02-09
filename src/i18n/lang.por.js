@@ -482,12 +482,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Português';
+const languageTag = 'pt';
 
 export const langPor = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

@@ -485,12 +485,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Italiano';
+const languageTag = 'it';
 
 export const langIta = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

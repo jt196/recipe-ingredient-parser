@@ -788,11 +788,13 @@ const badgeLabels = {
 };
 
 const languageName = 'English';
+const languageTag = 'en';
 
 export const langEng = {
   unitTranslations,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,

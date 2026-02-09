@@ -433,12 +433,14 @@ const badgeLabels = {
 };
 
 const languageName = 'Русский';
+const languageTag = 'ru';
 
 export const langRus = {
   unitTranslations,
   badgeLabels,
 
   languageName,
+  languageTag,
   prepositions,
   joiners,
   toTaste,
