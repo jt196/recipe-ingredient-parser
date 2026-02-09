@@ -145,6 +145,8 @@ combine([
 | Hindi      | `hin` | 42    | `1 कप आटा`                      |
 | Indonesian | `ind` | 43    | `1 cangkir tepung`               |
 | Arabic     | `ara` | 42    | `1 فنجان دقيق`                   |
+| Hungarian  | `hun` | 42    | `1 csésze liszt`                 |
+| Czech      | `ces` | 42    | `1 hrnek mouky`                  |
 
 **Want to add a new language?** See [Adding a New Language](#adding-a-new-language) below.
 
