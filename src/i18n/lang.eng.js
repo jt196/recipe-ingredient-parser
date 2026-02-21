@@ -787,6 +787,19 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  extraUnitAliasExtras: {
+    kcal: ['cal', 'calorie', 'calories', 'kilocalorie', 'kilocalories'],
+    kj: ['kilojoule', 'kilojoules'],
+    mg: ['milligram', 'milligrams'],
+    g: ['gram', 'grams'],
+    kg: ['kilogram', 'kilograms'],
+    mcg: ['microgram', 'micrograms'],
+    ml: ['milliliter', 'milliliters', 'millilitre', 'millilitres'],
+    l: ['liter', 'liters', 'litre', 'litres'],
+  },
+};
+
 const languageName = 'English';
 const languageTag = 'en';
 
@@ -809,5 +822,6 @@ export const langEng = {
   numbersMagnitude,
   problematicUnits,
   badgeLabels,
+  nutrition,
   isCommaDelimited: false,
 };

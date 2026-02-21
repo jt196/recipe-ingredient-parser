@@ -425,6 +425,25 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['kalorien', 'energie'],
+    carbohydrates: ['kohlenhydrate'],
+    protein: ['eiweiß', 'eiweiss'],
+    fat: ['fett'],
+    saturatedFat: ['gesättigte fettsäuren', 'gesattigte fettsauren'],
+    fiber: ['ballaststoffe'],
+    sugar: ['zucker'],
+    sodium: ['natrium'],
+  },
+  perServingPhrases: ['pro portion', 'pro servierung', 'je portion'],
+  ignoreTokenExtras: ['nährwertangaben', 'nahrwertangaben'],
+  extraUnitAliasExtras: {
+    kcal: ['kalorie', 'kalorien'],
+    kj: ['kilojoule', 'kilojoules'],
+  },
+};
+
 const languageName = 'Deutsch';
 const languageTag = 'de';
 
@@ -447,5 +466,6 @@ export const langDeu = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: true,
 };

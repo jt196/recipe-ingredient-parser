@@ -486,6 +486,24 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['calorías', 'calorias', 'energía', 'energia'],
+    carbohydrates: ['carbohidratos'],
+    protein: ['proteína', 'proteina'],
+    fat: ['grasa', 'grasas'],
+    saturatedFat: ['grasa saturada', 'grasas saturadas'],
+    fiber: ['fibra'],
+    sugar: ['azúcar', 'azucar', 'azúcares', 'azucares'],
+    sodium: ['sodio'],
+  },
+  perServingPhrases: ['por porción', 'por porcion', 'por ración', 'por racion', 'porción:'],
+  ignoreTokenExtras: ['información nutricional', 'informacion nutricional'],
+  extraUnitAliasExtras: {
+    kcal: ['caloria', 'calorías', 'calorias'],
+  },
+};
+
 const languageName = 'Español';
 const languageTag = 'es';
 
@@ -508,5 +526,6 @@ export const langEsp = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: true,
 };

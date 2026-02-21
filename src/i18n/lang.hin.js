@@ -441,6 +441,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['कैलोरी'],
+    carbohydrates: ['कार्बोहाइड्रेट'],
+    protein: ['प्रोटीन'],
+    fat: ['वसा'],
+    saturatedFat: ['संतृप्त वसा'],
+    fiber: ['फाइबर', 'रेशा'],
+    sugar: ['चीनी'],
+    sodium: ['सोडियम'],
+  },
+  perServingPhrases: ['प्रति सर्विंग', 'प्रति परोस', 'सर्विंग:'],
+  ignoreTokenExtras: ['पोषण तथ्य'],
+};
+
 const languageName = 'हिन्दी';
 const languageTag = 'hi';
 
@@ -463,5 +478,6 @@ export const langHin = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: false,
 };

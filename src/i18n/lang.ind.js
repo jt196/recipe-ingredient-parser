@@ -453,6 +453,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['kalori', 'energi'],
+    carbohydrates: ['karbohidrat'],
+    protein: ['protein'],
+    fat: ['lemak'],
+    saturatedFat: ['lemak jenuh'],
+    fiber: ['serat'],
+    sugar: ['gula'],
+    sodium: ['natrium'],
+  },
+  perServingPhrases: ['per porsi', 'per sajian', 'sajian:'],
+  ignoreTokenExtras: ['fakta nutrisi'],
+};
+
 const languageName = 'Bahasa Indonesia';
 const languageTag = 'id';
 
@@ -475,5 +490,6 @@ export const langInd = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: true,
 };

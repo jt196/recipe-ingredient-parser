@@ -427,6 +427,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['السعرات الحرارية', 'طاقة'],
+    carbohydrates: ['الكربوهيدرات'],
+    protein: ['بروتين'],
+    fat: ['دهون', 'الدهون'],
+    saturatedFat: ['دهون مشبعة'],
+    fiber: ['ألياف', 'الياف'],
+    sugar: ['سكر', 'سكريات'],
+    sodium: ['صوديوم'],
+  },
+  perServingPhrases: ['لكل حصة', 'لكل وجبة', 'الحصة:'],
+  ignoreTokenExtras: ['حقائق غذائية'],
+};
+
 const languageName = 'العربية';
 const languageTag = 'ar';
 
@@ -449,5 +464,6 @@ export const langAra = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: true,
 };

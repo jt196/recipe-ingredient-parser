@@ -545,6 +545,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['kalorie', 'energie'],
+    carbohydrates: ['sacharidy'],
+    protein: ['bílkoviny', 'bilkoviny'],
+    fat: ['tuky', 'tuk'],
+    saturatedFat: ['nasycené tuky', 'nasycene tuky'],
+    fiber: ['vláknina', 'vlakninа'],
+    sugar: ['cukr', 'cukry'],
+    sodium: ['sodík', 'sodik'],
+  },
+  perServingPhrases: ['na porci', 'na jednu porci', 'porce:'],
+  ignoreTokenExtras: ['výživové údaje', 'vyzivove udaje'],
+};
+
 const languageName = 'Čeština';
 const languageTag = 'cs';
 
@@ -567,5 +582,6 @@ export const langCes = {
   numbersMagnitude,
   problematicUnits,
   badgeLabels,
+  nutrition,
   isCommaDelimited: true,
 };

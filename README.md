@@ -8,7 +8,7 @@ This project was built on top of code written by [nsafai](https://github.com/nsa
 
 ### Key Features
 
-- **Multi-language support**: 12 languages including English, German, Italian, Spanish, French, Portuguese, Russian, Hindi, Indonesian, Arabic, Hungarian, and Czech
+- **Multi-language support**: 13 languages including English, German, Italian, Spanish, French, Portuguese, Russian, Hindi, Indonesian, Arabic, Hungarian, Czech, and Dutch
 - **No external NLP libraries**: Lightweight and fast
 - **Cross-platform**: Works with Node.js, browser, and React Native
 - **Smart parsing**: Handles fractions (including Unicode), ranges, and numbers written as words
@@ -147,6 +147,7 @@ combine([
 | Arabic     | `ara` | 42    | `1 فنجان دقيق`                   |
 | Hungarian  | `hun` | 42    | `1 csésze liszt`                 |
 | Czech      | `ces` | 42    | `1 hrnek mouky`                  |
+| Dutch      | `nld` | 42    | `1 kopje bloem`                  |
 
 **Want to add a new language?** See [Adding a New Language](#adding-a-new-language) below.
 
@@ -379,9 +380,24 @@ const problematicUnits = {
   clove: ['garlic'],  // Context clues for ambiguous units
 };
 
+// Optional: nutrition localization used by Vanilla Cookbook.
+// Omit this block if English nutrition fallback is acceptable.
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['calories'],
+    carbohydrates: ['carbs'],
+  },
+  perServingPhrases: ['per serving', 'serving:'],
+  ignoreTokenExtras: ['nutrition facts'],
+  extraUnitAliasExtras: {
+    kcal: ['calorie', 'calories'],
+  },
+};
+
 export const langXXX = {
   unitTranslations,
   badgeLabels,
+  nutrition,             // Optional
   languageName,
   prepositions,
   joiners,
@@ -415,6 +431,8 @@ const languages = {
   XXX: langXXX,  // Add your language
 };
 ```
+
+`nutrition` configuration is optional and only needed if you want language-specific nutrition parsing aliases/phrases. If omitted, nutrition parsing falls back to shared defaults/English behavior.
 
 #### 3. Unit Translations
 

@@ -271,6 +271,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['kalória', 'kaloria', 'energia'],
+    carbohydrates: ['szénhidrát', 'szenhidrat'],
+    protein: ['fehérje', 'feherje'],
+    fat: ['zsír', 'zsir'],
+    saturatedFat: ['telített zsír', 'telitett zsir'],
+    fiber: ['rost'],
+    sugar: ['cukor'],
+    sodium: ['nátrium', 'natrium'],
+  },
+  perServingPhrases: ['adagonként', 'egy adagra', 'adag:'],
+  ignoreTokenExtras: ['tápérték', 'tapanyag'],
+};
+
 const languageName = 'Magyar';
 const languageTag = 'hu';
 
@@ -293,5 +308,6 @@ export const langHun = {
   numbersMagnitude,
   problematicUnits,
   badgeLabels,
+  nutrition,
   isCommaDelimited: true,
 };

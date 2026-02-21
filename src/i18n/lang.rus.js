@@ -432,6 +432,21 @@ const badgeLabels = {
   },
 };
 
+const nutrition = {
+  nutrientAliasExtras: {
+    calories: ['калории', 'энергия'],
+    carbohydrates: ['углеводы'],
+    protein: ['белки', 'белок'],
+    fat: ['жиры', 'жир'],
+    saturatedFat: ['насыщенные жиры'],
+    fiber: ['клетчатка'],
+    sugar: ['сахар'],
+    sodium: ['натрий'],
+  },
+  perServingPhrases: ['на порцию', 'на одну порцию', 'порция:'],
+  ignoreTokenExtras: ['пищевая ценность'],
+};
+
 const languageName = 'Русский';
 const languageTag = 'ru';
 
@@ -454,5 +469,6 @@ export const langRus = {
   numbersSmall,
   numbersMagnitude,
   problematicUnits,
+  nutrition,
   isCommaDelimited: true,
 };

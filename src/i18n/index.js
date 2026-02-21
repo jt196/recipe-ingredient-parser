@@ -10,6 +10,7 @@ import {langInd} from './lang.ind.js';
 import {langAra} from './lang.ara.js';
 import {langHun} from './lang.hun.js';
 import {langCes} from './lang.ces.js';
+import {langNld} from './lang.nld.js';
 
 /**
  * Base units data - single source of truth for all unit metadata.
@@ -707,6 +708,7 @@ const languages = {
   ara: langAra,
   hun: langHun,
   ces: langCes,
+  nld: langNld,
 };
 
 export const i18nMap = Object.fromEntries(
